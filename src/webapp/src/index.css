@@ -70,6 +70,14 @@ hr {
   border-color: #8a8989;
 }
 
+pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+}
+
 .editor-button {
   margin: 4px;
   padding-left: 10px;
