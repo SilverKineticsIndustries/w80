@@ -61,7 +61,7 @@ export default function Appointment({selectedAppointment, onClose})
     const [appointment, setAppointment] = useReducer(appointmentReducer, selectedAppointment || {
         id: "",
         applicationId: "",
-        title: "",
+        description: "",
         startDateTimeUTC: "",
         endDateTimeUTC: ""
     });
