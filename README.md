@@ -86,9 +86,9 @@
 
   For development, the following ports are utilized:
 
-  15000 = Database
-  15001 = Server
-  15002 = Webapp
+  - 15000 = Database
+  - 15001 = Server
+  - 15002 = Webapp
 
   For development, MongoDB mounts its data to the ./data/data folder. The backend
   logs are persisted to the ./logs folder.
@@ -106,10 +106,10 @@
 
      make run-server-tests
 
-  Cypress framework is used for end-to-end testing, so run the tests without any visual UI, run:
+  Cypress framework is used for end-to-end testing. To run the tests without any visual UI, run:
 
      make run-end-to-end-tests
 
-  If you would like to see the actual visual browser automation of the end-to-end testing,
+  If you would like to see the actual browser automation of the end-to-end testing,
   run npx cypress open, and the Cypress UI will open. From there you can run each tests
   and look at the automation in realtime.
