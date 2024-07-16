@@ -3,6 +3,7 @@ import { createUseStyles } from 'react-jss'
 
 const styles = createUseStyles({
     wrapper: {
+        marginTop: "8px",
         marginLeft: "10px",
         marginRight: "10px",
         "@media (max-width: 400px)": {
