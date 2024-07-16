@@ -1,0 +1,570 @@
+[
+  {
+    "_id": { "$oid": "6627e962eedeb7a7e2089bb5" },
+    "Name": "Advertising Industry",
+    "SeqNo": 0,
+    "Translations": {
+      "de": "Werbebranche"
+    }
+  },
+  {
+    "_id": { "$oid": "6627edb9eedeb7a7e2089bb6" },
+    "Name": "Aerospace",
+    "SeqNo": 1,
+    "Translations": {
+      "de": "Luft- und Raumfahrt"
+    }
+  },
+  {
+    "_id": { "$oid": "6627ede0eedeb7a7e2089bb7" },
+    "Name": "Agriculture and Farming",
+    "SeqNo": 2,
+    "Translations": {
+      "de": "Landwirtschaft und Landwirtschaft"
+    }
+  },
+  {
+    "_id": { "$oid": "6627ee3ceedeb7a7e2089bb8" },
+    "Name": "Art",
+    "SeqNo": 3,
+    "Translations": {
+      "de": "Kunst"
+    }
+  },
+  {
+    "_id": { "$oid": "6627ee6eeedeb7a7e2089bb9" },
+    "Name": "Automotive Industry",
+    "SeqNo": 4,
+    "Translations": {
+      "de": "Automobilindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627eea2eedeb7a7e2089bba" },
+    "Name": "Banking & Financial Services",
+    "SeqNo": 5,
+    "Translations": {
+      "de": "Bank- und Finanzdienstleistungen"
+    }
+  },
+  {
+    "_id": { "$oid": "6627eee6eedeb7a7e2089bbb" },
+    "Name": "Biotechnology",
+    "SeqNo": 6,
+    "Translations": {
+      "de": "Biotechnologie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627ef12eedeb7a7e2089bbc" },
+    "Name": "Building Materials and Supplies",
+    "SeqNo": 7,
+    "Translations": {
+      "de": "Baumaterialien und -bedarf"
+    }
+  },
+  {
+    "_id": { "$oid": "6627ef30eedeb7a7e2089bbd" },
+    "Name": "Business Services",
+    "SeqNo": 8,
+    "Translations": {
+      "de": "Geschäftsdienstleistungen"
+    }
+  },
+  {
+    "_id": { "$oid": "6627ef5eeedeb7a7e2089bbe" },
+    "Name": "Chemical Industry",
+    "SeqNo": 9,
+    "Translations": {
+      "de": "Chemieindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627ef8eeedeb7a7e2089bbf" },
+    "Name": "Cleaning Products and Services",
+    "SeqNo": 10,
+    "Translations": {
+      "de": "Reinigungsprodukte und -dienstleistungen"
+    }
+  },
+  {
+    "_id": { "$oid": "6627efeceedeb7a7e2089bc0" },
+    "Name": "Cloud Computing",
+    "SeqNo": 11,
+    "Translations": {
+      "de": "Cloud Computing"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f0a5eedeb7a7e2089bc1" },
+    "Name": "Computer Hardware",
+    "SeqNo": 12,
+    "Translations": {
+      "de": "Computerhardware"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f0cceedeb7a7e2089bc2" },
+    "Name": "Construction Industry",
+    "SeqNo": 13,
+    "Translations": {
+      "de": "Baugewerbe"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f105eedeb7a7e2089bc3" },
+    "Name": "Consulting",
+    "SeqNo": 14,
+    "Translations": {
+      "de": "Beratung"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f134eedeb7a7e2089bc4" },
+    "Name": "Consumer Electronics",
+    "SeqNo": 15,
+    "Translations": {
+      "de": "Unterhaltungselektronik"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f158eedeb7a7e2089bc5" },
+    "Name": "Consumer Goods",
+    "SeqNo": 16,
+    "Translations": {
+      "de": "Konsumgüter"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f17ceedeb7a7e2089bc6" },
+    "Name": "Consumer Healthcare",
+    "SeqNo": 17,
+    "Translations": {
+      "de": "Verbrauchergesundheit"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f1a3eedeb7a7e2089bc7" },
+    "Name": "Crafts",
+    "SeqNo": 18,
+    "Translations": {
+      "de": "Kunsthandwerk"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f1c7eedeb7a7e2089bc8" },
+    "Name": "Culture Industry",
+    "SeqNo": 19,
+    "Translations": {
+      "de": "Kulturindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f1f4eedeb7a7e2089bc9" },
+    "Name": "Data Storage and Management",
+    "SeqNo": 20,
+    "Translations": {
+      "de": "Datenspeicherung und -verwaltung"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f231eedeb7a7e2089bca" },
+    "Name": "Defense Industry",
+    "SeqNo": 21,
+    "Translations": {
+      "de": "Rüstungsindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f250eedeb7a7e2089bcb" },
+    "Name": "Ecommerce",
+    "SeqNo": 22,
+    "Translations": {
+      "de": "E-Commerce"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f27beedeb7a7e2089bcc" },
+    "Name": "Education and Training",
+    "SeqNo": 23,
+    "Translations": {
+      "de": "Schul-und Berufsbildung"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f29feedeb7a7e2089bcd" },
+    "Name": "Energy",
+    "SeqNo": 24,
+    "Translations": {
+      "de": "Energie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f2c1eedeb7a7e2089bce" },
+    "Name": "Entertainment Industry",
+    "SeqNo": 25,
+    "Translations": {
+      "de": "Unterhaltungsindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f2e2eedeb7a7e2089bcf" },
+    "Name": "Environmental Services",
+    "SeqNo": 26,
+    "Translations": {
+      "de": "Umweltdienstleistungen"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f303eedeb7a7e2089bd0" },
+    "Name": "Events Industry",
+    "SeqNo": 27,
+    "Translations": {
+      "de": "Veranstaltungsbranche"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f323eedeb7a7e2089bd1" },
+    "Name": "Fabrics and Textiles",
+    "SeqNo": 28,
+    "Translations": {
+      "de": "Stoffe und Textilien"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f343eedeb7a7e2089bd2" },
+    "Name": "Fashion Industry",
+    "SeqNo": 29,
+    "Translations": {
+      "de": "Mode Industrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f36aeedeb7a7e2089bd3" },
+    "Name": "Food & Beverage",
+    "SeqNo": 30,
+    "Translations": {
+      "de": "Essen & Getränke"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f38eeedeb7a7e2089bd4" },
+    "Name": "Healthcare Industry",
+    "SeqNo": 31,
+    "Translations": {
+      "de": "Gesundheitsindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f3b3eedeb7a7e2089bd5" },
+    "Name": "Heavy Industry",
+    "SeqNo": 32,
+    "Translations": {
+      "de": "Schwerindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f3d6eedeb7a7e2089bd6" },
+    "Name": "Hospitality",
+    "SeqNo": 33,
+    "Translations": {
+      "de": "Gastfreundschaft"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f3f6eedeb7a7e2089bd7" },
+    "Name": "Information Technology",
+    "SeqNo": 34,
+    "Translations": {
+      "de": "Informationstechnologie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f427eedeb7a7e2089bd8" },
+    "Name": "Insurance",
+    "SeqNo": 35,
+    "Translations": {
+      "de": "Versicherung"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f449eedeb7a7e2089bd9" },
+    "Name": "Jewelry",
+    "SeqNo": 36,
+    "Translations": {
+      "de": "Schmuck"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f468eedeb7a7e2089bda" },
+    "Name": "Leisure and Recreation",
+    "SeqNo": 37,
+    "Translations": {
+      "de": "Freizeit und Erholung"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f488eedeb7a7e2089bdb" },
+    "Name": "Logistics and Supply Chain",
+    "SeqNo": 38,
+    "Translations": {
+      "de": "Logistik und Lieferkette"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f4a9eedeb7a7e2089bdc" },
+    "Name": "Luxury Goods",
+    "SeqNo": 39,
+    "Translations": {
+      "de": "Luxusgüter"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f5c0eedeb7a7e2089bdd" },
+    "Name": "Machinery and Heavy Equipmen",
+    "SeqNo": 40,
+    "Translations": {
+      "de": "Maschinen und Schwermaschinen"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f5e1eedeb7a7e2089bde" },
+    "Name": "Manufacturing",
+    "SeqNo": 41,
+    "Translations": {
+      "de": "Herstellung"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f600eedeb7a7e2089bdf" },
+    "Name": "Media",
+    "SeqNo": 42,
+    "Translations": {
+      "de": "Medien"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f620eedeb7a7e2089be0" },
+    "Name": "Medical Devices and Supplies",
+    "SeqNo": 43,
+    "Translations": {
+      "de": "Medizinische Geräte und Zubehör"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f63feedeb7a7e2089be1" },
+    "Name": "Mining",
+    "SeqNo": 44,
+    "Translations": {
+      "de": "Bergbau"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f65deedeb7a7e2089be2" },
+    "Name": "Music Industry",
+    "SeqNo": 45,
+    "Translations": {
+      "de": "Musikindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f67feedeb7a7e2089be3" },
+    "Name": "Personal Services",
+    "SeqNo": 46,
+    "Translations": {
+      "de": "Persönliche Dienstleistungen"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f69feedeb7a7e2089be4" },
+    "Name": "Pet Care and Supplies",
+    "SeqNo": 47,
+    "Translations": {
+      "de": "Haustierpflege und -bedarf"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f6c2eedeb7a7e2089be5" },
+    "Name": "Pharmaceutical Industry",
+    "SeqNo": 48,
+    "Translations": {
+      "de": "Pharmaindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f6e6eedeb7a7e2089be6" },
+    "Name": "Photography",
+    "SeqNo": 49,
+    "Translations": {
+      "de": "Fotografie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f707eedeb7a7e2089be7" },
+    "Name": "Printing",
+    "SeqNo": 50,
+    "Translations": {
+      "de": "Drucken"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f72beedeb7a7e2089be8" },
+    "Name": "Professional Services",
+    "SeqNo": 51,
+    "Translations": {
+      "de": "Professionelle Dienste"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f74deedeb7a7e2089be9" },
+    "Name": "Publishing",
+    "SeqNo": 52,
+    "Translations": {
+      "de": "Veröffentlichung"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f771eedeb7a7e2089bea" },
+    "Name": "Real Estate",
+    "SeqNo": 53,
+    "Translations": {
+      "de": "Immobilie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f792eedeb7a7e2089beb" },
+    "Name": "Restaurants and Food Services",
+    "SeqNo": 54,
+    "Translations": {
+      "de": "Restaurants und Lebensmitteldienstleistungen"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f7b3eedeb7a7e2089bec" },
+    "Name": "Retail",
+    "SeqNo": 55,
+    "Translations": {
+      "de": "Einzelhandel"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f7d9eedeb7a7e2089bed" },
+    "Name": "Robotics",
+    "SeqNo": 56,
+    "Translations": {
+      "de": "Robotik"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f800eedeb7a7e2089bee" },
+    "Name": "Security",
+    "SeqNo": 57,
+    "Translations": {
+      "de": "Sicherheit"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f820eedeb7a7e2089bef" },
+    "Name": "Social Media Industry",
+    "SeqNo": 58,
+    "Translations": {
+      "de": "Social-Media-Branche"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f845eedeb7a7e2089bf0" },
+    "Name": "Software",
+    "SeqNo": 59,
+    "Translations": {
+      "de": "Software"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f866eedeb7a7e2089bf1" },
+    "Name": "Space",
+    "SeqNo": 60,
+    "Translations": {
+      "de": "Raum"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f888eedeb7a7e2089bf2" },
+    "Name": "Sports and Fitness",
+    "SeqNo": 61,
+    "Translations": {
+      "de": "Sport und Fitness"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f8a9eedeb7a7e2089bf3" },
+    "Name": "Technology",
+    "SeqNo": 62,
+    "Translations": {
+      "de": "Technologie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f8cbeedeb7a7e2089bf4" },
+    "Name": "Telecom Industry",
+    "SeqNo": 63,
+    "Translations": {
+      "de": "Telekommunikationsbranche"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f944eedeb7a7e2089bf6" },
+    "Name": "Toys and Games",
+    "SeqNo": 64,
+    "Translations": {
+      "de": "Spielsachen und Spiele"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f966eedeb7a7e2089bf7" },
+    "Name": "Traditional Products",
+    "SeqNo": 65,
+    "Translations": {
+      "de": "Traditionelle Produkte"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f987eedeb7a7e2089bf8" },
+    "Name": "Transportation",
+    "SeqNo": 66,
+    "Translations": {
+      "de": "Transport"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f9a7eedeb7a7e2089bf9" },
+    "Name": "Travel & Tourism",
+    "SeqNo": 67,
+    "Translations": {
+      "de": "Reise Tourismus"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f9cbeedeb7a7e2089bfa" },
+    "Name": "Utilities",
+    "SeqNo": 68,
+    "Translations": {
+      "de": "Dienstprogramme"
+    }
+  },
+  {
+    "_id": { "$oid": "6627f9ebeedeb7a7e2089bfb" },
+    "Name": "Video Game Industry",
+    "SeqNo": 69,
+    "Translations": {
+      "de": "Videospielindustrie"
+    }
+  },
+  {
+    "_id": { "$oid": "6627fa0feedeb7a7e2089bfc" },
+    "Name": "Waste Management",
+    "SeqNo": 70,
+    "Translations": {
+      "de": "Abfallmanagement"
+    }
+  }
+]

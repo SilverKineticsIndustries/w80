@@ -1,0 +1,47 @@
+services:
+  database-keys:
+    image: depop/openssl-bats
+    container_name: w80-devel-database-keys
+    volumes:
+      - mongo-keys:/mongo-conf
+    command: 'bash -c "openssl rand -base64 741 > /mongo-conf/mongodb-keyfile; chmod 600 /mongo-conf/mongodb-keyfile; chown 999 /mongo-conf/mongodb-keyfile"'
+  database:
+    image: mongo:7.0.11
+    container_name: w80-devel-database
+    command: [--replSet, rs0, --bind_ip_all, --keyFile, "/opt/keyfile/mongodb-keyfile"]
+    ports:
+      - ${DBPORT}:27017
+    volumes:
+      - ./data/data:/data/db
+      - mongo-keys:/opt/keyfile
+    environment:
+      - MONGO_INITDB_DATABASE=${W80_Database__Name}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    depends_on:
+      - database-keys
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'database'}]}) }" | mongosh -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin
+      interval: 5s
+      timeout: 15s
+      start_period: 15s
+      retries: 10
+  database_seeder:
+    image: mongo:7.0.11
+    container_name: w80-devel-database-seeder
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./db:/tmp/db/
+    environment:
+      - MONGO_INITDB_DATABASE=${W80_Database__Name}
+      - MONGOIMPORT_HOST_STRING=rs0/database
+      - MONGOIMPORT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGOIMPORT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGOSH_CONNECTIONSTRING=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@database
+    command: >
+      bash -c 'bash /tmp/db/import/import.sh'
+
+volumes:
+  mongo-keys:

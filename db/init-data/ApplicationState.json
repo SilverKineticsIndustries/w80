@@ -1,0 +1,38 @@
+[
+  {
+    "_id": { "$oid": "661ecad42dc928266934b5d5" },
+    "Name": "Applied",
+    "HexColor": "007BFF",
+    "SeqNo": 0
+  },
+  {
+    "_id": { "$oid": "661ecb1d2dc928266934b5d6" },
+    "Name": "Client Responded",
+    "HexColor": "009DCE",
+    "SeqNo": 10
+  },
+  {
+    "_id": { "$oid": "661ecb412dc928266934b5d7" },
+    "Name": "Screening",
+    "HexColor": "00B5BA",
+    "SeqNo": 20
+  },
+  {
+    "_id": { "$oid": "661ecb592dc928266934b5d8" },
+    "Name": "Assessments",
+    "HexColor": "00BA95",
+    "SeqNo": 30
+  },
+  {
+    "_id": { "$oid": "661ecb902dc928266934b5d9" },
+    "Name": "Hiring Manager Screening",
+    "HexColor": "00BA65",
+    "SeqNo": 40
+  },
+  {
+    "_id": { "$oid": "661ecba72dc928266934b5da" },
+    "Name": "Decision / Job Offer",
+    "HexColor": "4ABF00",
+    "SeqNo": 50
+  }
+]

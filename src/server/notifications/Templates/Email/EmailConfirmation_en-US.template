@@ -1,0 +1,14 @@
+<p>
+Hello {{name}},
+</p>
+
+<p>
+You have recently created an account on {{appname}}.<br />
+Please confirm your email by clicking at <a href='{{confirmationUrl}}' alt='Link to confirmation email'>{{confirmationUrl}}</a>
+This confirmation link will expire after {{confirmationExpirationLength}} hours.
+</p>
+
+<p>
+Thank you,<br/>
+{{appname}} Admin
+</p>

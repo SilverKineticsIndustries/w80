@@ -1,0 +1,21 @@
+:root {
+  --lighter: #fbfbfb;
+  --light: #f0f0f0;
+  --semi-dark: #909090;
+  --dark: #616161;
+  --darker: #484848;
+  --very-dark: #cfcfc324;
+
+  --dialog-background: #e5e5e5;
+  --page-background: rgb(240,240,240) radial-gradient(circle, rgba(240,240,240,1) 0%, rgba(97,97,97,1) 100%);
+
+  --regular-text: #2b2b2b;
+  --info-border: #c2c2c2;
+
+  --error-border:  #ddb8b8;
+  --error-header: #f10f0f;
+  --error-text: #820000;
+
+  --rejected: #c80000;
+  --accepted: #43f000;
+}

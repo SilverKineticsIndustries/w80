@@ -1,0 +1,14 @@
+<p>
+Hallo {{name}},
+</p>
+
+<p>
+Sie haben kürzlich ein Konto bei {{appname}} erstellt.<br />
+Bitte bestätigen Sie Ihre E-Mail, indem Sie auf <a href='{{confirmationUrl}}' alt='Link zur Bestätigungs-E-Mail'>{{confirmationUrl}}</a> klicken
+Dieser Bestätigungslink läuft nach {{confirmationExpirationLength}} Stunden ab.
+</p>
+
+<p>
+Vielen Dank,<br/>
+{{appname}} Admin
+</p>

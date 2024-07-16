@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>SilverKinetics.w80.TestHelper</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\server\application\w80.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\server\notifications\w80.Notifications.csproj" />
+    <ProjectReference Include="..\..\..\src\server\common\w80.Common.csproj" />
+    <ProjectReference Include="..\..\..\src\server\domain\w80.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\server\di\w80.DI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+  </ItemGroup>
+
+</Project>

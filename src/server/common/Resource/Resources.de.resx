@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="data">
+      <xsd:complexType>
+        <xsd:sequence>
+          <xsd:element name="value" type="xsd:string" minOccurs="0"                     msdata:Ordinal="2" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="type" type="xsd:string" />
+        <xsd:attribute name="mimetype" type="xsd:string" />
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+	<data name="An error has occured and administrator has been notified." xml:space="preserve">
+		<value>Es ist ein Fehler aufgetreten und der Administrator wurde benachrichtigt.</value>
+	</data>
+	<data name="Captcha verification failed." xml:space="preserve">
+		<value>Die Captcha-Überprüfung ist fehlgeschlagen.</value>
+	</data>
+	<data name="User cannot be deactivated." xml:space="preserve">
+		<value>Der Benutzer kann nicht deaktiviert werden.</value>
+	</data>
+	<data name="User cannot deactivate their own account." xml:space="preserve">
+		<value>Der Benutzer kann sein eigenes Konto nicht deaktivieren.</value>
+	</data>
+	<data name="User cannot be deactivated because they are already in a deactivated state." xml:space="preserve">
+		<value>Der Benutzer kann nicht deaktiviert werden, da er sich bereits in einem deaktivierten Zustand befindet.</value>
+	</data>
+	<data name="Last administrator cannot be deactivated." xml:space="preserve">
+		<value>Der letzte Administrator kann nicht deaktiviert werden.</value>
+	</data>
+	<data name="User email cannot be empty." xml:space="preserve">
+		<value>Die E-Mail-Adresse des Benutzers darf nicht leer sein.</value>
+	</data>
+	<data name="User role cannot be empty." xml:space="preserve">
+		<value>Die Benutzerrolle darf nicht leer sein.</value>
+	</data>
+	<data name="Role cannot be empty." xml:space="preserve">
+		<value>Die Rolle darf nicht leer sein.</value>
+	</data>
+	<data name="Invalid user." xml:space="preserve">
+		<value>Ungültiger Benutzer.</value>
+	</data>
+	<data name="An account already exists with same email." xml:space="preserve">
+		<value>Es existiert bereits ein Konto mit derselben E-Mail-Adresse.</value>
+	</data>
+	<data name="User email max length is {0} characters." xml:space="preserve">
+		<value>Die maximale Länge der Benutzer-E-Mail beträgt {0} Zeichen.</value>
+	</data>
+	<data name="User email is in an invalid format." xml:space="preserve">
+		<value>Die E-Mail-Adresse des Benutzers hat ein ungültiges Format.</value>
+	</data>
+	<data name="User nickname max length is {0} characters." xml:space="preserve">
+		<value>Die maximale Länge des Benutzer-Spitznamens beträgt {0} Zeichen.</value>
+	</data>
+	<data name="A culture is mandatory." xml:space="preserve">
+		<value>Eine Kultur ist obligatorisch.</value>
+	</data>
+	<data name="Culture {0} is not a supported culture." xml:space="preserve">
+		<value>Kultur {0} ist keine unterstützte Kultur.</value>
+	</data>
+	<data name="A timezone is mandatory." xml:space="preserve">
+		<value>Eine Zeitzone ist obligatorisch.</value>
+	</data>
+	<data name="Timezone {0} is not a supported timezone." xml:space="preserve">
+		<value>Zeitzone {0} ist keine unterstützte Zeitzone.</value>
+	</data>
+	<data name="Deactivated applications cannot be accepted." xml:space="preserve">
+		<value>Deaktivierte Bewerbungen können nicht angenommen werden.</value>
+	</data>
+	<data name="Archived applications cannot be accepted." xml:space="preserve">
+		<value>Archivierte Bewerbungen können nicht angenommen werden.</value>
+	</data>
+	<data name="Application cannot be accepted because it is already in a accepted state." xml:space="preserve">
+		<value>Der Antrag kann nicht angenommen werden, da er sich bereits in einem angenommenen Zustand befindet.</value>
+	</data>
+	<data name="Acceptance method must be provided." xml:space="preserve">
+		<value>Die Akzeptanzmethode muss angegeben werden.</value>
+	</data>
+	<data name="Acceptance text max length is {0} characters." xml:space="preserve">
+		<value>Die maximale Länge des Annahmetextes beträgt {0} Zeichen.</value>
+	</data>
+	<data name="Deactivated applications cannot be archived." xml:space="preserve">
+		<value>Deaktivierte Anwendungen können nicht archiviert werden.</value>
+	</data>
+	<data name="Rejected applications cannot be archived." xml:space="preserve">
+		<value>Abgelehnte Bewerbungen können nicht archiviert werden.</value>
+	</data>
+	<data name="Only non-archived applications can be archived." xml:space="preserve">
+		<value>Es können nur nicht archivierte Bewerbungen archiviert werden.</value>
+	</data>
+	<data name="Deactivated applications cannot be unarchived." xml:space="preserve">
+		<value>Deaktivierte Anwendungen können nicht dearchiviert werden.</value>
+	</data>
+	<data name="Rejected application cannot be unarchived." xml:space="preserve">
+		<value>Eine abgelehnte Bewerbung kann nicht aus der Archivierung entfernt werden.</value>
+	</data>
+	<data name="Only archived applications can be unarchived." xml:space="preserve">
+		<value>Nur archivierte Bewerbungen können dearchiviert werden.</value>
+	</data>
+	<data name="Application cannot be deactivated because it is already in a deactivated state." xml:space="preserve">
+		<value>Die Anwendung kann nicht deaktiviert werden, da sie sich bereits in einem deaktivierten Zustand befindet.</value>
+	</data>
+	<data name="Application cannot be reactivated because it is not in a deactivated state." xml:space="preserve">
+		<value>Die Anwendung kann nicht erneut aktiviert werden, da sie sich nicht in einem deaktivierten Zustand befindet.</value>
+	</data>
+	<data name="Deactivated applications cannot be rejected." xml:space="preserve">
+		<value>Deaktivierte Bewerbungen können nicht abgelehnt werden.</value>
+	</data>
+	<data name="Archived applications cannot be rejected." xml:space="preserve">
+		<value>Archivierte Bewerbungen können nicht abgelehnt werden.</value>
+	</data>
+	<data name="Application cannot be rejected because it is already in a rejected state." xml:space="preserve">
+    	<value>Der Antrag kann nicht abgelehnt werden, da er sich bereits im Status „Abgelehnt“ befindet.</value>
+	</data>
+	<data name="Rejection reason cannot be empty." xml:space="preserve">
+    	<value>Der Ablehnungsgrund darf nicht leer sein.</value>
+	</data>
+	<data name="Rejection reason max length is {0} characters." xml:space="preserve">
+    	<value>Die maximale Länge des Ablehnungsgrunds beträgt {0} Zeichen.</value>
+	</data>
+	<data name="Rejection method must be provided." xml:space="preserve">
+    	<value>Die Ablehnungsmethode muss angegeben werden.</value>
+	</data>
+	<data name="Rejection response text max length is {0} characters." xml:space="preserve">
+    	<value>Die maximale Länge des Ablehnungsantworttextes beträgt {0} Zeichen.</value>
+	</data>
+	<data name="Deactivated application cannot be updated." xml:space="preserve">
+    	<value>Deaktivierte Anwendung kann nicht aktualisiert werden.</value>
+	</data>
+	<data name="User cannot be empty." xml:space="preserve">
+    	<value>Der Benutzer darf nicht leer sein.</value>
+	</data>
+	<data name="Id cannot be empty." xml:space="preserve">
+    	<value>ID darf nicht leer sein.</value>
+	</data>
+	<data name="Company name cannot be empty." xml:space="preserve">
+    	<value>Der Firmenname darf nicht leer sein.</value>
+	</data>
+	<data name="Company name max length is {0} characters." xml:space="preserve">
+    	<value>Die maximale Länge des Firmennamens beträgt {0} Zeichen.</value>
+	</data>
+	<data name="Compensation type should be entered if minimum or maximum compensation is entered." xml:space="preserve">
+    	<value>Wenn eine Mindest- oder Höchstvergütung eingegeben wird, muss die Art der Vergütung eingegeben werden.</value>
+	</data>
+	<data name="Compensation max cannot be a less than or equal to zero." xml:space="preserve">
+    	<value>Die maximale Vergütung darf nicht kleiner oder gleich Null sein.</value>
+	</data>
+	<data name="Compensation min cannot be a less than or equal to zero." xml:space="preserve">
+    	<value>Die Mindestvergütung darf nicht kleiner oder gleich Null sein.</value>
+	</data>
+	<data name="Compensation min cannot be greater than compensation max." xml:space="preserve">
+    	<value>Die minimale Kompensation kann nicht größer sein als die maximale Kompensation.</value>
+	</data>
+	<data name="Role description cannot be empty." xml:space="preserve">
+    	<value>Die Rollenbeschreibung darf nicht leer sein.</value>
+	</data>
+	<data name="Role description max length is {0} characters." xml:space="preserve">
+    	<value>Die maximale Länge der Rollenbeschreibung beträgt {0} Zeichen.</value>
+	</data>
+	<data name="Role max length is {0} characters." xml:space="preserve">
+    	<value>Die maximale Rollenlänge beträgt {0} Zeichen.</value>
+	</data>
+	<data name="An application must have a set of states." xml:space="preserve">
+    	<value>Eine Anwendung muss über eine Reihe von Zuständen verfügen.</value>
+	</data>
+	<data name="An application cannot in more than one state at a time." xml:space="preserve">
+    	<value>Eine Anwendung kann sich nicht gleichzeitig in mehr als einem Status befinden.</value>
+	</data>
+	<data name="An application must be in a state." xml:space="preserve">
+    	<value>Eine Anwendung muss sich in einem Bundesstaat befinden.</value>
+	</data>
+	<data name="Application state sequence numbers must be unique." xml:space="preserve">
+    	<value>Anwendungsstatus-Sequenznummern müssen eindeutig sein.</value>
+	</data>
+	<data name="Application state must have a valid Id." xml:space="preserve">
+    	<value>Der Anwendungsstatus muss eine gültige ID haben.</value>
+	</data>
+	<data name="Application state must have unique Ids." xml:space="preserve">
+    	<value>Der Anwendungsstatus muss eindeutige IDs haben.</value>
+	</data>
+	<data name="Appointments must have valid Ids." xml:space="preserve">
+    	<value>Termine müssen gültige IDs haben.</value>
+	</data>
+	<data name="Appointments must have unique Ids." xml:space="preserve">
+    	<value>Termine müssen eindeutige IDs haben.</value>
+	</data>
+	<data name="Appointment description cannot be empty." xml:space="preserve">
+    	<value>Die Terminbeschreibung darf nicht leer sein.</value>
+	</data>
+	<data name="Appointment description max length is {0} characters." xml:space="preserve">
+    	<value>Die maximale Länge der Terminbeschreibung beträgt {0} Zeichen.</value>
+	</data>
+	<data name="Appointment start date/time cannot be empty." xml:space="preserve">
+    	<value>Das Startdatum/die Startzeit des Termins darf nicht leer sein.</value>
+	</data>
+	<data name="Appointment start date/time must be specified in UTC." xml:space="preserve">
+    	<value>Das Startdatum/die Startzeit des Termins muss in UTC angegeben werden.</value>
+	</data>
+	<data name="Appointment end date/time cannot be empty." xml:space="preserve">
+    	<value>Datum/Uhrzeit des Terminendes darf nicht leer sein.</value>
+	</data>
+	<data name="Appointment end date/time must be specified in UTC." xml:space="preserve">
+    	<value>Datum und Uhrzeit des Terminendes müssen in UTC angegeben werden.</value>
+	</data>
+	<data name="Appointment cannot have same start and end date/time." xml:space="preserve">
+    	<value>Der Termin darf nicht dasselbe Start- und Enddatum/-uhrzeit haben.</value>
+	</data>
+	<data name="Appointment start date/time cannot be after appointment end date/time." xml:space="preserve">
+    	<value>Appointment start date/time cannot be after appointment end date/time.</value>
+	</data>
+	<data name="Appointment duration cannot be shorter than {0} minutes." xml:space="preserve">
+    	<value>Die Dauer des Termins darf nicht kürzer als {0} Minuten sein.</value>
+	</data>
+	<data name="Appointment duration cannot be longer than {0} days." xml:space="preserve">
+    	<value>Die Dauer des Termins darf nicht länger als {0} Tage sein.</value>
+	</data>
+	<data name="Appointments cannot overlap." xml:space="preserve">
+    	<value>Termine dürfen sich nicht überschneiden.</value>
+	</data>
+	<data name="Rejection fields are read-only and cannot be modified." xml:space="preserve">
+    	<value>Ablehnungsfelder sind schreibgeschützt und können nicht geändert werden.</value>
+	</data>
+	<data name="Acceptance fields are read-only and cannot be modified." xml:space="preserve">
+    	<value>Akzeptanzfelder sind schreibgeschützt und können nicht geändert werden.</value>
+	</data>
+	<data name="User is deactivated." xml:space="preserve">
+    	<value>Benutzer ist deaktiviert.</value>
+	</data>
+	<data name="You must confirm email ownership before logging in." xml:space="preserve">
+    	<value>Sie müssen den Besitz Ihrer E-Mail-Adresse bestätigen, bevor Sie sich anmelden.</value>
+	</data>
+	<data name="Refresh token missing." xml:space="preserve">
+    	<value>Aktualisierungstoken fehlt.</value>
+	</data>
+	<data name="Invalid invitation code." xml:space="preserve">
+    	<value>Ungültiger Einladungscode.</value>
+	</data>
+	<data name="Invitation code already used." xml:space="preserve">
+    	<value>Der Einladungscode wurde bereits verwendet.</value>
+	</data>
+	<data name="Invalid email confirmation token." xml:space="preserve">
+    	<value>Ungültiges E-Mail-Bestätigungstoken.</value>
+	</data>
+	<data name="Email confirmation token has expired." xml:space="preserve">
+    	<value>Das E-Mail-Bestätigungstoken ist abgelaufen.</value>
+	</data>
+	<data name="User has not been activated." xml:space="preserve">
+    	<value>Der Benutzer wurde nicht aktiviert.</value>
+	</data>
+	<data name="User's email has already been confirmed." xml:space="preserve">
+    	<value>Die E-Mail-Adresse des Benutzers wurde bereits bestätigt.</value>
+	</data>
+	<data name="Password cannot be empty." xml:space="preserve">
+    	<value>Passwort kann nicht leer sein.</value>
+	</data>
+	<data name="Password must be at least {0} characters long." xml:space="preserve">
+    	<value>Das Passwort muss mindestens {0} Zeichen lang sein.</value>
+	</data>
+	<data name="New password is same as current password." xml:space="preserve">
+    	<value>Das neue Passwort ist dasselbe wie das aktuelle Passwort.</value>
+	</data>
+	<data name="Unknown" xml:space="preserve">
+    	<value>Unbekannt</value>
+	</data>
+	<data name="Email account ownership confirmation" xml:space="preserve">
+    	<value>E-Mail-Bestätigung der Kontoinhaberschaft</value>
+	</data>
+	<data name="Appointment Alert" xml:space="preserve">
+    	<value>Terminbenachrichtigung</value>
+	</data>
+</root>

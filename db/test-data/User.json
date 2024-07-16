@@ -1,0 +1,30 @@
+[
+    {
+      "_id": { "$oid": "660a11c6416fdcf29ef3768e" },
+      "Culture": "en-US",
+      "Email": "testadmin@silverkinetics.dev",
+      "Nickname": "testadmin",
+      "TimeZone": "America/New_York",
+      "CreatedBy": { "$oid": "660a11c6416fdcf29ef3768e" },
+      "CreatedUTC": "2024-05-08T05:09:51.502Z",
+      "Role": 20,
+      "UpdatedBy": null,
+      "UpdatedUTC": null,
+      "DeactivatedBy": null,
+      "DeactivatedUTC": null
+    },
+    {
+      "_id": { "$oid": "660a11c6416fdcf29ef37690" },
+      "Culture": "en-US",
+      "Email": "testuser@silverkinetics.dev",
+      "Nickname": "testuser",
+      "TimeZone": "America/New_York",
+      "CreatedBy": { "$oid": "660a11c6416fdcf29ef3768e" },
+      "CreatedUTC": "2024-05-08T05:09:51.502Z",
+      "Role": 30,
+      "UpdatedBy": null,
+      "UpdatedUTC": null,
+      "DeactivatedBy": null,
+      "DeactivatedUTC": null
+    }
+]

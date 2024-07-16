@@ -1,0 +1,12 @@
+<p>
+Hallo {{name}},
+</p>
+
+<p>
+Sie haben in {{minutes}} Minuten einen Termin mit {{companyName}}.
+</p>
+
+<p>
+Vielen Dank,<br/>
+{{appname}} Admin
+</p>

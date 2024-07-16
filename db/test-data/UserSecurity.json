@@ -1,0 +1,18 @@
+[
+    {
+      "_id": { "$oid": "660a11c6416fdcf29ef3768e" },
+      "IsEmailOwnershipConfirmed": true,
+      "MustActivateWithInvitationCode": false,
+      "PasswordHash": "$2a$11$2Ki7bgj9HPzTbwyMyKVJ2.jMFdUh4eqc8wkYsp4U6HbJiejyavtmG",
+      "RefreshTokenExpirationUTC": null,
+      "RefreshTokenHash": null
+    },
+    {
+      "_id": { "$oid": "660a11c6416fdcf29ef37690" },
+      "IsEmailOwnershipConfirmed": true,
+      "MustActivateWithInvitationCode": false,
+      "PasswordHash": "$2a$11$7TqYksk8uzwPsOVdJ2BGcu/B0omnBEPU1xOdwK4gmQ8Kei7WqbzKm",
+      "RefreshTokenExpirationUTC": null,
+      "RefreshTokenHash": null
+    }
+]

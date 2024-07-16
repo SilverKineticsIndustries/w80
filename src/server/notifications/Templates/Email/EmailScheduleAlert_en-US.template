@@ -1,0 +1,12 @@
+<p>
+Hello {{name}},
+</p>
+
+<p>
+You have an appointment with {{companyName}} in {{minutes}} minutes.
+</p>
+
+<p>
+Thank you,<br/>
+{{appname}} Admin
+</p>

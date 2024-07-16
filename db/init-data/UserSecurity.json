@@ -1,0 +1,10 @@
+[
+    {
+      "_id": { "$oid": "6643e4837ae260d25a226bc3" },
+      "IsEmailOwnershipConfirmed": false,
+      "MustActivateWithInvitationCode": false,
+      "PasswordHash": null,
+      "RefreshTokenExpirationUTC": null,
+      "RefreshTokenHash": null
+    }
+]

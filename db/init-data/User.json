@@ -1,0 +1,16 @@
+[
+    {
+      "_id": { "$oid": "6643e4837ae260d25a226bc3" },
+      "Culture": "en-US",
+      "Email": "serviceworker@silverkinetics.dev",
+      "Nickname": "",
+      "TimeZone": "America/New_York",
+      "CreatedBy": { "$oid": "660a11c6416fdcf29ef3768e" },
+      "CreatedUTC": "2024-05-08T05:09:51.502Z",
+      "Role": 10,
+      "UpdatedBy": null,
+      "UpdatedUTC": null,
+      "DeactivatedBy": null,
+      "DeactivatedUTC": null
+    }
+]
