@@ -95,7 +95,7 @@ export default function UserManagementEdit({user, onPostUpdate, onCancel})
                         <div className={classes.labelText}>{t("user-management.role")}:</div>
                         <select name="role" required={true} value={userItem.role || ""} data-test="user-management-role"
                             onChange={onFieldChange} className={classes.inputControl} autoComplete="false" >
-                                <option value='User' key='User'>{t("user-managament.user-role")}</option>
+                                <option value='User' key='User'>{t("user-management.user-role")}</option>
                                 <option value='Administrator' key='Administrator'>{t("user-management.admin-role")}</option>
                         </select>
                     </label>
@@ -121,8 +121,8 @@ export default function UserManagementEdit({user, onPostUpdate, onCancel})
                         <div className={classes.labelText}>{t("user-management.timezone")}:</div>
                         <select name="timeZone" required={true} value={userItem.timeZone || ""} data-test="user-management-timezone"
                             onChange={onFieldChange} className={classes.inputControl} autoComplete="false" >
-                                {timezones.map((t) =>
-                                    <option value={t.value} key={t.value}>{t.name}</option>
+                                {timezones.map((t, idx) =>
+                                    <option value={t.value} key={idx}>{t.name}</option>
                                 )}
                         </select>
                     </label>
@@ -130,10 +130,10 @@ export default function UserManagementEdit({user, onPostUpdate, onCancel})
                 <div className={classes.fieldContainer}>
                     <label>
                         <div className={classes.labelText}>{t("user-management.culture")}:</div>
-                        <select name="culture" required={true} value={userItem.culture | ""} data-test="user-management-culture"
+                        <select name="culture" required={true} value={userItem.culture || ""} data-test="user-management-culture"
                             onChange={onFieldChange} className={classes.inputControl} autoComplete="false" >
-                                {cultures.map((t) =>
-                                    <option value={t.value} key={t.value}>{t.name}</option>
+                                {cultures.map((t, idx) =>
+                                    <option value={t.value} key={idx}>{t.name}</option>
                                 )}
                         </select>
                     </label>

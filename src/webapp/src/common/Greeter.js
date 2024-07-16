@@ -40,8 +40,8 @@ const Greeter = () => {
             <div className={classes.wrapper} data-test="greeter">
                 {isAdmin &&
                     <React.Fragment>
-                        <img data-tooltip-id={uniqueid} className={classes.admin} src={admin} height={20} width={20} alt={t("common.Administrator")} />
-                        <Tooltip id={uniqueid} delayShow="100" place="top">{t("common.Administrator")}</Tooltip>
+                        <img data-tooltip-id={uniqueid} className={classes.admin} src={admin} height={20} width={20} alt={t("common.administrator")} />
+                        <Tooltip id={uniqueid} delayShow="100" place="top">{t("common.administrator")}</Tooltip>
                     </React.Fragment>
                 }
                 <span className={classes.useridentifier} data-test="greeter-useridentifier">{currentUser.email}</span>
