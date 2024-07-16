@@ -74,7 +74,7 @@ start-app:               ## Start application
 	docker compose -f compose.devel.yaml rm -f
 	docker compose -f compose.devel.yaml build
 	docker compose -f compose.devel.yaml up -d --remove-orphans
-	open "http://localhost:`$$WEBPORT`"
+	open "http://localhost:$$PORT"
 
 stop-app:                ## Stop application
 	docker compose -f compose.devel.yaml stop
