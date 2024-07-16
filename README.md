@@ -44,15 +44,15 @@
 ### Start app
 ----------------
 
-  To try out the app you need two things, an .env file and the docker compose file.
-  If you just cloned the repo, run make init and this will go through a initialization script
-  which will create a .env file. Almost all options have default value.
+  To try out the app you need an .env file. If you just cloned the repo, run "make init"
+  and this will go through a initialization script which will create an .env file. All
+  options have default values.
 
   Afterwards, you can start the app using:
 
     make start-app
 
-  Login with: testuser@silverkinetics.dev / longpassword123
+  Log in with: testuser@silverkinetics.dev / longpassword123
 
   When done you can run:
 
@@ -68,8 +68,8 @@
   After cloning the repo for the first time, make sure you run "make init" which will
   create your default .env file. You can modify this as you choose afterwards.
 
-  You should create a .gitconfig file in the repo root folder and fill in all your
-  git settins for this project. The git/.config file has the include for the ./.gitconfig file.
+  You should create a .gitconfig file in the repo root folder and fill in all of your
+  git settings for this project. The git/.config file has the include for the ./.gitconfig file.
 
   I like to use Makefiles to create simple recipies for various tasks you might do
   during development. You can see all the recipies and their explanations by running
