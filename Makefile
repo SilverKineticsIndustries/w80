@@ -6,8 +6,8 @@ endif
 
 REPO_URL=https://github.com/silverkineticsindustries/w80.git
 
-.PHONY: list init start-app run-server-tests run-end-to-end-tests \
-		start-devel-db del-devel-data clean show-todos deploy
+.PHONY: list init start-app stop-app start-devel-db run-server-tests run-end-to-end-tests \
+		del-devel-data clean show-todos deploy-from-github
 
 list:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
