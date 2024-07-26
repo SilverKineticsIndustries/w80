@@ -2,20 +2,21 @@ using System.Text;
 using SilverKinetics.w80.Application.Events;
 using SilverKinetics.w80.Notifications.Contracts;
 
-namespace SilverKinetics.w80.Application.Services.IntegrationTests;
+namespace SilverKinetics.w80.Application.IntegrationTests.Services;
 
-[TestFixture(TestOf = typeof(Services.AuthenticationApplicationService))]
+[TestFixture(TestOf = typeof(Application.Services.AuthenticationApplicationService))]
 public class AuthenticationApplicationService
 {
     [Test]
     public async Task LoginWithCredentialsAsync_emptyUserName_shouldNotAllowLogin()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var request = new LoginRequestDto();
             request.Email = string.Empty;
-            Assert.ThrowsAsync<ArgumentNullException>(async() => {
+            Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            {
                 await service.LoginWithCredentialsAsync(request, new CookieManagerFake(), RequestSourceInfo.Empty, CancellationToken.None);
             });
         }
@@ -24,13 +25,14 @@ public class AuthenticationApplicationService
     [Test]
     public async Task LoginWithCredentialsAsync_filledUserNameAndEmptyPassword_shouldNotAllowLogin()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var request = new LoginRequestDto();
             request.Email = ctx.GetTestUserEmail();
             request.Password = string.Empty;
-            Assert.ThrowsAsync<ArgumentNullException>(async() => {
+            Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            {
                 await service.LoginWithCredentialsAsync(request, new CookieManagerFake(), RequestSourceInfo.Empty, CancellationToken.None);
             });
         }
@@ -39,7 +41,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task LoginWithCredentialsAsync_validEmailAndInvalidPassword_shouldNotAllowLogin()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var request = new LoginRequestDto();
@@ -179,7 +181,8 @@ public class AuthenticationApplicationService
             var emailClaim = token.Claims.FirstOrDefault(x => x.Type == "Email");
             var nicknameClaim = token.Claims.FirstOrDefault(x => x.Type == "Nickname");
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(nicknameClaim.Value, Is.EqualTo("testuser"));
                 Assert.That(roleClaim.Value, Is.EqualTo(Role.User.ToString()));
                 Assert.That(emailClaim.Value, Is.EqualTo(ctx.GetTestUserEmail()));
@@ -300,7 +303,8 @@ public class AuthenticationApplicationService
 
             var emailSenderService = ctx.Services.GetRequiredService<IEmailSenderService>() as EmailSenderServiceFake;
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(response.EmailConfirmationSent, Is.True);
                 Assert.That(emailSenderService.Emails.Value.Any(x => x.Subject == stringLocalizer["Email account ownership confirmation"]));
                 Assert.That(emailSenderService.Emails.Value.Any(x => x.Addresses.Contains(request.Email)));
@@ -328,7 +332,8 @@ public class AuthenticationApplicationService
             var refreshLoginResponse = await service.LoginWithRefreshTokenAsync(request, cookieManager, RequestSourceInfo.Empty, CancellationToken.None);
             var newRefreshToken = cookieManager.GetCookie(Tokens.RefreshTokenCookieName);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(firstRefreshToken, Is.Not.Empty);
                 Assert.That(newRefreshToken, Is.Not.Empty);
                 Assert.That(firstRefreshToken, Is.Not.EqualTo(newRefreshToken));
@@ -408,13 +413,14 @@ public class AuthenticationApplicationService
             // We need this so that prev access token is different from new one.
             // Otherwise the expiration date on prev token is same as new one and this make them
             // exactly the same
-            Thread.Sleep(1*1000);
+            Thread.Sleep(1 * 1000);
 
             var request = new RefreshRequestDto();
             request.RefreshToken = refreshToken;
             var refreshLoginResponse = await service.LoginWithRefreshTokenAsync(request, cookieManager, RequestSourceInfo.Empty, CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(refreshLoginResponse.AccessToken, Is.Not.Empty);
                 Assert.That(refreshLoginResponse.AccessToken, Is.Not.EqualTo(tokenEncoded));
             });
@@ -447,7 +453,7 @@ public class AuthenticationApplicationService
             // We need this so that prev access token is different from new one.
             // Otherwise the expiration date on prev token is same as new one and this make them
             // exactly the same
-            Thread.Sleep(1*1000);
+            Thread.Sleep(1 * 1000);
 
             var request = new RefreshRequestDto();
             request.RefreshToken = refreshToken;
@@ -471,7 +477,8 @@ public class AuthenticationApplicationService
             Assume.That(response.Success, Is.True);
 
             var logOutResponse = await service.LogoutAsync(cookieManager, RequestSourceInfo.Empty, CancellationToken.None);
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(logOutResponse.Success, Is.True);
                 Assert.That(!cookieManager.Cookies.Value.ContainsKey(Tokens.RefreshTokenCookieName));
             });
@@ -499,7 +506,8 @@ public class AuthenticationApplicationService
 
             var userProfile = await userProfileSet.AsQueryable().SingleAsync(x => x.Email == request.Email);
             var userStorage = await userSecuritySet.AsQueryable().SingleAsync(x => x.Id == userProfile.Id);
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(userStorage.RefreshTokenHash, Is.Null);
                 Assert.That(userStorage.RefreshTokenExpirationUTC, Is.Null);
             });
@@ -509,7 +517,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessInvitationAsync_invitationCodeForNonExistingUser_shouldReturnNotValid()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var request = ctx.CreateInvitationProcessRequestDto(
@@ -524,7 +532,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessInvitationAsync_processInvitationCodeForValidUserWhoHasAlreadyUsedTheirInvitationCode_shouldReturnNotValid()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var request = new InvitationGenerationRequestDto();
@@ -551,7 +559,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessInvitationAsync_processInvitationCodeForValidInactiveUser_shouldBeSuccess()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var userEmail = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(userEmail);
@@ -564,7 +572,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessInvitationAsync_processInvitationCodeForValidInactiveUser_userShouldBeMarkedThatTheyActivatedWithInvitationCodeAnymore()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var userEmail = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(userEmail);
@@ -580,7 +588,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessInvitationAsync_processInvitationCodeForValidInactiveUser_userShouldBePutIntoEmailConfirmationState()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var userEmail = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(userEmail);
@@ -590,7 +598,8 @@ public class AuthenticationApplicationService
             var userSecurityRepo = ctx.Services.GetRequiredService<IMongoCollection<UserSecurity>>();
             var userSecurity = await userSecurityRepo.AsQueryable().FirstAsync(x => x.Id == ObjectId.Parse(ret.Result.Id));
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(userSecurity.MustActivateWithInvitationCode, Is.False);
                 Assert.That(userSecurity.IsEmailOwnershipConfirmed, Is.False);
             });
@@ -600,7 +609,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessInvitationAsync_invitationCodeForDifferentEmailAddress_shouldReturnNotValid()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var request = new InvitationGenerationRequestDto();
@@ -617,7 +626,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessInvitationAsync_invitationCodeForDeactivatedUser_shouldReturnNotValid()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var request = new InvitationGenerationRequestDto();
@@ -634,7 +643,8 @@ public class AuthenticationApplicationService
 
             var invitationProcessRequest = ctx.CreateInvitationProcessRequestDto(request.Email, response.Code);
             var verificationResponse = await service.ProcessInvitationAsync(invitationProcessRequest, CancellationToken.None);
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(verificationResponse.Success, Is.False);
                 Assert.That(verificationResponse.InfoMessages.Any(x => x == "User is deactivated."), Is.True);
             });
@@ -644,7 +654,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessInvitationAsync_validInvitationCodeForNewUser_emailConfirmationNotificationShouldBeSent()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
@@ -659,7 +669,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessEmailConfirmationTokenAsync_validEmailConfirmationCodeForNewUser_shouldBeSuccess()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
@@ -680,7 +690,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessEmailConfirmationTokenAsync_invalidEmailConfirmationCodeForNewUser_shouldReturnFail()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
@@ -701,7 +711,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessEmailConfirmationTokenAsync_validEmailConfirmationCodeForDeactivatedUser_shouldFailAndReturnDeactivatedUserMessage()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
@@ -718,7 +728,8 @@ public class AuthenticationApplicationService
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var response = await service.ProcessEmailConfirmationTokenAsync(req, RequestSourceInfo.Empty, CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(response.Success, Is.False);
                 Assert.That(response.InfoMessages.Contains("User is deactivated."), Is.True);
             });
@@ -728,7 +739,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessEmailConfirmationTokenAsync_validEmailConfirmationCodeForUserWhoDidNotActivateWithInvitationCode_shouldReturnFail()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
@@ -740,7 +751,8 @@ public class AuthenticationApplicationService
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var response = await service.ProcessEmailConfirmationTokenAsync(req, RequestSourceInfo.Empty, CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(response.Success, Is.False);
                 Assert.That(response.InfoMessages.Contains("User has not been activated."), Is.True);
             });
@@ -750,7 +762,7 @@ public class AuthenticationApplicationService
     [Test]
     public async Task ProcessEmailConfirmationTokenAsync_validEmailConfirmationCodeForUserWhoAlreadyConfirmedEmail_shouldReturnFailAndReturnUserAlreadyConfirmatedMessage()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
@@ -766,7 +778,8 @@ public class AuthenticationApplicationService
             await service.ProcessEmailConfirmationTokenAsync(req, RequestSourceInfo.Empty, CancellationToken.None);
             var response = await service.ProcessEmailConfirmationTokenAsync(req, RequestSourceInfo.Empty, CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(response.Success, Is.False);
                 Assert.That(response.InfoMessages.Contains("User's email has already been confirmed."), Is.True);
             });

@@ -1,15 +1,15 @@
 using System.Text.Encodings.Web;
 using SilverKinetics.w80.Notifications;
 
-namespace SilverKinetics.w80.Domain.Services.UnitTests;
+namespace SilverKinetics.w80.Domain.UnitTests.Services;
 
-[TestFixture(TestOf = typeof(Services.EmailMessageGenerator))]
+[TestFixture(TestOf = typeof(Domain.Services.EmailMessageGenerator))]
 public class EmailMessageGenerator
 {
     [Test]
     public void GetEmailAccountOwnershipVerificationEmailMessage_generateForUser_emailTokenExpirationDateShouldBeAccordingToConfig()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var service = ctx.Services.GetRequiredService<IEmailMessageGenerator>();
             var configuration = ctx.Services.GetRequiredService<IConfiguration>();
@@ -24,7 +24,7 @@ public class EmailMessageGenerator
     [Test]
     public void GetEmailAccountOwnershipVerificationEmailMessage_generateForUser_confirmationUrlShouldBeCorrect()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var service = ctx.Services.GetRequiredService<IEmailMessageGenerator>();
             var configuration = ctx.Services.GetRequiredService<IConfiguration>();
@@ -44,7 +44,7 @@ public class EmailMessageGenerator
     [Test]
     public void GetEmailAccountOwnershipVerificationEmailMessage_generateForUser_userEmailShouldBePresent()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var service = ctx.Services.GetRequiredService<IEmailMessageGenerator>();
             var configuration = ctx.Services.GetRequiredService<IConfiguration>();
@@ -53,7 +53,8 @@ public class EmailMessageGenerator
 
             var emailMessage = service.GetEmailAccountOwnershipVerificationEmailMessage(user, token);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(emailMessage.EmailAddresses.Count, Is.EqualTo(1));
                 Assert.That(emailMessage.EmailAddresses.Contains(user.Email), Is.True);
             });
@@ -63,7 +64,7 @@ public class EmailMessageGenerator
     [Test]
     public void GetEmailAccountOwnershipVerificationEmailMessage_generateForUser_userNameShouldBePresent()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var service = ctx.Services.GetRequiredService<IEmailMessageGenerator>();
             var configuration = ctx.Services.GetRequiredService<IConfiguration>();
@@ -81,7 +82,7 @@ public class EmailMessageGenerator
     [Test]
     public void GetEmailAccountOwnershipVerificationEmailMessage_generateForUser_correntTemplateTypeShouldBePresent()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var service = ctx.Services.GetRequiredService<IEmailMessageGenerator>();
             var configuration = ctx.Services.GetRequiredService<IConfiguration>();
@@ -96,7 +97,7 @@ public class EmailMessageGenerator
     [Test]
     public void GetEmailAccountOwnershipVerificationEmailMessage_generateForUser_correctCultureShoulddBePresent()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var service = ctx.Services.GetRequiredService<IEmailMessageGenerator>();
             var configuration = ctx.Services.GetRequiredService<IConfiguration>();
@@ -111,7 +112,7 @@ public class EmailMessageGenerator
     [Test]
     public void GetEmailAccountOwnershipVerificationEmailMessage_generateForUser_allParametersInMessageShouldBeInTemplateMetadata()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var service = ctx.Services.GetRequiredService<IEmailMessageGenerator>();
             var configuration = ctx.Services.GetRequiredService<IConfiguration>();

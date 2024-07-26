@@ -1,12 +1,12 @@
-namespace SilverKinetics.w80.Domain.Services.Application.UnitTests;
+namespace SilverKinetics.w80.Domain.UnitTests.Services.Application;
 
-[TestFixture(TestOf = typeof(Application.ApplicationUpsertService))]
+[TestFixture(TestOf = typeof(Domain.Services.Application.ApplicationUpsertService))]
 public class ApplicationUpsertService
 {
     [Test]
     public async Task ValidateAsync_noCompanyName_companyNameIsRequired()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompanyName = "";
@@ -20,21 +20,21 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_companyNameLargerThanMax_companyNameCannotBeMoreThanMax()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompanyName = string.Join(string.Empty, Enumerable.Repeat('A', 500));
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
 
-            Assert.That(bag.Any(x => x.Message == $"Company name max length is {Entities.Application.CompanyNameMaxLength} characters."));
+            Assert.That(bag.Any(x => x.Message == $"Company name max length is {Domain.Entities.Application.CompanyNameMaxLength} characters."));
         }
     }
 
     [Test]
     public async Task ValidateAsync_compensationMinEnteredCompensationMaxNotEnteredAndCompensationTypeNotEntered_compensationTypeIsRequired()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompensationMin = 100;
@@ -49,7 +49,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_compensationMaxEnteredCompensationMinNotEnteredAndCompensationTypeNotEntered_compensationTypeIsRequired()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompensationMax = 100;
@@ -64,7 +64,7 @@ public class ApplicationUpsertService
     [Test()]
     public async Task ValidateAsync_roleDescriptionNotEntered_roleDescriptionIsRequired()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.RoleDescription = "";
@@ -78,35 +78,35 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_roleDescriptionGreaterThanMaxLength_roleDescriptionCannotBeMoreThanMax()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.RoleDescription = string.Join(string.Empty, Enumerable.Repeat('A', Entities.Application.RoleDescriptionMaxLength + 1));
+            app.RoleDescription = string.Join(string.Empty, Enumerable.Repeat('A', Domain.Entities.Application.RoleDescriptionMaxLength + 1));
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
 
-            Assert.That(bag.Any(x => x.Message == $"Role description max length is {Entities.Application.RoleDescriptionMaxLength} characters."));
+            Assert.That(bag.Any(x => x.Message == $"Role description max length is {Domain.Entities.Application.RoleDescriptionMaxLength} characters."));
         }
     }
 
     [Test]
     public async Task ValidateAsync_roleGreaterThanMaxLength_roleCannotBeMoreThanMax()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.Role = string.Join(string.Empty, Enumerable.Repeat('A', Entities.Application.RoleMaxLength + 1));
+            app.Role = string.Join(string.Empty, Enumerable.Repeat('A', Domain.Entities.Application.RoleMaxLength + 1));
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
 
-            Assert.That(bag.Any(x => x.Message == $"Role max length is {Entities.Application.RoleMaxLength} characters."));
+            Assert.That(bag.Any(x => x.Message == $"Role max length is {Domain.Entities.Application.RoleMaxLength} characters."));
         }
     }
 
     [Test]
     public async Task ValidateAsync_compensationMaxLessThenZero_compensationMaxCannotBeLessThanZero()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompensationMax = -10;
@@ -120,7 +120,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_compensationMaxIsZero_compensationMaxCannotBeZero()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompensationMax = 0;
@@ -134,7 +134,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_compensationMinLessThenZero_compesationMinCannotBeLessThanZero()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompensationMin = -10;
@@ -148,7 +148,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_compensationMinIsZero_compensationMinCannotBeZero()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompensationMin = 0;
@@ -162,7 +162,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_compensationMinGreaterThanPayMax_compensationMinCannotBeGreaterThanPayMax()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.CompensationMin = 10;
@@ -177,7 +177,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_UserIdNotEntered_userIdIsRequired()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.UserId = default;
@@ -192,7 +192,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_statesMissing_applicationShouldHaveListOf()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.States.Clear();
@@ -207,10 +207,10 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_currentStateNoSelected_applicationShouldHaveCurrentState()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            foreach(var state in app.States)
+            foreach (var state in app.States)
                 state.IsCurrent = false;
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
@@ -223,10 +223,10 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_multipleStatesSelected_applicationShouldOnlyBeInOneCurrentState()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            foreach(var state in app.States)
+            foreach (var state in app.States)
                 state.IsCurrent = true;
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
@@ -239,10 +239,10 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_multipleStatesWithSameSeqNo_seqNoHasToBeUnique()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            foreach(var state in app.States)
+            foreach (var state in app.States)
                 state.SeqNo = 0;
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
@@ -255,16 +255,24 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_twoAppointmentsStartAtSameTime_twoAppointmentsCannotOverlap()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
             var eventStartDate = DateTime.UtcNow;
             var eventEndDate = DateTime.UtcNow.AddHours(4);
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = eventStartDate, EndDateTimeUTC = eventEndDate, Description = "Interview 1"});
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = eventStartDate, EndDateTimeUTC = eventEndDate, Description = "Interview 2"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = eventStartDate,
+                EndDateTimeUTC = eventEndDate,
+                Description = "Interview 1"
+            });
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = eventStartDate,
+                EndDateTimeUTC = eventEndDate,
+                Description = "Interview 2"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -276,7 +284,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_twoAppointmentsOverlap_appointmentsCannotOverlap()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -286,10 +294,18 @@ public class ApplicationUpsertService
             var event2StartDate = now.AddHours(2);
             var event2EndDate = now.AddHours(6);
 
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = event1StartDate, EndDateTimeUTC = event1EndDate, Description = "Interview 1"});
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = event2StartDate, EndDateTimeUTC = event2EndDate, Description = "Interview 2"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = event1StartDate,
+                EndDateTimeUTC = event1EndDate,
+                Description = "Interview 1"
+            });
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = event2StartDate,
+                EndDateTimeUTC = event2EndDate,
+                Description = "Interview 2"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -301,14 +317,18 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_sameStartAndEndDateTime_cannotHaveSameStartAndEndDateTime()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
             var now = DateTime.UtcNow;
 
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = now, EndDateTimeUTC = now, Description = "Interview"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = now,
+                EndDateTimeUTC = now,
+                Description = "Interview"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -320,7 +340,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_startAndEndSmallerThanAllowedMinimum_cannotHaveStartAndEndDateTimeSmallerThanMinimum()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -328,8 +348,12 @@ public class ApplicationUpsertService
             var startDateTime = now;
             var endDateTime = now.Add(Constants.MinimumAppoingmentDuration).AddSeconds(-1);
 
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = startDateTime, EndDateTimeUTC = endDateTime, Description = "Interview"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = startDateTime,
+                EndDateTimeUTC = endDateTime,
+                Description = "Interview"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -341,7 +365,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_appointmentStartDateTimeIsAfterEndDateTime_cannotHaveStartDateTimeBeAfterEndDateTime()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -349,8 +373,12 @@ public class ApplicationUpsertService
             var startDateTime = now;
             var endDateTime = now.AddHours(-4);
 
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = startDateTime, EndDateTimeUTC = endDateTime, Description = "Interview"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = startDateTime,
+                EndDateTimeUTC = endDateTime,
+                Description = "Interview"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -362,14 +390,16 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_appointmentDescriptionIsEmpty_descriptionCannotBeEmpty()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
             var now = DateTime.UtcNow;
-            app.Appointments.Add(new Appointment() {
+            app.Appointments.Add(new Appointment()
+            {
                 StartDateTimeUTC = now,
-                EndDateTimeUTC = now.AddHours(-4)});
+                EndDateTimeUTC = now.AddHours(-4)
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -381,15 +411,17 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_appointmentDescriptionIsGreaterThanMax_descriptionCannotBeGreaterThanMax()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
             var now = DateTime.UtcNow;
-            app.Appointments.Add(new Appointment() {
+            app.Appointments.Add(new Appointment()
+            {
                 StartDateTimeUTC = now,
                 EndDateTimeUTC = now.AddHours(-4),
-                Description = string.Join(string.Empty, Enumerable.Repeat("A", Appointment.DescriptionMaxLength + 1))});
+                Description = string.Join(string.Empty, Enumerable.Repeat("A", Appointment.DescriptionMaxLength + 1))
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -401,12 +433,16 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_appointmentStartDateIsMissing_appointmentStartDateTimeIsRequired()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = default, EndDateTimeUTC = DateTime.UtcNow, Description = "Interview"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = default,
+                EndDateTimeUTC = DateTime.UtcNow,
+                Description = "Interview"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -418,12 +454,16 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_appointmentEndDateIsMissing_appointmentEndDateTimeIsRequired()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = DateTime.UtcNow, EndDateTimeUTC = default, Description = "Interview"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = DateTime.UtcNow,
+                EndDateTimeUTC = default,
+                Description = "Interview"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -435,7 +475,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_appointmentIsLongerThanMaximumLength_cannotHaveStartAndEndDateTimeLargerThanMaximum()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -443,8 +483,12 @@ public class ApplicationUpsertService
             var startDateTime = now;
             var endDateTime = now.Add(Constants.MaximumAppointmentDuration).AddSeconds(1);
 
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = startDateTime, EndDateTimeUTC = endDateTime, Description = "Interview"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = startDateTime,
+                EndDateTimeUTC = endDateTime,
+                Description = "Interview"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -456,7 +500,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_appointmentHasDuplicateObjectId_appointmentCannotHaveDuplicateObjectIds()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -465,10 +509,20 @@ public class ApplicationUpsertService
             var endDateTime = now.AddHours(4);
             var objId = Guid.NewGuid();
 
-            app.Appointments.Add(new Appointment() {
-                Id = objId, StartDateTimeUTC = startDateTime, EndDateTimeUTC = endDateTime, Description = "Interview"});
-            app.Appointments.Add(new Appointment() {
-                Id = objId, StartDateTimeUTC = startDateTime.AddDays(1), EndDateTimeUTC = endDateTime.AddDays(1), Description = "Interview"});
+            app.Appointments.Add(new Appointment()
+            {
+                Id = objId,
+                StartDateTimeUTC = startDateTime,
+                EndDateTimeUTC = endDateTime,
+                Description = "Interview"
+            });
+            app.Appointments.Add(new Appointment()
+            {
+                Id = objId,
+                StartDateTimeUTC = startDateTime.AddDays(1),
+                EndDateTimeUTC = endDateTime.AddDays(1),
+                Description = "Interview"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -480,7 +534,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_appointmentHasEmptyObjectId_appointmentMustHaveValidObjectIds()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -488,8 +542,12 @@ public class ApplicationUpsertService
             var startDateTime = now;
             var endDateTime = now.AddHours(4);
 
-            app.Appointments.Add(new Appointment() {
-                StartDateTimeUTC = startDateTime, EndDateTimeUTC = endDateTime, Description = "Interview"});
+            app.Appointments.Add(new Appointment()
+            {
+                StartDateTimeUTC = startDateTime,
+                EndDateTimeUTC = endDateTime,
+                Description = "Interview"
+            });
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -501,7 +559,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_applicationStateHasDuplicateObjectId_applicationStatesEventsCannotHaveDuplicateObjectIds()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.States.First().Id = app.States.Last().Id;
@@ -516,7 +574,7 @@ public class ApplicationUpsertService
     [Test]
     public async Task ValidateAsync_applicationStateHasEmptyObjectId_applicationStateMustHaveValidObjectIds()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.States.First().Id = ObjectId.Empty;

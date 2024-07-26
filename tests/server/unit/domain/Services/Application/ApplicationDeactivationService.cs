@@ -1,16 +1,17 @@
-namespace SilverKinetics.w80.Domain.Services.Application.UnitTests;
+namespace SilverKinetics.w80.Domain.UnitTests.Services.Application;
 
-[TestFixture(TestOf = typeof(Application.ApplicationDeactivationService))]
+[TestFixture(TestOf = typeof(Domain.Services.Application.ApplicationDeactivationService))]
 public class ApplicationDeactivationService
 {
     [Test]
     public async Task ValidateForArchiveAsync_rejectedApplicationBeingArchived_cannotArchiveRejectedApplication()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.Reject(ctx.Services.GetRequiredService<IDateTimeProvider>(),
-            new Rejection(){
+            new Rejection()
+            {
                 Reason = "Some reason",
                 Method = RejectionMethod.Email
             });
@@ -24,7 +25,7 @@ public class ApplicationDeactivationService
     [Test]
     public async Task ValidateForReactivationAsync_notArchivedApplicationBeingUnarchived_applicationMustBeArchivedToBeUnarchived()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             var service = ctx.Services.GetRequiredService<IApplicationDeactivationService>();
@@ -36,7 +37,7 @@ public class ApplicationDeactivationService
     [Test]
     public async Task ValidateForDeactivationAsync_notArchivedApplicationBeingUnarchived_applicationMustBeArchivedToBeUnarchived()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.Deactivate(ctx.Services.GetRequiredService<IDateTimeProvider>());
@@ -49,10 +50,11 @@ public class ApplicationDeactivationService
     [Test]
     public async Task Deactivate_deactivateApplication_calendarEventsForApplicationShouldBeCleared()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment(){
+            app.Appointments.Add(new Appointment()
+            {
                 StartDateTimeUTC = DateTime.UtcNow.AddDays(2),
                 EndDateTimeUTC = DateTime.UtcNow.AddDays(2),
                 Description = "Interview"
@@ -67,7 +69,7 @@ public class ApplicationDeactivationService
     [Test]
     public async Task Deactivate_deactivateApplication_deactivationDateShouldBeSet()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 

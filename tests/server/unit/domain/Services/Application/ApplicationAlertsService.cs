@@ -1,15 +1,14 @@
-using SilverKinetics.w80.Domain.Services.User;
 using SilverKinetics.w80.Notifications.Contracts;
 
-namespace SilverKinetics.w80.Domain.Services.Application.UnitTests;
+namespace SilverKinetics.w80.Domain.UnitTests.Services.Application;
 
-[TestFixture(TestOf = typeof(Application.ApplicationAlertsService))]
+[TestFixture(TestOf = typeof(Domain.Services.Application.ApplicationAlertsService))]
 public class ApplicationAlertsService
 {
     [Test]
     public async Task SendScheduleEmailAlertsAsync_userWithOneAppointmentBeforeAlertThreshold_emailAlertShouldNotBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             await EnableEmailAlertsOnTestUserAsync(ctx);
 
@@ -24,7 +23,8 @@ public class ApplicationAlertsService
             var service = ctx.Services.GetRequiredService<IApplicationAlertsService>();
             var update = await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(update.Count, Is.EqualTo(0));
                 Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(0));
             });
@@ -34,7 +34,7 @@ public class ApplicationAlertsService
     [Test]
     public async Task SendScheduleEmailAlertsAsync_userWithOneAppointmentAtBorderOfAlertThreshold_emailAlertShouldBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             await EnableEmailAlertsOnTestUserAsync(ctx);
 
@@ -49,7 +49,8 @@ public class ApplicationAlertsService
             var service = ctx.Services.GetRequiredService<IApplicationAlertsService>();
             var update = await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(update.Count, Is.EqualTo(1));
                 Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(1));
             });
@@ -59,7 +60,7 @@ public class ApplicationAlertsService
     [Test]
     public async Task SendScheduleEmailAlertsAsync_userWithOneAppointmentAtBorderOfAlertThreshold_correctEmailNotificationShouldBeSent()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             await EnableEmailAlertsOnTestUserAsync(ctx);
 
@@ -80,7 +81,8 @@ public class ApplicationAlertsService
             var email = emailSender.Emails.Value.First();
             var subject = stringLocalizer["Appointment Alert"].Value;
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(email.Subject, Is.EqualTo(subject));
                 Assert.That(email.Addresses.Contains(user.Email), Is.True);
                 Assert.That(email.Template, Is.EqualTo(TemplateType.EmailApplicationScheduleAlert));
@@ -91,7 +93,7 @@ public class ApplicationAlertsService
     [Test]
     public async Task SendScheduleEmailAlertsAsync_userWithOneAppointmentInsideAlertThreshold_emailAlertShouldBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             await EnableEmailAlertsOnTestUserAsync(ctx);
 
@@ -106,7 +108,8 @@ public class ApplicationAlertsService
             var service = ctx.Services.GetRequiredService<IApplicationAlertsService>();
             var update = await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(update.Count, Is.EqualTo(1));
                 Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(1));
             });
@@ -116,7 +119,7 @@ public class ApplicationAlertsService
     [Test]
     public async Task SendScheduleEmailAlertsAsync_userWithOneAppointmentInsideAlertThreshold_appointmentShouldBeMarkedAsSent()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             await EnableEmailAlertsOnTestUserAsync(ctx);
 
@@ -139,7 +142,7 @@ public class ApplicationAlertsService
     [Test]
     public async Task SendScheduleEmailAlertsAsync_userWithOneAppointmentInsideAlertThresholdWithEmailAlertsTurnedOff_emailAlertShouldNotBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             await EnableEmailAlertsOnTestUserAsync(ctx);
 
@@ -156,7 +159,8 @@ public class ApplicationAlertsService
             var emailSender = ctx.Services.GetRequiredService<IEmailSenderService>() as EmailSenderServiceFake;
             var update = await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(update.Count, Is.EqualTo(0));
                 Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(0));
             });
@@ -166,7 +170,7 @@ public class ApplicationAlertsService
     [Test]
     public async Task SendScheduleEmailAlertsAsync_deactivatedUserWithOneAppointmentInsideAlertThreshold_emailAlertShouldNotBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             await EnableEmailAlertsOnTestUserAsync(ctx);
 
@@ -189,7 +193,8 @@ public class ApplicationAlertsService
 
             var update = await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(update.Count, Is.EqualTo(0));
                 Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(0));
             });
@@ -199,7 +204,7 @@ public class ApplicationAlertsService
     [Test]
     public async Task SendScheduleEmailAlertsAsync_userWithOneAppointmentOnDeactivatedApplicationInsideAlertThreshold_emailAlertShouldNotBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             await EnableEmailAlertsOnTestUserAsync(ctx);
 
@@ -222,14 +227,15 @@ public class ApplicationAlertsService
 
             var update = await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(update.Count, Is.EqualTo(0));
                 Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(0));
             });
         }
     }
 
-    private async Task<Entities.Application> CreateApplicationWithAppointmentAsync(
+    private async Task<Domain.Entities.Application> CreateApplicationWithAppointmentAsync(
         TestHelper.TestContext ctx,
         ObjectId userId,
         DateTime eventStartDateTime,
@@ -237,7 +243,8 @@ public class ApplicationAlertsService
     {
         var app = ctx.CreateApplication();
         app.UserId = userId;
-        app.Appointments.Add(new Appointment() {
+        app.Appointments.Add(new Appointment()
+        {
             ApplicationStateId = app.GetCurrentState().Id.ToString(),
             StartDateTimeUTC = eventStartDateTime,
             EndDateTimeUTC = eventEndDateTime,
@@ -253,7 +260,7 @@ public class ApplicationAlertsService
 
     private async Task EnableEmailAlertsOnTestUserAsync(TestHelper.TestContext ctx)
     {
-        var userRepo  = ctx.Services.GetRequiredService<IUserRepository>();
+        var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
         var current = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
         var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
         user.EnableEventEmailNotifications = true;
@@ -262,7 +269,7 @@ public class ApplicationAlertsService
 
     private async Task DisableEmailAlertsOnTestUserAsync(TestHelper.TestContext ctx)
     {
-        var userRepo  = ctx.Services.GetRequiredService<IUserRepository>();
+        var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
         var current = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
         var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
         user.EnableEventEmailNotifications = false;

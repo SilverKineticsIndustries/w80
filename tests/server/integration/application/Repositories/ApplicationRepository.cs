@@ -1,7 +1,6 @@
+namespace SilverKinetics.w80.Application.IntegrationTests.Repositories;
 
-namespace SilverKinetics.w80.Application.Repositories.IntegrationTests;
-
-[TestFixture(TestOf = typeof(Repositories.ApplicationRepository))]
+[TestFixture(TestOf = typeof(Application.Repositories.ApplicationRepository))]
 public class ApplicationRepository
 {
     [Test]

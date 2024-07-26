@@ -1,12 +1,12 @@
-namespace SilverKinetics.w80.Domain.Services.Application.UnitTests;
+namespace SilverKinetics.w80.Domain.UnitTests.Services.Application;
 
-[TestFixture(TestOf = typeof(Application.ApplicationArchiveService))]
+[TestFixture(TestOf = typeof(Domain.Services.Application.ApplicationArchiveService))]
 public class ApplicationArchiveService
 {
     [Test]
     public async Task ValidateForArchiveAsync_deactivatedApplicationBeingArchived_cannotArchiveDeactivatedApplication()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.Deactivate(ctx.Services.GetRequiredService<IDateTimeProvider>());
@@ -20,7 +20,7 @@ public class ApplicationArchiveService
     [Test]
     public async Task ValidateForArchiveAsync_rejectedApplicationBeingArchived_cannotArchiveRejectedApplication()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.Reject(ctx.Services.GetRequiredService<IDateTimeProvider>(), ctx.CreateRejection());
@@ -34,7 +34,7 @@ public class ApplicationArchiveService
     [Test]
     public async Task ValidateForUnarchiveAsync_notArchivedApplicationBeingUnarchived_applicationMustBeArchivedToBeUnarchived()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             var service = ctx.Services.GetRequiredService<IApplicationArchiveService>();
@@ -46,10 +46,11 @@ public class ApplicationArchiveService
     [Test]
     public async Task Archive_archiveApplication_calendarEventsForApplicationShouldBeCleared()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment(){
+            app.Appointments.Add(new Appointment()
+            {
                 StartDateTimeUTC = DateTime.UtcNow.AddDays(2),
                 EndDateTimeUTC = DateTime.UtcNow.AddDays(2),
                 Description = "Interview"
@@ -64,7 +65,7 @@ public class ApplicationArchiveService
     [Test]
     public async Task Archive_archiveApplication_archiveDateShouldBeSet()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 

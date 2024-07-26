@@ -1,14 +1,14 @@
 using SilverKinetics.w80.Application.Exceptions;
 
-namespace SilverKinetics.w80.Application.Services.IntegrationTests;
+namespace SilverKinetics.w80.Application.IntegrationTests.Services;
 
-[TestFixture(TestOf = typeof(Services.ApplicationApplicationService))]
+[TestFixture(TestOf = typeof(Application.Services.ApplicationApplicationService))]
 public class ApplicationApplicationService
 {
     [Test]
     public async Task GetAsync_queryExistingApplication_applicationShouldBeFound()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var app = ctx.CreateApplicationUpdateRequestDto();
@@ -24,7 +24,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task GetAsync_queryNonExistingApplication_applicationShouldNotBeFound()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var app = ctx.CreateApplicationUpdateRequestDto();
@@ -40,7 +40,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task InitializeAsync_creatingNewRecord_statusesShouldBePresentOnNewApplication()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationStateSet = ctx.Services.GetRequiredService<IMongoCollection<ApplicationState>>();
@@ -54,7 +54,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_changeCurrentState_newStateShouldBePersisted()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -80,7 +80,7 @@ public class ApplicationApplicationService
         // getting confused somewhere). Wrote about this in docs/notes.
         // https://jira.mongodb.org/browse/EF-115
 
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationStateSet = ctx.Services.GetRequiredService<IMongoCollection<ApplicationState>>();
@@ -98,7 +98,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_removeOneState_stateShouldBeRemoved()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationStateSet = ctx.Services.GetRequiredService<IMongoCollection<ApplicationState>>();
@@ -112,7 +112,8 @@ public class ApplicationApplicationService
             app.States = response.States.Where(x => x.Id != stateToRemove.Id).ToList();
 
             var ret = (await service.UpsertAsync(app)).Result;
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(ret.States.Count(), Is.EqualTo(applicationStates.Count - 1));
                 Assert.That(ret.States.Count(x => x.Id == stateToRemove.Id), Is.EqualTo(0));
             });
@@ -122,7 +123,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_addContact_newContactShouldBeAdded()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -138,7 +139,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_removeContact_contactShouldBeRemoved()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -158,7 +159,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updateContactParameter_contactShouldBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -197,7 +198,8 @@ public class ApplicationApplicationService
 
             res = await service.UpsertAsync(app);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(res.Result.Contacts.Count, Is.EqualTo(3));
                 Assert.That(res.Result.Contacts.Count(x => x.ContactParameter == "john.smith@w80.silverkinetics.dev"), Is.EqualTo(0));
                 Assert.That(res.Result.Contacts.Count(x => x.ContactParameter == "john.smith100@w80.silverkinetics.dev"), Is.EqualTo(1));
@@ -208,7 +210,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updateContactName_contactShouldBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -245,7 +247,8 @@ public class ApplicationApplicationService
             app.Contacts.First(x => x.ContactParameter == "john.smith@w80.silverkinetics.dev").ContactName = updatedName;
             res = await service.UpsertAsync(app);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(res.Result.Contacts.Count, Is.EqualTo(3));
                 Assert.That(res.Result.Contacts.Count(x => x.ContactName == "John Smith"), Is.EqualTo(0));
                 Assert.That(res.Result.Contacts.Count(x => x.ContactName == updatedName), Is.EqualTo(1));
@@ -256,7 +259,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_addAppointment_appointmentShouldBeAdded()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -268,7 +271,8 @@ public class ApplicationApplicationService
             app.Appointments.Add(ctx.CreateAppointmentDto(startEventDateTime, endEventDateTime));
 
             var res = await service.UpsertAsync(app);
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(res.Result.Appointments.Count, Is.EqualTo(1));
                 Assert.That(res.Result.Appointments.Count(x =>
                     x.StartDateTimeUTC.ToString() == startEventDateTime.ToString()
@@ -280,7 +284,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_addCalendarEvent_calendarStartDateShouldBePersistedAsUTC()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -301,7 +305,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_addCalendarEvent_calendarEndDateShouldBePersistedAsUTC()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -322,7 +326,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_removeCalendarEvent_calendarEventShouldBeRemoved()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -345,7 +349,8 @@ public class ApplicationApplicationService
             app.Appointments.Remove(toRemove);
             res = await service.UpsertAsync(app);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(res.Result.Appointments.Count, Is.EqualTo(1));
                 Assert.That(res.Result.Appointments.Count(x =>
                     x.StartDateTimeUTC.ToString() == event1StartDateTime.ToString()
@@ -360,7 +365,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updateCalendarEventDescription_calendarEventDescriptionShouldBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -383,7 +388,8 @@ public class ApplicationApplicationService
             toUpdate.Description = "Interview with Bill from Company A";
             res = await service.UpsertAsync(app);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(res.Result.Appointments.Count, Is.EqualTo(2));
                 Assert.That(res.Result.Appointments.Count(
                     x => x.Description == toUpdate.Description
@@ -396,7 +402,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updateCalendarEventDateTime_calendarEventDateTimeShouldBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -423,7 +429,8 @@ public class ApplicationApplicationService
             toUpdate.EndDateTimeUTC = newEvent3EndDateTime;
             res = await service.UpsertAsync(app);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(res.Result.Appointments.Count, Is.EqualTo(3));
                 Assert.That(res.Result.Appointments.Count(
                     x => x.Description == toUpdate.Description
@@ -437,7 +444,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_saveNewApplication_updatedUTCShouldNotBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -445,7 +452,8 @@ public class ApplicationApplicationService
             var res = await service.UpsertAsync(app);
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(res.Result.UpdatedUTC, Is.Null);
                 Assert.That(appl.UpdatedUTC, Is.Null);
             });
@@ -455,7 +463,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updateExistingApplication_updatedUTCshouldBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -467,7 +475,8 @@ public class ApplicationApplicationService
             res = await service.UpsertAsync(app);
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(res.Result.UpdatedUTC.HasValue);
                 Assert.That(res.Result.UpdatedUTC.Value, Is.EqualTo(now).Within(10).Seconds);
                 Assert.That(appl.UpdatedUTC.Value, Is.EqualTo(now).Within(10).Seconds);
@@ -478,7 +487,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updateDeactivatedApplication_deactivatedApplicationCannotBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -499,7 +508,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updateApplication_applicationUpdatedSystemEventShouldBePersisted()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -512,7 +521,8 @@ public class ApplicationApplicationService
             res = await service.UpsertAsync(app);
 
             var systemEvent = await systemEventSet.AsQueryable().Where((x) => x.EntityId == ObjectId.Parse(app.Id) && x.EntityName == nameof(Domain.Entities.Application)).FirstAsync();
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(systemEvent, Is.Not.Null);
             });
         }
@@ -521,7 +531,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task DeactivateAsync_deactivateApplication_applicationShouldBeDeactivated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -540,7 +550,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task DeactivateAsync_deactivateApplication_deactivatedByShouldBeSet()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -559,11 +569,11 @@ public class ApplicationApplicationService
     [Test]
     public async Task DeactivateAsync_deactivateApplication_applicationDeactivatedSystemEventIsPersisted()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
-            var systemEventSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.SystemEventEntry>>();
+            var systemEventSet = ctx.Services.GetRequiredService<IMongoCollection<SystemEventEntry>>();
 
             var now = DateTime.UtcNow;
             var app = ctx.CreateApplicationUpdateRequestDto();
@@ -575,16 +585,17 @@ public class ApplicationApplicationService
             Assume.That(appl.DeactivatedUTC, Is.Not.Null);
 
             var systemEvent = await systemEventSet.AsQueryable().Where((x) => x.EntityId == appl.Id && x.EntityName == nameof(Domain.Entities.Application)).FirstAsync();
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(systemEvent, Is.Not.Null);
             });
         }
     }
 
-     [Test]
+    [Test]
     public async Task ReactivateAsync_reactiveApplication_applicationShouldBeReactivated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -606,7 +617,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task ReactivateAsync_deactivateApplication_deactivatedByShouldBeSetToEmpty()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -625,7 +636,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task ReactivateAsync_reactivateApplication_applicationReacivatedSystemEventIsPersisted()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -644,7 +655,8 @@ public class ApplicationApplicationService
             Assume.That(appl.DeactivatedUTC, Is.Null);
 
             var systemEvent = await systemEventSet.AsQueryable().Where((x) => x.EntityId == appl.Id && x.EntityName == nameof(Domain.Entities.Application)).FirstAsync();
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(systemEvent, Is.Not.Null);
             });
         }
@@ -653,7 +665,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task ArchiveAsync_archiveApplication_applicationShouldBeArchived()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -672,11 +684,11 @@ public class ApplicationApplicationService
     [Test]
     public async Task ArchiveAsync_archiveApplication_applicationArchiveSystemEventIsPersisted()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
-            var systemEventSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.SystemEventEntry>>();
+            var systemEventSet = ctx.Services.GetRequiredService<IMongoCollection<SystemEventEntry>>();
 
             var now = DateTime.UtcNow;
             var app = ctx.CreateApplicationUpdateRequestDto();
@@ -690,7 +702,8 @@ public class ApplicationApplicationService
 
             var systemEvent = await systemEventSet.AsQueryable().Where((x) => x.EntityId == appl.Id && x.EntityName == nameof(Domain.Entities.Application)).FirstOrDefaultAsync();
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(systemEvent, Is.Not.Null);
             });
         }
@@ -699,7 +712,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UnarchiveAsync_unarchiveApplication_applicationShouldBeUnarchived()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -721,11 +734,11 @@ public class ApplicationApplicationService
     [Test]
     public async Task UnarchiveAsync_unarchiveApplication_applicationUnarchiveSystemEventIsPersisted()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
-            var systemEventSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.SystemEventEntry>>();
+            var systemEventSet = ctx.Services.GetRequiredService<IMongoCollection<SystemEventEntry>>();
 
             var now = DateTime.UtcNow;
             var app = ctx.CreateApplicationUpdateRequestDto();
@@ -738,7 +751,8 @@ public class ApplicationApplicationService
             Assume.That(appl.ArchivedUTC, Is.Null);
 
             var systemEvent = await systemEventSet.AsQueryable().Where((x) => x.EntityId == appl.Id && x.EntityName == nameof(Domain.Entities.Application)).FirstAsync();
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(systemEvent, Is.Not.Null);
             });
         }
@@ -747,7 +761,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task RejectAsync_rejectApplication_applicationShouldBeRejected()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationRepo = ctx.Services.GetRequiredService<IApplicationRepository>();
@@ -767,7 +781,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task RejectAsync_rejectApplication_applicationRejectedSystemEventIsPersisted()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
             var applicationSet = ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>();
@@ -782,7 +796,8 @@ public class ApplicationApplicationService
 
             var systemEventSet = ctx.Services.GetRequiredService<IMongoCollection<SystemEventEntry>>();
             var systemEvent = await systemEventSet.AsQueryable().Where((x) => x.EntityId == appl.Id && x.EntityName == nameof(Domain.Entities.Application)).FirstAsync();
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(systemEvent, Is.Not.Null);
             });
         }
@@ -791,14 +806,15 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_createApplicationWithDifferentUserId_authorizationExceptionShouldBeThrown()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
             var now = DateTime.UtcNow;
             var app = ctx.CreateApplicationUpdateRequestDto();
             app.UserId = ObjectId.GenerateNewId().ToString();
-            Assert.ThrowsAsync<AuthorizationException>(async () => {
+            Assert.ThrowsAsync<AuthorizationException>(async () =>
+            {
                 await service.UpsertAsync(app);
             });
         }
@@ -807,7 +823,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updatingApplicationWithDifferentUserId_authorizationExceptionShouldBeThrown()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -817,7 +833,8 @@ public class ApplicationApplicationService
 
             app.UserId = ObjectId.GenerateNewId().ToString();
 
-            Assert.ThrowsAsync<AuthorizationException>(async () => {
+            Assert.ThrowsAsync<AuthorizationException>(async () =>
+            {
                 await service.UpsertAsync(app);
             });
         }
@@ -826,7 +843,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_updatingApplicationByChangingIdToApplicationOfDifferentUser_authorizationExceptionShouldBeThrown()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -845,7 +862,8 @@ public class ApplicationApplicationService
 
             appForCurrentUser.Id = different.Id.ToString();
 
-            Assert.ThrowsAsync<AuthorizationException>(async () => {
+            Assert.ThrowsAsync<AuthorizationException>(async () =>
+            {
                 await service.UpsertAsync(appForCurrentUser);
             });
         }
@@ -854,7 +872,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_appointmentShiftedWithinThresholdAfterEmailAlertWasSend_EmailAndBrowserNotificationSentShouldBeCleared()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -863,7 +881,8 @@ public class ApplicationApplicationService
             var threshold = TimeSpan.FromMinutes(30);
 
             var app = ctx.CreateApplicationUpdateRequestDto();
-            app.Appointments.Add(new AppointmentDto() {
+            app.Appointments.Add(new AppointmentDto()
+            {
                 StartDateTimeUTC = now.AddMinutes(15),
                 EndDateTimeUTC = now.AddHours(4),
                 Description = "Event 1",
@@ -881,7 +900,8 @@ public class ApplicationApplicationService
 
             var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().GetSingleOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
             var evnt = updatedApp.Appointments.First();
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(evnt.EmailNotificationSent, Is.False);
                 Assert.That(evnt.BrowserNotificationSent, Is.False);
             });
@@ -891,7 +911,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_appointmentShiftedOutsideOfThresholdAfterEmailAlertWasSend_EmailAndBrowserNotificationSentShouldBeResetToFalse()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -900,7 +920,8 @@ public class ApplicationApplicationService
             var threshold = TimeSpan.FromMinutes(30);
 
             var app = ctx.CreateApplicationUpdateRequestDto();
-            app.Appointments.Add(new AppointmentDto() {
+            app.Appointments.Add(new AppointmentDto()
+            {
                 StartDateTimeUTC = now.AddMinutes(15),
                 EndDateTimeUTC = now.AddHours(4),
                 Description = "Event 1",
@@ -918,7 +939,8 @@ public class ApplicationApplicationService
 
             var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().GetSingleOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
             var evnt = updatedApp.Appointments.First();
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(evnt.EmailNotificationSent, Is.False);
                 Assert.That(evnt.BrowserNotificationSent, Is.False);
             });
@@ -928,7 +950,7 @@ public class ApplicationApplicationService
     [Test]
     public async Task UpsertAsync_appointmentShiftedIntoThePastAfterEmailAlertWasSend_EmailAndBrowserNotificationSentShouldBeNotBeReset()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
@@ -937,7 +959,8 @@ public class ApplicationApplicationService
             var threshold = TimeSpan.FromMinutes(30);
 
             var app = ctx.CreateApplicationUpdateRequestDto();
-            app.Appointments.Add(new AppointmentDto() {
+            app.Appointments.Add(new AppointmentDto()
+            {
                 StartDateTimeUTC = now.AddMinutes(15),
                 EndDateTimeUTC = now.AddHours(4),
                 Description = "Event 1",
@@ -956,7 +979,8 @@ public class ApplicationApplicationService
 
             var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().GetSingleOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
             var evnt = updatedApp.Appointments.First();
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(evnt.EmailNotificationSent, Is.True);
                 Assert.That(evnt.BrowserNotificationSent, Is.True);
             });

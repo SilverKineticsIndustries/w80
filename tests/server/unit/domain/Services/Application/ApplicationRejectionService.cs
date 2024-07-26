@@ -1,12 +1,12 @@
-namespace SilverKinetics.w80.Domain.Services.Application.UnitTests;
+namespace SilverKinetics.w80.Domain.UnitTests.Services.Application;
 
-[TestFixture(TestOf = typeof(Application.ApplicationRejectionService))]
+[TestFixture(TestOf = typeof(Domain.Services.Application.ApplicationRejectionService))]
 public class ApplicationRejectionService
 {
     [Test]
     public async Task ValidateAsync_noRejectionReasonProvided_rejectionReasonMustBeProvided()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -21,7 +21,7 @@ public class ApplicationRejectionService
     [Test]
     public async Task ValidateAsync_noRejectionMethodProvided_rejectionMethodMustBeProvided()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -36,7 +36,7 @@ public class ApplicationRejectionService
     [Test]
     public async Task ValidateAsync_rejectionReasonIsLargerThanMaxLength_rejectionReasonMustBeSmallerThanMaxLength()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -52,7 +52,7 @@ public class ApplicationRejectionService
     [Test]
     public async Task ValidateAsync_rejectionResponseTextIsLargerThanMaxLength_rejectionResponseTextMustBeSmallerThanMaxLength()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 
@@ -70,7 +70,7 @@ public class ApplicationRejectionService
     [Test]
     public async Task ValidateAsync_deactivatedApplicationBeingRejected_cannotRejectDeactivatedApplication()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.Deactivate(ctx.Services.GetRequiredService<IDateTimeProvider>());
@@ -84,7 +84,7 @@ public class ApplicationRejectionService
     [Test]
     public async Task ValidateAsync_archivedApplicationBeingRejected_cannotRejectArchivedApplication()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
             app.Archive(ctx.Services.GetRequiredService<IDateTimeProvider>());
@@ -98,10 +98,11 @@ public class ApplicationRejectionService
     [Test]
     public async Task Reject_rejectApplication_calendarEventsForApplicationShouldBeCleared()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment(){
+            app.Appointments.Add(new Appointment()
+            {
                 StartDateTimeUTC = DateTime.UtcNow.AddDays(2),
                 EndDateTimeUTC = DateTime.UtcNow.AddDays(2),
                 Description = "Interview"
@@ -116,7 +117,7 @@ public class ApplicationRejectionService
     [Test]
     public async Task Reject_rejectApplication_rejectionDateShouldBeSet()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
 

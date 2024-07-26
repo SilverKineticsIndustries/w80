@@ -1,12 +1,12 @@
-namespace SilverKinetics.w80.Domain.Services.User.UnitTests;
+namespace SilverKinetics.w80.Domain.UnitTests.Services.User;
 
-[TestFixture(TestOf = typeof(Services.User.UserUpsertService))]
+[TestFixture(TestOf = typeof(Domain.Services.User.UserUpsertService))]
 public class UserProfileUpsertService
 {
     [Test]
     public async Task ValidateProfileAsync_updateUserWithEmptyEmail_userEmailCannotBeEmpty()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var user = ctx.CreateUser();
             user.Email = "";
@@ -19,7 +19,7 @@ public class UserProfileUpsertService
     [Test]
     public async Task ValidateProfileAsync_updateEmailWithEmailFromAnotherUser_twoUsersCannotHaveSameEmail()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var user = ctx.CreateUser();
             user.Email = ctx.GetTestUserEmail();
@@ -33,7 +33,7 @@ public class UserProfileUpsertService
     [Test]
     public async Task ValidateFullyAsync_updateUserRoleToServiceWorker_serviceWorkerCannotBeUpserted()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var user = ctx.CreateUser();
             user.Id = ObjectId.GenerateNewId();
@@ -48,38 +48,38 @@ public class UserProfileUpsertService
     [Test]
     public async Task ValidateProfileAsync_insertLongEmailAddress_emailAddressLengthCannotExceedMaximum()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var user = ctx.CreateUser();
             user.Id = ObjectId.GenerateNewId();
             user.Role = Role.User;
-            user.Email = string.Join(string.Empty, Enumerable.Repeat('A', Entities.User.EmailMaxLength + 1));
+            user.Email = string.Join(string.Empty, Enumerable.Repeat('A', Domain.Entities.User.EmailMaxLength + 1));
             var service = ctx.Services.GetRequiredService<IUserUpsertService>();
             var bag = await service.ValidateProfileAsync(user, CancellationToken.None);
-            Assert.That(bag.Any(x => x.Message == $"User email max length is {Entities.User.EmailMaxLength} characters."), Is.True);
+            Assert.That(bag.Any(x => x.Message == $"User email max length is {Domain.Entities.User.EmailMaxLength} characters."), Is.True);
         }
     }
 
     [Test]
     public async Task ValidateProfileAsync_insertLongNickname_nicknameLengthCannotExceedMaximum()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var user = ctx.CreateUser();
             user.Id = ObjectId.GenerateNewId();
             user.Role = Role.User;
             user.Email = "testuser1000@silverkinetics.dev";
-            user.Nickname = string.Join(string.Empty, Enumerable.Repeat('A', Entities.User.NicknameMaxLength+ 1));
+            user.Nickname = string.Join(string.Empty, Enumerable.Repeat('A', Domain.Entities.User.NicknameMaxLength + 1));
             var service = ctx.Services.GetRequiredService<IUserUpsertService>();
             var bag = await service.ValidateProfileAsync(user, CancellationToken.None);
-            Assert.That(bag.Any(x => x.Message == $"User nickname max length is {Entities.User.NicknameMaxLength} characters."), Is.True);
+            Assert.That(bag.Any(x => x.Message == $"User nickname max length is {Domain.Entities.User.NicknameMaxLength} characters."), Is.True);
         }
     }
 
     [Test]
     public async Task ValidateFullyAsync_insertUserWithoutRole_roleCannotBeEmpty()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var user = ctx.CreateUser();
             user.Id = ObjectId.GenerateNewId();

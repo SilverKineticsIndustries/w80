@@ -1,19 +1,20 @@
 using SilverKinetics.w80.Application.Exceptions;
 
-namespace SilverKinetics.w80.Application.Services.IntegrationTests;
+namespace SilverKinetics.w80.Application.IntegrationTests.Services;
 
-[TestFixture(TestOf = typeof(Services.UserApplicationService))]
+[TestFixture(TestOf = typeof(UserApplicationService))]
 public class UserApplicationService
 {
     [Test]
     public async Task UpdateAsync_asNormalUserCreateNewUser_authorizationExceptionShouldBeThrownBecauseOnlyAdminCanAddUsers()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = ctx.CreateUser("john.smith@dev.silverkinetics.com");
 
-            Assert.ThrowsAsync<AuthorizationException>(async () => {
+            Assert.ThrowsAsync<AuthorizationException>(async () =>
+            {
                 await service.UpdateAsync(UserMapper.ToUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
             });
         }
@@ -22,7 +23,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_updateOwnProfile_roleShouldNotChange()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var set = ctx.Services.GetRequiredService<IMongoCollection<User>>();
             var beforeUpdate = await set.AsQueryable().FirstAsync(x => x.Id == ctx.GetTestUserID());
@@ -41,7 +42,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asNormalUserUpdateOwnPassword_passworkShouldBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = await service.GetProfileAsync(ctx.GetTestUserID(), CancellationToken.None);
@@ -51,7 +52,7 @@ public class UserApplicationService
 
             var authenticationService = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var res = await authenticationService.LoginWithCredentialsAsync(
-                new LoginRequestDto() { Email = ctx.GetTestUserEmail(), Password = "longpassword456"},
+                new LoginRequestDto() { Email = ctx.GetTestUserEmail(), Password = "longpassword456" },
                 new CookieManagerFake(),
                 RequestSourceInfo.Empty,
                 CancellationToken.None
@@ -64,7 +65,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asAdminUserUpdateOwnPassword_passworkShouldBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
@@ -76,7 +77,7 @@ public class UserApplicationService
 
             var authenticationService = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var res = await authenticationService.LoginWithCredentialsAsync(
-                new LoginRequestDto() { Email = ctx.GetAdminUserEmail(), Password = "longpassword456"},
+                new LoginRequestDto() { Email = ctx.GetAdminUserEmail(), Password = "longpassword456" },
                 new CookieManagerFake(),
                 RequestSourceInfo.Empty,
                 CancellationToken.None
@@ -89,14 +90,14 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asNormalUserUpdateOwnPasswordWithSmallPassword_passwordLengthCannotBeLessThanMinimum()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var config = ctx.Services.GetRequiredService<IConfiguration>();
             var minLength = Convert.ToInt32(config[Keys.PasswordMinimumLength]);
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = await service.GetProfileAsync(ctx.GetTestUserID(), CancellationToken.None);
             var updateRequest = UserMapper.ToUpdateDTO(user);
-            updateRequest.Password =  string.Join(string.Empty, Enumerable.Repeat('A', minLength - 1));
+            updateRequest.Password = string.Join(string.Empty, Enumerable.Repeat('A', minLength - 1));
             var res = await service.UpdateAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
             Assert.That(res.Errors.Any(y => y.ClientMessage == $"Password must be at least {minLength} characters long."), Is.True);
         }
@@ -105,7 +106,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asNormalUserUpdateOwnPasswordToSamePasswordAsBefore_validationErrorShouldBeThrown()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = await service.GetProfileAsync(ctx.GetTestUserID(), CancellationToken.None);
@@ -119,7 +120,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asAdminCreateNewUser_newUserShouldBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
@@ -135,7 +136,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asAdminChangeEmailOfAnotherUser_anotherUserEmailShouldBeChanged()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
@@ -155,7 +156,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asAdminCreateNewUserWithSameEmail_validationErrorShouldBeReturned()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
@@ -175,7 +176,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asNormalUserUpdateEmailOnOwnProfile_emailShouldBeUpdated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var securityContext = ctx.Services.GetRequiredService<ISecurityContext>();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
@@ -195,7 +196,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_asNormalUserUpdateOwnProfile_makeSureUpdatedUTCisChanged()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var securityContext = ctx.Services.GetRequiredService<ISecurityContext>();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
@@ -207,7 +208,8 @@ public class UserApplicationService
             await service.UpdateAsync(UserMapper.ToUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
 
             user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(user.UpdatedUTC, Is.Not.EqualTo(currentUpdatedUTC));
                 Assert.That(user.UpdatedUTC, Is.EqualTo(DateTime.UtcNow).Within(10).Seconds);
             });
@@ -217,7 +219,7 @@ public class UserApplicationService
     [Test]
     public async Task UpdateAsync_changeUserIdOnExistingUser_authorizationExceptionShouldBeThrown()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var securityContext = ctx.Services.GetRequiredService<ISecurityContext>();
             var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
@@ -227,7 +229,8 @@ public class UserApplicationService
             user.Id = ObjectId.GenerateNewId();
             var userDto = UserMapper.ToUpdateDTO(user);
 
-            Assert.ThrowsAsync<AuthorizationException>(async() => {
+            Assert.ThrowsAsync<AuthorizationException>(async () =>
+            {
                 await service.UpdateAsync(userDto, RequestSourceInfo.Empty, CancellationToken.None);
             });
         }
@@ -236,7 +239,7 @@ public class UserApplicationService
     [Test]
     public async Task DeactivateAsync_deactivateRegularUser_userShouldBeDeactivated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
@@ -250,7 +253,7 @@ public class UserApplicationService
     [Test]
     public async Task DeactivateAsync_deactivateRegularUser_deactivatedByShouldBeSetCorrectly()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
             var adminUserId = ctx.GetCurrentUserId();
@@ -265,7 +268,7 @@ public class UserApplicationService
     [Test]
     public async Task GetAllAsync_getAllUsers_allNormalUsersShouldBeReturned()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var count = await ctx.Services.GetRequiredService<IMongoCollection<User>>().AsQueryable().CountAsync();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
@@ -278,7 +281,7 @@ public class UserApplicationService
     [Test]
     public async Task GetAllAsync_getAllUsers_serviceWorkerShouldNotBeReturned()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var users = await service.GetAllAsync(CancellationToken.None);
@@ -290,7 +293,7 @@ public class UserApplicationService
     [Test]
     public async Task GetAllAsync_getAllUsers_deactivatedUsersShouldAlsoBeReturned()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var userId = ctx.GetCurrentUserId();
             ctx.SetUserToAdmin();
@@ -310,13 +313,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asRegularUserCreateNewNotActiveUser_authorizationExceptionShouldBeThrown()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
-            Assert.ThrowsAsync<AuthorizationException>(async () => {
+            Assert.ThrowsAsync<AuthorizationException>(async () =>
+            {
                 await service.UpsertAsync(
-                    new UserUpsertRequestDto() {
+                    new UserUpsertRequestDto()
+                    {
                         Nickname = "testuser1000",
                         Email = "testuser1000@silverkinetics.dev",
                         Culture = SupportedCultures.DefaultCulture,
@@ -334,14 +339,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUser_newUserShouldBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -362,14 +368,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUser_correspondingUserSecurityRecordShouldBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -390,14 +397,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUser_userShouldBeMarkedAsRequiringUsageOfInvitationCode()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -418,14 +426,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUser_userShouldBeMarkedAsNotHavingEmailConfirmated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -446,14 +455,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUser_userShouldNotHavePassword()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -474,14 +484,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUser_newUserShouldBeMarkedAsNeedingInvitationCode()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -502,14 +513,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUser_newUserShouldHaveInvitationCode()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var ret = await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -527,13 +539,14 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUserWithProvidingId_newIdShouldBeCreated()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var ret = await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -550,7 +563,7 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewNotActiveUser_newUserShouldHaveValidInvitationCode()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
@@ -558,7 +571,8 @@ public class UserApplicationService
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var ret = await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = userEmail,
                     Culture = SupportedCultures.DefaultCulture,
@@ -574,7 +588,8 @@ public class UserApplicationService
             var config = ctx.Services.GetRequiredService<IConfiguration>();
             Invitations.Decrypt(config, code, out string email, out DateTime utcDateTime);
 
-            Assert.Multiple(() => {
+            Assert.Multiple(() =>
+            {
                 Assert.That(userEmail, Is.EqualTo(email));
                 Assert.That(utcDateTime, Is.EqualTo(DateTime.UtcNow).Within(10).Seconds);
             });
@@ -584,14 +599,15 @@ public class UserApplicationService
     [Test]
     public async Task UpsertAsync_asAdminCreateNewServiceWorkerUser_validationErrorShouldReturn()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var userId = ObjectId.GenerateNewId().ObjectIdToStringId();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var ret = await service.UpsertAsync(
-                new UserUpsertRequestDto() {
+                new UserUpsertRequestDto()
+                {
                     Nickname = "testuser1000",
                     Email = "testuser1000@silverkinetics.dev",
                     Culture = SupportedCultures.DefaultCulture,
@@ -609,7 +625,7 @@ public class UserApplicationService
     [Test]
     public async Task DeactivateAsync_userTriesToDeactivateThemselves_validationErrorShouldReturn()
     {
-        using(var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();

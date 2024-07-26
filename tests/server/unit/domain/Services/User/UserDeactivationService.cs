@@ -1,12 +1,12 @@
-namespace SilverKinetics.w80.Domain.Services.User.UnitTests;
+namespace SilverKinetics.w80.Domain.UnitTests.Services.User;
 
-[TestFixture(TestOf = typeof(User.UserDeactivationService))]
+[TestFixture(TestOf = typeof(Domain.Services.User.UserDeactivationService))]
 public class UserDeactivationService
 {
     [Test]
     public async Task ValidateForDeactivationAsync_deactivationServiceWorker_userCannotBeDeactivated()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var user = ctx.CreateUser();
             user.Role = Role.ServiceWorker;
@@ -20,7 +20,7 @@ public class UserDeactivationService
     [Test]
     public async Task ValidateForDeactivationAsync_userTryingToDeactivateThemselves_userCannotBeDeactivated()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var user = ctx.CreateUser();
             user.Id = ctx.GetCurrentUserId();
@@ -34,7 +34,7 @@ public class UserDeactivationService
     [Test]
     public async Task ValidateForDeactivationAsync_deactivatingUserWhoIsAlreadyDeactivated_userCannotBeDeactivated()
     {
-        using(var ctx = TestContextFactory.Create())
+        using (var ctx = TestContextFactory.Create())
         {
             var user = ctx.CreateUser();
             user.Id = ObjectId.GenerateNewId();

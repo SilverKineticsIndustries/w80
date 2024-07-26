@@ -1,6 +1,6 @@
 namespace SilverKinetics.w80.Notifications.UnitTests;
 
-[TestFixture(TestOf = typeof(w80.Notifications.TemplateResolver))]
+[TestFixture(TestOf = typeof(Notifications.TemplateResolver))]
 public class TemplateResolver
 {
     [Test]
@@ -9,7 +9,7 @@ public class TemplateResolver
         using(var ctx = TestContextFactory.Create())
         {
             var config = ctx.Services.GetRequiredService<IConfiguration>();
-            var resolver = new w80.Notifications.TemplateResolver(config);
+            var resolver = new Notifications.TemplateResolver(config);
 
             var body = "Test {{one}}";
             var prms = new Dictionary<string,string>(){ {"one", "resolved"} };
@@ -25,7 +25,7 @@ public class TemplateResolver
         using(var ctx = TestContextFactory.Create())
         {
             var config = ctx.Services.GetRequiredService<IConfiguration>();
-            var resolver = new w80.Notifications.TemplateResolver(config);
+            var resolver = new Notifications.TemplateResolver(config);
 
             var body = "Test {{one}}";
             var prms = new Dictionary<string,string>();
@@ -41,7 +41,7 @@ public class TemplateResolver
         using(var ctx = TestContextFactory.Create())
         {
             var config = ctx.Services.GetRequiredService<IConfiguration>();
-            var resolver = new w80.Notifications.TemplateResolver(config);
+            var resolver = new Notifications.TemplateResolver(config);
 
             var val = config[Keys.Appname];
             var body = "Test {{appname}}";
@@ -59,7 +59,7 @@ public class TemplateResolver
         using(var ctx = TestContextFactory.Create())
         {
             var config = ctx.Services.GetRequiredService<IConfiguration>();
-            var resolver = new w80.Notifications.TemplateResolver(config);
+            var resolver = new Notifications.TemplateResolver(config);
 
             Assert.DoesNotThrowAsync(async () => {
                 foreach(var culture in SupportedCultures.Cultures)
