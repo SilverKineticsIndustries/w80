@@ -507,6 +507,7 @@ yarn-error.log*
 # dev environment files
 /data
 /logs
+/deploy
 /src/server/controller/logs
 .mono
 
@@ -517,3 +518,4 @@ n2n/artifacts
 
 .gitconfig
 .runsettings
+

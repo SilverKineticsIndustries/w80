@@ -4,8 +4,10 @@ ifneq (,$(wildcard ./.env))
  	export
 endif
 
+REPO_URL=https://github.com/silverkineticsindustries/w80.git
+
 .PHONY: list init start-app run-server-tests run-end-to-end-tests \
-		start-devel-db del-devel-data clean show-todos
+		start-devel-db del-devel-data clean show-todos deploy
 
 list:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
@@ -111,7 +113,17 @@ del-devel-data:          ## Delete development db data
 clean:                   ## Clean all build artifacts
 	dotnet clean
 
-test:                    ## Initialize development environment
-
 show-todos:              ## Show TODOs
 	grep -i -R --binary-files=without-match -A 10 --color=always "TODO" ./src/server/ ./src/webapp/src/ ./tests/n2n ./tests/server
+
+deploy-from-github:      ## Deploy latest version from master branch on GitHub
+	rm -rf ./deploy
+	git clone --depth 1 $(REPO_URL) ./deploy
+	cp .env.prod ./deploy
+	rsync -avr --include-from=./.deploy.include --exclude='*' -e "ssh -i $$W80_DEPLOY_SECRET_PATH" ./deploy/ $$W80_DEPLOY_SSH_PATH:"/app/src"
+	ssh -i $$W80_DEPLOY_SECRET_PATH $$W80_DEPLOY_SSH_PATH '  															\
+	cd /app/src;																										\
+	mv -f ./.env.prod ./.env; 																							\
+	docker compose -f compose.prod.yaml down; 																			\
+	docker compose -f compose.prod.yaml build;  																		\
+	docker compose -f compose.prod.yaml up -d;'

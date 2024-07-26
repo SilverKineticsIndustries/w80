@@ -1,0 +1,6 @@
+# Relative from ./deploy
+src/***
+db/***
+.env.prod
+compose.prod.yaml
+w80.sln
