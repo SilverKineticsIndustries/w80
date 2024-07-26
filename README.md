@@ -71,8 +71,8 @@
   You should create a .gitconfig file in the repo root folder and fill in all of your
   git settings for this project. The git/.config file has the include for the ./.gitconfig file.
 
-  I like to use Makefiles to create simple recipies for various tasks you might do
-  during development. You can see all the recipies and their explanations by running
+  I like to use Makefiles to create simple recipes for various tasks you might do
+  during development. You can see all the recipes and their explanations by running
   "make" or "make list"
 
   To begin development you can run:
@@ -102,7 +102,7 @@
   ./tests/server/.runsettings file looks fine. It should have been created during
   "make init" stage. Afterwards, you can run the tests from VS Code.
 
-  You can also run unit and integration outside of VS Code by runnung:
+  You can also run unit and integration outside of VS Code by running:
 
      make run-server-tests
 
@@ -112,4 +112,4 @@
 
   If you would like to see the actual browser automation of the end-to-end testing,
   run npx cypress open, and the Cypress UI will open. From there you can run each tests
-  and look at the automation in realtime.
+  and look at the automation in real-time.
