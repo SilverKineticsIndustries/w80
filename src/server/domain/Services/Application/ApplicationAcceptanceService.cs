@@ -18,7 +18,7 @@ public class ApplicationAcceptanceService(
 {
     public void Accept(Entities.Application application, Acceptance acceptance)
     {
-        application.Accept(dateTimeProvider, acceptance);
+        application.Accept(acceptance);
         systemEventSink.Add(new ApplicationAcceptedEvent(securityContext.UserId, dateTimeProvider.GetUtcNow(), application));
     }
 
@@ -32,7 +32,7 @@ public class ApplicationAcceptanceService(
         return openApplications;
     }
 
-    public async Task<ValidationBag> ValidateAsync(Entities.Application application, Acceptance acceptance, CancellationToken cancellationToken = default)
+    public ValidationBag Validate(Entities.Application application, Acceptance acceptance, CancellationToken cancellationToken = default)
     {
         var bag = new ValidationBag();
 

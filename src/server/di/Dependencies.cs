@@ -21,8 +21,8 @@ namespace SilverKinetics.w80.DI;
 
 public static class Dependencies
 {
-    private static IMongoClient _mongoClient;
-    private static IMongoDatabase _mongoDatabase;
+    private static IMongoClient _mongoClient = null!;
+    private static IMongoDatabase _mongoDatabase = null!;
 
     public static IServiceCollection AddDependencies(
         this IServiceCollection services,

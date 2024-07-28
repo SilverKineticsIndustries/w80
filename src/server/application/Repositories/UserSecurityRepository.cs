@@ -18,9 +18,9 @@ public class UserSecurityRepository(
     public async Task UpsertAsync(UserSecurity userSecurity, CancellationToken cancellationToken, IClientSessionHandle? session = null)
     {
         if (session == null)
-            await userSecuritySet.ReplaceOneAsync(x => x.Id == userSecurity.Id, userSecurity, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(x => x.Id == userSecurity.Id, userSecurity, replaceOptions, cancellationToken).ConfigureAwait(false);
         else
-            await userSecuritySet.ReplaceOneAsync(session, x => x.Id == userSecurity.Id, userSecurity, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(session, x => x.Id == userSecurity.Id, userSecurity, replaceOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }

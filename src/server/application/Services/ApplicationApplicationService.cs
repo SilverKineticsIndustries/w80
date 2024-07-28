@@ -30,7 +30,7 @@ public class ApplicationApplicationService(
     public async Task<ApplicationViewDto?> GetAsync(ObjectId id, CancellationToken cancellationToken= default)
     {
         var appl = await applicationRepo
-                            .GetSingleOrDefaultAsync((x) => x.Id == id, cancellationToken)
+                            .FirstOrDefaultAsync((x) => x.Id == id, cancellationToken)
                             .ConfigureAwait(false);
 
         if (appl is not null)
@@ -57,7 +57,7 @@ public class ApplicationApplicationService(
     public async Task<ComplexResponseDto<ApplicationViewDto>> UpsertAsync(ApplicationUpdateRequestDto application, CancellationToken cancellationToken = default)
     {
         var objId = ObjectId.Parse(application.Id);
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == objId, cancellationToken);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == objId, cancellationToken);
         VerifyUserCanAccessApplication(ObjectId.Parse(application.UserId), current);
 
         var entity = ApplicationMapper.ToEntity(application);
@@ -81,7 +81,7 @@ public class ApplicationApplicationService(
 
     public async Task<ComplexResponseDto<ApplicationViewDto>> DeactivateAsync(ObjectId id, CancellationToken cancellationToken = default)
     {
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
         if (current is not null)
         {
             VerifyUserCanAccessApplication(current.UserId);
@@ -107,7 +107,7 @@ public class ApplicationApplicationService(
 
     public async Task<ComplexResponseDto<ApplicationViewDto>> ReactivateAsync(ObjectId id, CancellationToken cancellationToken = default)
     {
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
         if (current is not null)
         {
             VerifyUserCanAccessApplication(current.UserId);
@@ -133,7 +133,7 @@ public class ApplicationApplicationService(
 
     public async Task<ComplexResponseDto<ApplicationViewDto>> ArchiveAsync(ObjectId id, CancellationToken cancellationToken = default)
     {
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
         if (current is not null)
         {
             VerifyUserCanAccessApplication(current.UserId);
@@ -159,13 +159,13 @@ public class ApplicationApplicationService(
 
     public async Task<ComplexResponseDto<ApplicationViewDto>> RejectAsync(ObjectId id, RejectionDto rejection, CancellationToken cancellationToken = default)
     {
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
         if (current is not null)
         {
             VerifyUserCanAccessApplication(current.UserId);
 
             var reject = ApplicationMapper.ToEntity(rejection);
-            var bag = await applicationRejectionService.ValidateAsync(current, reject);
+            var bag = applicationRejectionService.Validate(current, reject);
             if (bag.HasErrors)
                 return
                     new ComplexResponseDto<ApplicationViewDto>(bag.ToValidationItemDtoList());
@@ -186,13 +186,13 @@ public class ApplicationApplicationService(
 
     public async Task<ComplexResponseDto<ApplicationViewDto>> AcceptAsync(ObjectId id, AcceptanceDto acceptance, CancellationToken cancellationToken = default)
     {
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
         if (current is not null)
         {
             VerifyUserCanAccessApplication(current.UserId);
 
             var accept = ApplicationMapper.ToEntity(acceptance);
-            var bag = await applicationAcceptanceService.ValidateAsync(current, accept);
+            var bag = applicationAcceptanceService.Validate(current, accept);
             if (bag.HasErrors)
                 return
                     new ComplexResponseDto<ApplicationViewDto>(bag.ToValidationItemDtoList());
@@ -217,7 +217,7 @@ public class ApplicationApplicationService(
 
     public async Task<ComplexResponseDto<ApplicationViewDto>> UnarchiveAsync(ObjectId id, CancellationToken cancellationToken = default)
     {
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
         if (current is not null)
         {
             VerifyUserCanAccessApplication(current.UserId);
@@ -244,7 +244,7 @@ public class ApplicationApplicationService(
     public async Task<IList<ValidationItemDto>> ValidateAsync(ApplicationUpdateRequestDto application, CancellationToken cancellationToken = default)
     {
         var objId = ObjectId.Parse(application.Id);
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == objId, cancellationToken);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == objId, cancellationToken);
         VerifyUserCanAccessApplication(ObjectId.Parse(application.UserId), current);
 
         var entity = ApplicationMapper.ToEntity(application);

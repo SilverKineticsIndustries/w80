@@ -21,9 +21,9 @@ public class UserRepository(
         update.CopyFrom(current);
         ApplyPreSaveActions(update);
         if (session == null)
-            await userSet.ReplaceOneAsync(x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
         else
-            await userSet.ReplaceOneAsync(session, x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(session, x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }
@@ -36,9 +36,9 @@ public class UserRepository(
                         .Set(appl => appl.DeactivatedBy, user.DeactivatedBy);
 
         if (session == null)
-            await userSet.UpdateOneAsync(x => x.Id == user.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(x => x.Id == user.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
         else
-            await userSet.UpdateOneAsync(session, x => x.Id == user.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(session, x => x.Id == user.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken);
     }

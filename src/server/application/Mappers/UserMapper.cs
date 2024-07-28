@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using Riok.Mapperly.Abstractions;
+using SilverKinetics.w80.Common;
 using SilverKinetics.w80.Domain.Shared;
 using SilverKinetics.w80.Domain.Entities;
 using SilverKinetics.w80.Application.DTOs;
@@ -10,10 +11,20 @@ namespace SilverKinetics.w80.Application.Mappers;
 public partial class UserMapper
 {
     public static partial UserProfileViewDto ToDTO(User user);
-    public static partial UserProfileUpdateRequestDto ToUpdateDTO(User user);
-    public static partial UserProfileUpdateRequestDto ToUpdateDTO(UserProfileViewDto userProfile);
-    public static partial User ToEntity(UserProfileUpdateRequestDto userProfile);
-    public static partial User ToEntity(UserProfileViewDto userProfile);
+    public static partial UserProfileUpdateRequestDto ToProfileUpdateDTO(User user);
+    public static partial UserProfileUpdateRequestDto ToProfileUpdateDTO(UserProfileViewDto userProfile);
+
+    public static User ToEntity(UserProfileUpdateRequestDto profile, Role role)
+    {
+        return new User(ObjectId.Parse(profile.Id), role, profile.Email ?? string.Empty)
+        {
+            Nickname = profile.Nickname,
+            TimeZone = profile.TimeZone ?? SupportedTimeZones.DefaultTimezone,
+            Culture = profile.Culture ?? SupportedCultures.DefaultCulture,
+            EnableEventBrowserNotifications = profile.EnableEventBrowserNotifications,
+            EnableEventEmailNotifications = profile.EnableEventEmailNotifications
+        };
+    }
     public static partial User ToEntity(UserUpsertRequestDto user);
 
     public static async Task<UserViewDto> ToDTOAsync(IUserRepository userRepository, User user, UserSecurity userSecurity)

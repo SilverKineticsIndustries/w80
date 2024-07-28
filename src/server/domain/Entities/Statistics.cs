@@ -14,10 +14,9 @@ public class Statistics
     [BsonDictionaryOptions(MongoDB.Bson.Serialization.Options.DictionaryRepresentation.ArrayOfArrays)]
     public Dictionary<ObjectId, int> ApplicationRejectionStateCounts = [];
 
-    private Statistics() {}
-    public static Statistics Create(ObjectId userId)
+    public Statistics(ObjectId userId)
     {
-        return new Statistics() { Id = userId };
+        Id = userId;
     }
 
     #region [ IVersionedEntity ]

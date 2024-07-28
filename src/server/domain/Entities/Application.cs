@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson;
 using SilverKinetics.w80.Common.Contracts;
@@ -17,14 +18,14 @@ public class Application
     public ObjectId Id { get; set; }
     public ObjectId UserId { get; set; }
     [MaxLength(CompanyNameMaxLength)]
-    public string CompanyName { get; set; }
+    public string CompanyName { get; set; } = null!;
+    public string RoleDescription { get; set; } = null!;
     public decimal? CompensationMin { get; set; }
     public decimal? CompensationMax { get; set; }
     public CompensationType? CompensationType { get; set; }
     [MaxLength(RoleMaxLength)]
     public string? Role { get; set; }
     [MaxLength(RoleDescriptionMaxLength)]
-    public string RoleDescription { get; set; }
     public PositionType? PositionType { get; set; }
     public WorkSetting? WorkSetting { get; set; }
     public List<Contact> Contacts { get; private set; }
@@ -34,10 +35,10 @@ public class Application
     public string? HQLocation { get; set; }
     public string? PositionLocation { get; set; }
     public string? AdditionalInfo { get; set; }
-    public string TravelRequirements { get; set; }
-    public List<State> States { get; private set; }
-    public Rejection Rejection { get; set; } = new Rejection();
-    public Acceptance Acceptance { get; set; } = new Acceptance();
+    public string? TravelRequirements { get; set; }
+    public ReadOnlyCollection<State> States { get; private set; }
+    public Rejection? Rejection { get; set; }
+    public Acceptance? Acceptance { get; set; }
 
     public ObjectId CreatedBy { get; set;}
     public DateTime CreatedUTC { get; set; }
@@ -47,11 +48,13 @@ public class Application
     public DateTime? DeactivatedUTC { get; set; }
     public ObjectId? DeactivatedBy { get; set; }
 
-    public Application()
+    public Application(ObjectId id, ObjectId userId, IEnumerable<ApplicationState> states)
     {
-        States = new List<State>();
+        Id = id;
+        UserId = userId;
         Contacts = new List<Contact>();
         Appointments = new List<Appointment>();
+        States = new ReadOnlyCollection<State>(Initialize(states));
     }
 
     public bool IsDeactivated()
@@ -72,24 +75,6 @@ public class Application
     public bool IsAccepted()
     {
         return Acceptance?.AcceptedUTC is not null;
-    }
-
-    public void Initialize(IEnumerable<ApplicationState> states)
-    {
-        if (states == null || !states.Any())
-            throw new ArgumentException("Parameter states must contain a list of all application states.", nameof(states));
-
-        if (states.Count() != states.Select(x => x.SeqNo).Distinct().Count())
-            throw new ArgumentException("Each application state must contain unique sequence number.", nameof(states));
-
-        if (states.Where(x => !x.IsDeactivated()).Count() < 2)
-            throw new ArgumentException("There must be at least two active application states.", nameof(states));
-
-        States.Clear();
-        foreach (var stat in states.Where(x => !x.IsDeactivated()))
-            States.Add(new State(stat));
-
-        States.OrderBy(status => status.SeqNo).First().IsCurrent = true;
     }
 
     // TODO: There are situations where states will be cleared and this will throw an error.
@@ -115,17 +100,15 @@ public class Application
         Appointments.Clear();
     }
 
-    public void Reject(IDateTimeProvider dateTimeProvider, Rejection rejection)
+    public void Reject(Rejection rejection)
     {
         Rejection = rejection;
-        Rejection.RejectedUTC = dateTimeProvider.GetUtcNow();
         Appointments.Clear();
     }
 
-    public void Accept(IDateTimeProvider dateTimeProvider, Acceptance acceptance)
+    public void Accept(Acceptance acceptance)
     {
         Acceptance = acceptance;
-        Acceptance.AcceptedUTC = dateTimeProvider.GetUtcNow();
         Appointments.Clear();
     }
 
@@ -134,21 +117,28 @@ public class Application
         ArchivedUTC = null;
     }
 
-    public void CopyFrom(Application? other)
+    public void CopyFrom(Application? current)
     {
-        if (other == null)
+        if (current == null)
             return;
 
-        CreatedBy = other.CreatedBy;
-        CreatedUTC = other.CreatedUTC;
-        UpdatedUTC = other.UpdatedUTC;
-        UpdatedBy = other.UpdatedBy;
-        ArchivedUTC = other.ArchivedUTC;
-        DeactivatedBy = other.DeactivatedBy;
-        DeactivatedUTC = other.DeactivatedUTC;
+        CreatedBy = current.CreatedBy;
+        CreatedUTC = current.CreatedUTC;
+        UpdatedUTC = current.UpdatedUTC;
+        UpdatedBy = current.UpdatedBy;
+        ArchivedUTC = current.ArchivedUTC;
+        DeactivatedBy = current.DeactivatedBy;
+        DeactivatedUTC = current.DeactivatedUTC;
 
-        Rejection = other.Rejection with {};
-        Acceptance = other.Acceptance with {};
+        if (current.Rejection != null)
+            Rejection = current.Rejection with {};
+        else
+            Rejection = null;
+
+        if (current.Acceptance != null)
+            Acceptance = current.Acceptance with {};
+        else
+            Acceptance = null;
     }
 
     public IEnumerable<Appointment> GetScheduleEmailAlertsToSendOut(DateTime now, TimeSpan threshold)
@@ -157,6 +147,26 @@ public class Application
             return [];
 
         return Appointments.Where(x => !x.EmailNotificationSent && x.IsNowWithinThresholdOfEventStart(now, threshold));
+    }
+
+    private IList<State> Initialize(IEnumerable<ApplicationState> states)
+    {
+        var applicationStates = new List<State>();
+
+        if (states == null || !states.Any())
+            throw new ArgumentException("Parameter states must contain a list of all application states.", nameof(states));
+
+        if (states.Count() != states.Select(x => x.SeqNo).Distinct().Count())
+            throw new ArgumentException("Each application state must contain unique sequence number.", nameof(states));
+
+        if (states.Where(x => !x.IsDeactivated()).Count() < 2)
+            throw new ArgumentException("There must be at least two active application states.", nameof(states));
+
+        foreach (var stat in states.Where(x => !x.IsDeactivated()))
+            applicationStates.Add(new State(stat));
+
+        applicationStates.OrderBy(status => status.SeqNo).First().IsCurrent = true;
+        return applicationStates;
     }
 
     #region [ IVersionedEntity ]

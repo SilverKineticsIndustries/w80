@@ -6,39 +6,45 @@ public static class Extensions
 {
     public static User CreateUser(this TestContext cxt, string? email = null)
     {
-        return new User()
+        return new User(ObjectId.GenerateNewId(), Role.User, email ?? "testuser@silverkinetics.dev")
         {
-            Id = ObjectId.GenerateNewId(),
-            Role = Role.User,
-            Email = email ?? "testuser@silverkinetics.dev",
             Culture = SupportedCultures.DefaultCulture,
             Nickname = "testuser@silverkientics.dev",
             TimeZone = SupportedTimeZones.DefaultTimezone
         };
     }
 
+    public static UserUpsertRequestDto CreateUserUpsertDto(this TestContext cxt, string? email = null)
+    {
+        return
+            new UserUpsertRequestDto() {
+                Nickname = email,
+                Email = email,
+                Culture = SupportedCultures.DefaultCulture,
+                TimeZone = SupportedTimeZones.DefaultTimezone,
+                Role = Role.User,
+                Id = ObjectId.GenerateNewId().ToString()
+            };
+    }
+
     public static Domain.Entities.Application CreateApplication(this TestContext ctx)
     {
-        var app = new Domain.Entities.Application()
-        {
-            Id = ObjectId.GenerateNewId(),
-            UserId = ctx.GetTestUserID(),
-            CompanyName = "Company 1",
-            Role = "Senior Java Developer",
-            RoleDescription = "Senior Java Developer. Must know Java.",
-            CompensationMax = 140000,
-            CompensationMin = 120000,
-            CompensationType = CompensationType.Salary,
-            PositionType = PositionType.Fulltime,
-            WorkSetting = WorkSetting.OnSite,
-            Industry = "Healthcare",
-            HQLocation = "Miami",
-            PositionLocation = "Miami",
-            TravelRequirements = "No travel is required",
-        };
-
-        app.Initialize(_GetApplicationStates());
-        return app;
+        return
+            new Domain.Entities.Application(ObjectId.GenerateNewId(), ctx.GetTestUserID(), _GetApplicationStates())
+            {
+                CompanyName = "Company 1",
+                Role = "Senior Java Developer",
+                RoleDescription = "Senior Java Developer. Must know Java.",
+                CompensationMax = 140000,
+                CompensationMin = 120000,
+                CompensationType = CompensationType.Salary,
+                PositionType = PositionType.Fulltime,
+                WorkSetting = WorkSetting.OnSite,
+                Industry = "Healthcare",
+                HQLocation = "Miami",
+                PositionLocation = "Miami",
+                TravelRequirements = "No travel is required",
+            };
     }
 
     public static ApplicationUpdateRequestDto CreateApplicationUpdateRequestDto(this TestContext ctx)
@@ -67,10 +73,7 @@ public static class Extensions
     }
     public static Rejection CreateRejection(this TestContext ctx)
     {
-        var rejection = new Rejection();
-        rejection.Reason = "Some reason";
-        rejection.Method = RejectionMethod.Email;
-        return rejection;
+        return new Rejection(RejectionMethod.Email, "Some reason");
     }
 
     public static AppointmentDto CreateAppointmentDto(this TestContext ctx, DateTime startEventDateTime, DateTime endEventDateTime)
@@ -100,7 +103,7 @@ public static class Extensions
     }
 
     public async static Task<ComplexResponseDto<UserViewDto>> UpsertNewUserAsync(this TestContext ctx,
-        string email, string id = null, bool enableEventEmailNotifications = false)
+        string email, string? id = null, bool enableEventEmailNotifications = false)
     {
         ctx.SetUserToAdmin();
         var userId = id ?? ObjectId.GenerateNewId().ObjectIdToStringId();
@@ -144,64 +147,68 @@ public static class Extensions
             serviceProvider.GetServices<IHostedService>().OfType<T>().Single();
     }
 
+    public static Appointment CreateAppointment(this TestContext ctx, DateTime start, DateTime end, string description = "description", Guid? id = null)
+    {
+        return
+            new Appointment(
+                id ?? Guid.NewGuid(),
+                description,
+                start,
+                end);
+    }
+
     private static IList<ApplicationState> _GetApplicationStates()
     {
         return
             new List<ApplicationState>()
             {
                 {
-                    new ApplicationState()
-                    {
-                        Id = ObjectId.Parse("661ecad42dc928266934b5d5"),
-                        Name = "Applied",
-                        HexColor = "007BFF",
-                        SeqNo = 0
-                    }
+                    new ApplicationState(
+                        ObjectId.Parse("661ecad42dc928266934b5d5"),
+                        "Applied",
+                        "007BFF",
+                        0
+                    )
                 },
                 {
-                    new ApplicationState()
-                    {
-                        Id = ObjectId.Parse("661ecb1d2dc928266934b5d6"),
-                        Name = "Client Responded",
-                        HexColor = "00A3FF",
-                        SeqNo = 10
-                    }
+                    new ApplicationState(
+                        ObjectId.Parse("661ecb1d2dc928266934b5d6"),
+                        "Client Responded",
+                        "00A3FF",
+                        10
+                    )
                 },
                 {
-                    new ApplicationState()
-                    {
-                        Id = ObjectId.Parse("661ecb412dc928266934b5d7"),
-                        Name = "Screening",
-                        HexColor = "00D2FF",
-                        SeqNo = 20
-                    }
+                    new ApplicationState(
+                        ObjectId.Parse("661ecb412dc928266934b5d7"),
+                        "Screening",
+                        "00D2FF",
+                        20
+                    )
                 },
                 {
-                    new ApplicationState()
-                    {
-                        Id = ObjectId.Parse("661ecb592dc928266934b5d8"),
-                        Name = "Assessments",
-                        HexColor = "00FFD1",
-                        SeqNo = 30
-                    }
+                    new ApplicationState(
+                        ObjectId.Parse("661ecb592dc928266934b5d8"),
+                        "Assessments",
+                        "00FFD1",
+                        30
+                    )
                 },
                 {
-                    new ApplicationState()
-                    {
-                        Id = ObjectId.Parse("661ecb902dc928266934b5d9"),
-                        Name = "Hiring Manager Screening",
-                        HexColor = "00FF85",
-                        SeqNo = 40
-                    }
+                    new ApplicationState(
+                        ObjectId.Parse("661ecb902dc928266934b5d9"),
+                        "Hiring Manager Screening",
+                        "00FF85",
+                        40
+                    )
                 },
                 {
-                    new ApplicationState()
-                    {
-                        Id = ObjectId.Parse("661ecba72dc928266934b5da"),
-                        Name = "Decision / Job Offer",
-                        HexColor = "9EFF00",
-                        SeqNo = 50
-                    }
+                    new ApplicationState(
+                        ObjectId.Parse("661ecba72dc928266934b5da"),
+                        "Decision / Job Offer",
+                        "9EFF00",
+                        50
+                    )
                 }
             };
     }

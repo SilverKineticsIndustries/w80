@@ -7,13 +7,20 @@ public record Appointment
     public Guid Id { get; set;}
     public DateTime StartDateTimeUTC { get; set; }
     public DateTime EndDateTimeUTC { get; set; }
-
     [MaxLength(DescriptionMaxLength)]
     public string Description { get; set; }
     public string? ApplicationStateId { get; set; }
 
     public bool BrowserNotificationSent { get; set; }
     public bool EmailNotificationSent { get; set; }
+
+    public Appointment(Guid id, string description, DateTime startDateTimeUTC, DateTime endDateTimeUTC)
+    {
+        Id = id;
+        Description = description;
+        StartDateTimeUTC = startDateTimeUTC;
+        EndDateTimeUTC = endDateTimeUTC;
+    }
 
     public bool IsNowWithinThresholdOfEventStart(DateTime utcNow, TimeSpan threshold)
     {

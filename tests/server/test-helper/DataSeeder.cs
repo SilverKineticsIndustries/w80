@@ -30,7 +30,7 @@ public static class DataSeeder
 
         await Parallel.ForEachAsync(files, async (file, cancellationToken) =>
         {
-            if (!_fileContents.TryGetValue(file, out BsonDocument[] documents))
+            if (!_fileContents.TryGetValue(file, out BsonDocument[]? documents))
             {
                 var json = await File.ReadAllTextAsync(file, cancellationToken);
                 documents = BsonSerializer.Deserialize<BsonDocument[]>(json);

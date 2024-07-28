@@ -12,7 +12,8 @@ public static class EmailConfirmations
     {
         var plainText = string.Concat(email, "|", utcNow.ToISO8610String());
         var plainTextBytes = Encoding.Unicode.GetBytes(plainText);
-        return Encryption.Encrypt(plainTextBytes, config[Keys.Secrets.EmailConfirmationKey]);
+        return Encryption.Encrypt(plainTextBytes,
+            config.GetRequiredValue(Keys.Secrets.EmailConfirmationKey));
     }
 
     public static void Decrypt(IConfiguration config, string emailConfirmationToken, out string email, out DateTime utcDateTime)
@@ -21,7 +22,8 @@ public static class EmailConfirmations
         utcDateTime = DateTime.MinValue;
 
         var tokenCypherBytes = Convert.FromBase64String(emailConfirmationToken);
-        var token = Encoding.Unicode.GetString(Encryption.Decrypt(tokenCypherBytes, config[Keys.Secrets.EmailConfirmationKey]));
+        var token = Encoding.Unicode.GetString(Encryption.Decrypt(tokenCypherBytes,
+            config.GetRequiredValue(Keys.Secrets.EmailConfirmationKey)));
         if (!token.Contains('|'))
             return;
 

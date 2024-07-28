@@ -155,7 +155,7 @@ public class AuthenticationApplicationService
             request.Email = ctx.GetTestUserEmail();
             request.Password = ctx.GetTestUserPassword();
             var response = await service.LoginWithCredentialsAsync(request, cookieManager, RequestSourceInfo.Empty, CancellationToken.None);
-            var accessTokenDecoded = Tokens.DecodeJwtToken(response.AccessToken);
+            var accessTokenDecoded = Tokens.DecodeJwtToken(response?.AccessToken ?? string.Empty);
 
             var config = ctx.Services.GetRequiredService<IConfiguration>();
             var dateTimeProvider = ctx.Services.GetRequiredService<IDateTimeProvider>();
@@ -176,6 +176,12 @@ public class AuthenticationApplicationService
             request.Password = ctx.GetTestUserPassword();
             var response = await service.LoginWithCredentialsAsync(request, new CookieManagerFake(), RequestSourceInfo.Empty, CancellationToken.None);
             var tokenEncoded = response.AccessToken;
+            if (string.IsNullOrWhiteSpace(tokenEncoded))
+            {
+                Assert.Fail();
+                return;
+            }
+
             var token = Tokens.DecodeJwtToken(tokenEncoded);
             var roleClaim = token.Claims.FirstOrDefault(x => x.Type == "Role");
             var emailClaim = token.Claims.FirstOrDefault(x => x.Type == "Email");
@@ -183,9 +189,9 @@ public class AuthenticationApplicationService
 
             Assert.Multiple(() =>
             {
-                Assert.That(nicknameClaim.Value, Is.EqualTo("testuser"));
-                Assert.That(roleClaim.Value, Is.EqualTo(Role.User.ToString()));
-                Assert.That(emailClaim.Value, Is.EqualTo(ctx.GetTestUserEmail()));
+                    Assert.That(nicknameClaim?.Value, Is.EqualTo("testuser"));
+                    Assert.That(roleClaim?.Value, Is.EqualTo(Role.User.ToString()));
+                    Assert.That(emailClaim?.Value, Is.EqualTo(ctx.GetTestUserEmail()));
             });
         }
     }
@@ -203,7 +209,7 @@ public class AuthenticationApplicationService
             Assume.That(response.AccessToken, Is.Not.Null);
 
             var repo = ctx.Services.GetRequiredService<ISystemEventEntryRepository>();
-            var loggedInEvent = await repo.GetSingleOrDefaultAsync((x) => x.EventName == nameof(UserLoggedInEvent) && x.CreatedBy == ctx.GetTestUserID(), CancellationToken.None);
+            var loggedInEvent = await repo.FirstOrDefaultAsync((x) => x.EventName == nameof(UserLoggedInEvent) && x.CreatedBy == ctx.GetTestUserID(), CancellationToken.None);
             Assert.That(loggedInEvent, Is.Not.Null);
         }
     }
@@ -301,7 +307,7 @@ public class AuthenticationApplicationService
             request.ResendEmailConfirmation = true;
             var response = await service.LoginWithCredentialsAsync(request, new CookieManagerFake(), RequestSourceInfo.Empty, CancellationToken.None);
 
-            var emailSenderService = ctx.Services.GetRequiredService<IEmailSenderService>() as EmailSenderServiceFake;
+            var emailSenderService = (EmailSenderServiceFake)ctx.Services.GetRequiredService<IEmailSenderService>();
 
             Assert.Multiple(() =>
             {
@@ -385,6 +391,12 @@ public class AuthenticationApplicationService
             var request = new RefreshRequestDto();
             request.RefreshToken = firstRefreshToken;
             var refreshLoginResponse = await service.LoginWithRefreshTokenAsync(request, cookieManager, RequestSourceInfo.Empty, CancellationToken.None);
+            if (string.IsNullOrWhiteSpace(refreshLoginResponse.AccessToken))
+            {
+                Assert.Fail();
+                return;
+            }
+
             var tokenDecoded = Tokens.DecodeJwtToken(refreshLoginResponse.AccessToken);
 
             var config = ctx.Services.GetRequiredService<IConfiguration>();
@@ -434,11 +446,6 @@ public class AuthenticationApplicationService
         {
             var userProfileSet = ctx.Services.GetRequiredService<IMongoCollection<User>>();
             var userProfileRepo = ctx.Services.GetRequiredService<IUserRepository>();
-
-            var user = await userProfileSet.AsQueryable().SingleAsync(x => x.Email == ctx.GetTestUserEmail());
-            user.Deactivate(ctx.Services.GetRequiredService<IDateTimeProvider>());
-            await userProfileRepo.UpsertAsync(user, user, CancellationToken.None);
-
             var cookieManager = new CookieManagerFake();
             var service = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
 
@@ -454,6 +461,10 @@ public class AuthenticationApplicationService
             // Otherwise the expiration date on prev token is same as new one and this make them
             // exactly the same
             Thread.Sleep(1 * 1000);
+
+            var user = await userProfileSet.AsQueryable().SingleAsync(x => x.Email == ctx.GetTestUserEmail());
+            user.Deactivate(ctx.Services.GetRequiredService<IDateTimeProvider>());
+            await userProfileRepo.UpsertAsync(user, user, CancellationToken.None);
 
             var request = new RefreshRequestDto();
             request.RefreshToken = refreshToken;
@@ -550,7 +561,7 @@ public class AuthenticationApplicationService
             userSecurity.MustActivateWithInvitationCode = false;
             await userSecurityRepo.UpsertAsync(userSecurity, CancellationToken.None);
 
-            var invitationProcessRequest = ctx.CreateInvitationProcessRequestDto(request.Email, response.Code);
+            var invitationProcessRequest = ctx.CreateInvitationProcessRequestDto(request.Email, response.Code ?? string.Empty);
             var verificationResponse = await service.ProcessInvitationAsync(invitationProcessRequest, CancellationToken.None);
             Assert.That(verificationResponse.Success, Is.False);
         }
@@ -564,7 +575,7 @@ public class AuthenticationApplicationService
             var userEmail = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(userEmail);
 
-            var response = await ctx.LoginUserWithInvitationCodeAsync(userEmail, ret.Result.InvitationCode);
+            var response = await ctx.LoginUserWithInvitationCodeAsync(userEmail, ret?.Result?.InvitationCode ?? string.Empty);
             Assert.That(response.Success, Is.True);
         }
     }
@@ -576,11 +587,17 @@ public class AuthenticationApplicationService
         {
             var userEmail = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(userEmail);
+            if (ret.Result == null)
+            {
+                Assert.Fail();
+                return;
+            }
 
-            await ctx.LoginUserWithInvitationCodeAsync(userEmail, ret.Result.InvitationCode);
+            await ctx.LoginUserWithInvitationCodeAsync(userEmail, ret.Result?.InvitationCode ?? string.Empty);
 
+            var id = ret.Result?.Id;
             var userSecurityRepo = ctx.Services.GetRequiredService<IMongoCollection<UserSecurity>>();
-            var userSecurity = await userSecurityRepo.AsQueryable().FirstAsync(x => x.Id == ObjectId.Parse(ret.Result.Id));
+            var userSecurity = await userSecurityRepo.AsQueryable().FirstAsync(x => x.Id == ObjectId.Parse(id));
             Assert.That(userSecurity.MustActivateWithInvitationCode, Is.False);
         }
     }
@@ -592,11 +609,17 @@ public class AuthenticationApplicationService
         {
             var userEmail = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(userEmail);
+            if (ret.Result == null)
+            {
+                Assert.Fail();
+                return;
+            }
 
-            await ctx.LoginUserWithInvitationCodeAsync(userEmail, ret.Result.InvitationCode);
+            await ctx.LoginUserWithInvitationCodeAsync(userEmail, ret.Result?.InvitationCode ?? string.Empty);
 
+            var id = ret.Result?.Id;
             var userSecurityRepo = ctx.Services.GetRequiredService<IMongoCollection<UserSecurity>>();
-            var userSecurity = await userSecurityRepo.AsQueryable().FirstAsync(x => x.Id == ObjectId.Parse(ret.Result.Id));
+            var userSecurity = await userSecurityRepo.AsQueryable().FirstAsync(x => x.Id == ObjectId.Parse(id));
 
             Assert.Multiple(() =>
             {
@@ -617,7 +640,7 @@ public class AuthenticationApplicationService
             var response = service.GenerateInvitationCode(request);
             Assume.That(response.Success, Is.True);
 
-            var invitationProcessRequest = ctx.CreateInvitationProcessRequestDto("testuser1000@silverkinetics.dev", response.Code);
+            var invitationProcessRequest = ctx.CreateInvitationProcessRequestDto("testuser1000@silverkinetics.dev", response.Code ?? string.Empty);
             var verificationResponse = await service.ProcessInvitationAsync(invitationProcessRequest, CancellationToken.None);
             Assert.That(verificationResponse.Success, Is.False);
         }
@@ -641,12 +664,12 @@ public class AuthenticationApplicationService
             user.Deactivate(ctx.Services.GetRequiredService<IDateTimeProvider>());
             await userRepo.UpsertAsync(user, user, CancellationToken.None);
 
-            var invitationProcessRequest = ctx.CreateInvitationProcessRequestDto(request.Email, response.Code);
+            var invitationProcessRequest = ctx.CreateInvitationProcessRequestDto(request.Email, response.Code ?? string.Empty);
             var verificationResponse = await service.ProcessInvitationAsync(invitationProcessRequest, CancellationToken.None);
             Assert.Multiple(() =>
             {
                 Assert.That(verificationResponse.Success, Is.False);
-                Assert.That(verificationResponse.InfoMessages.Any(x => x == "User is deactivated."), Is.True);
+                Assert.That(verificationResponse?.InfoMessages?.Any(x => x == "User is deactivated."), Is.True);
             });
         }
     }
@@ -658,10 +681,10 @@ public class AuthenticationApplicationService
         {
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
-            var res = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result.InvitationCode);
+            var res = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result?.InvitationCode ?? string.Empty);
 
             var emailSenderService = ctx.Services.GetRequiredService<IEmailSenderService>() as EmailSenderServiceFake;
-            var emailSent = emailSenderService.Emails.Value.Any(x => x.Template == TemplateType.EmailConfirmation && x.Addresses.Contains(email));
+            var emailSent = emailSenderService?.Emails.Value.Any(x => x.Template == TemplateType.EmailConfirmation && x.Addresses.Contains(email));
             Assert.That(emailSent, Is.True);
         }
     }
@@ -674,7 +697,7 @@ public class AuthenticationApplicationService
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
 
-            var verificationResponse = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result.InvitationCode);
+            var verificationResponse = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result?.InvitationCode ?? string.Empty);
             Assume.That(verificationResponse.Success, Is.True);
 
             var config = ctx.Services.GetRequiredService<IConfiguration>();
@@ -695,7 +718,7 @@ public class AuthenticationApplicationService
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
 
-            var verificationResponse = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result.InvitationCode);
+            var verificationResponse = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result?.InvitationCode ?? string.Empty);
             Assume.That(verificationResponse.Success, Is.True);
 
             var config = ctx.Services.GetRequiredService<IConfiguration>();
@@ -716,10 +739,10 @@ public class AuthenticationApplicationService
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
 
-            var verificationResponse = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result.InvitationCode);
+            var verificationResponse = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result?.InvitationCode ?? string.Empty);
             Assume.That(verificationResponse.Success, Is.True);
 
-            await ctx.DeactivateUserAsync(ObjectId.Parse(ret.Result.Id));
+            await ctx.DeactivateUserAsync(ObjectId.Parse(ret?.Result?.Id));
 
             var config = ctx.Services.GetRequiredService<IConfiguration>();
             var req = new EmailConfirmationRequestDto();
@@ -731,7 +754,7 @@ public class AuthenticationApplicationService
             Assert.Multiple(() =>
             {
                 Assert.That(response.Success, Is.False);
-                Assert.That(response.InfoMessages.Contains("User is deactivated."), Is.True);
+                Assert.That(response?.InfoMessages?.Contains("User is deactivated."), Is.True);
             });
         }
     }
@@ -754,7 +777,7 @@ public class AuthenticationApplicationService
             Assert.Multiple(() =>
             {
                 Assert.That(response.Success, Is.False);
-                Assert.That(response.InfoMessages.Contains("User has not been activated."), Is.True);
+                Assert.That(response?.InfoMessages?.Contains("User has not been activated."), Is.True);
             });
         }
     }
@@ -767,7 +790,7 @@ public class AuthenticationApplicationService
             var email = "testuser1000@silverkinetics.dev";
             var ret = await ctx.UpsertNewUserAsync(email);
 
-            var verificationResponse = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result.InvitationCode);
+            var verificationResponse = await ctx.LoginUserWithInvitationCodeAsync(email, ret.Result?.InvitationCode ?? string.Empty);
             Assume.That(verificationResponse.Success, Is.True);
 
             var config = ctx.Services.GetRequiredService<IConfiguration>();
@@ -781,7 +804,7 @@ public class AuthenticationApplicationService
             Assert.Multiple(() =>
             {
                 Assert.That(response.Success, Is.False);
-                Assert.That(response.InfoMessages.Contains("User's email has already been confirmed."), Is.True);
+                Assert.That(response?.InfoMessages?.Contains("User's email has already been confirmed."), Is.True);
             });
         }
     }

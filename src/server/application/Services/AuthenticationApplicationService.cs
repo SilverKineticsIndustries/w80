@@ -12,7 +12,6 @@ using SilverKinetics.w80.Application.Security;
 using SilverKinetics.w80.Application.Contracts;
 using SilverKinetics.w80.Common.Configuration;
 using SilverKinetics.w80.Application.Events;
-using Microsoft.AspNetCore.Http;
 
 namespace SilverKinetics.w80.Application.Services;
 
@@ -42,7 +41,7 @@ public class AuthenticationApplicationService(
 
         var response = new LoginResponseDto() { Success = false };
 
-        var user = await userRepo.GetSingleOrDefaultAsync(x => x.Email == loginRequest.Email, cancellationToken).ConfigureAwait(false);
+        var user = await userRepo.FirstOrDefaultAsync(x => x.Email == loginRequest.Email, cancellationToken).ConfigureAwait(false);
         if (user == null)
             return response;
         else if (user.IsDeactivated())
@@ -51,12 +50,11 @@ public class AuthenticationApplicationService(
             return response;
         }
 
-        var userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync((x) => x.Id == user.Id, cancellationToken).ConfigureAwait(false);
+        var userSecurity = await userSecurityRepo.FirstAsync((x) => x.Id == user.Id, cancellationToken).ConfigureAwait(false);
 
         var now = dateTimeProvider.GetUtcNow();
 
-        // TODO: When would userSecurity be missing if user is present?
-        if (userSecurity is null || !userSecurity.CanLogin() || !Passwords.ArePasswordEqual(userSecurity, loginRequest.Password))
+        if (!userSecurity.CanLogin() || !Passwords.ArePasswordEqual(userSecurity, loginRequest.Password))
         {
             return response;
         }
@@ -85,7 +83,7 @@ public class AuthenticationApplicationService(
                 response.Success = true;
                 response.AccessToken = GenerateAccessToken(user, now);
                 response.RefreshToken = GenerateRefreshToken(userSecurity, now);
-                response.RefreshTokenExpirationUTC = userSecurity.RefreshTokenExpirationUTC.Value;
+                response.RefreshTokenExpirationUTC = userSecurity.RefreshTokenExpirationUTC ?? null;
                 await userSecurityRepo.UpsertAsync(userSecurity, cancellationToken, session);
                 cookieManager.SetCookie(Tokens.RefreshTokenCookieName, response.RefreshToken, response.RefreshTokenExpirationUTC, includePath: true);
             },
@@ -108,7 +106,7 @@ public class AuthenticationApplicationService(
         }
 
         var hashedRefreshTokenEncoded = Tokens.GetRefreshTokenHashInBase64(refreshToken);
-        var userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync((x) => x.RefreshTokenHash == hashedRefreshTokenEncoded, cancellationToken).ConfigureAwait(false);
+        var userSecurity = await userSecurityRepo.FirstOrDefaultAsync((x) => x.RefreshTokenHash == hashedRefreshTokenEncoded, cancellationToken).ConfigureAwait(false);
         if (userSecurity != null)
         {
             userSecurity.InvalidateRefreshToken();
@@ -127,17 +125,19 @@ public class AuthenticationApplicationService(
         CancellationToken cancellationToken)
     {
         var response = new RefreshResponseDto() { Success = false };
-
-        var refreshTokenHash = Tokens.GetRefreshTokenHashInBase64(refreshRequest.RefreshToken);
-        var userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync((x) => x.RefreshTokenHash == refreshTokenHash, cancellationToken).ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(refreshRequest.RefreshToken))
+        {
+            response.InfoMessage = stringLocalizer["Refresh token missing."];
+            return response;
+        }
 
         var now = dateTimeProvider.GetUtcNow();
-
-        // TODO: When would userSecurity be missing if user is present?
-        if (userSecurity is null || now > userSecurity.RefreshTokenExpirationUTC)
+        var refreshTokenHash = Tokens.GetRefreshTokenHashInBase64(refreshRequest.RefreshToken);
+        var userSecurity = await userSecurityRepo.FirstOrDefaultAsync((x) => x.RefreshTokenHash == refreshTokenHash, cancellationToken).ConfigureAwait(false);
+        if (userSecurity == null || now > userSecurity.RefreshTokenExpirationUTC)
             return response;
 
-        var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == userSecurity.Id, cancellationToken).ConfigureAwait(false);
+        var user = await userRepo.FirstOrDefaultAsync(x => x.Id == userSecurity.Id, cancellationToken).ConfigureAwait(false);
         if (user == null)
             return response;
         else if (user.IsDeactivated())
@@ -149,7 +149,7 @@ public class AuthenticationApplicationService(
         response.Success = true;
         response.AccessToken = GenerateAccessToken(user, now);
         response.RefreshToken = GenerateRefreshToken(userSecurity, now);
-        response.RefreshTokenExpirationUTC = userSecurity.RefreshTokenExpirationUTC.Value;
+        response.RefreshTokenExpirationUTC = userSecurity.RefreshTokenExpirationUTC ?? null;
         await userSecurityRepo.UpsertAsync(userSecurity, cancellationToken);
 
         cookieManager.SetCookie(
@@ -180,7 +180,7 @@ public class AuthenticationApplicationService(
         {
             Invitations.Decrypt(config, request.InvitationCode, out email, out utcDateTime);
         }
-        catch (Exception _)
+        catch
         {
             return
                 new InvitationProcessResponseDto() {
@@ -203,7 +203,7 @@ public class AuthenticationApplicationService(
                     InfoMessages = [stringLocalizer["Invitation code has expired."]]
                 };
 
-        User user = await userRepo.GetSingleOrDefaultAsync((x) => x.Email.ToLower() == email.ToLower(), cancellationToken).ConfigureAwait(false);
+        User? user = await userRepo.FirstOrDefaultAsync((x) => x.Email.ToLower() == email.ToLower(), cancellationToken).ConfigureAwait(false);
         if (user == null)
             return
                 new InvitationProcessResponseDto() {
@@ -218,7 +218,7 @@ public class AuthenticationApplicationService(
                     InfoMessages = [stringLocalizer["User is deactivated."]]
                 };
 
-        var userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync((x) => x.Id == user.Id, cancellationToken).ConfigureAwait(false);
+        var userSecurity = await userSecurityRepo.FirstAsync((x) => x.Id == user.Id, cancellationToken).ConfigureAwait(false);
         if (!userSecurity.MustActivateWithInvitationCode)
             return
                 new InvitationProcessResponseDto() {
@@ -289,7 +289,7 @@ public class AuthenticationApplicationService(
                     InfoMessages = [stringLocalizer["Email confirmation token has expired."]]
                 };
 
-        var user = await userRepo.GetSingleOrDefaultAsync((x) => x.Email.ToLower() == email.ToLower(), cancellationToken).ConfigureAwait(false);
+        var user = await userRepo.FirstOrDefaultAsync((x) => x.Email.ToLower() == email.ToLower(), cancellationToken).ConfigureAwait(false);
         if (user == null)
             return
                 new EmailConfirmationResponseDto() {
@@ -304,7 +304,7 @@ public class AuthenticationApplicationService(
                     InfoMessages = [stringLocalizer["User is deactivated."]]
                 };
 
-        var userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync((x) => x.Id == user.Id, cancellationToken).ConfigureAwait(false);
+        var userSecurity = await userSecurityRepo.FirstAsync((x) => x.Id == user.Id, cancellationToken).ConfigureAwait(false);
         if (userSecurity.MustActivateWithInvitationCode)
             return
                 new EmailConfirmationResponseDto() {
@@ -329,6 +329,10 @@ public class AuthenticationApplicationService(
         InvitationGenerationRequestDto request)
     {
         var res = new InvitationGenerationResponseDto();
+
+        if (string.IsNullOrWhiteSpace(request.Email))
+            throw new ArgumentNullException(nameof(request.Email));
+
         try
         {
             var code = Invitations.GenerateNew(config, request.Email, dateTimeProvider.GetUtcNow());
@@ -347,11 +351,14 @@ public class AuthenticationApplicationService(
         var res = new EmailConfirmationGenerationResponseDto();
         try
         {
-            var user = await userRepo.GetSingleOrDefaultAsync(x => x.Email == request.Email, cancellationToken).ConfigureAwait(false);
-            var token = Convert.ToBase64String(EmailConfirmations.GenerateNew(config, user.Email, dateTimeProvider.GetUtcNow()));
-            var emailMessage = emailMessageGenerator.GetEmailAccountOwnershipVerificationEmailMessage(user, token);
-            await emailNotificationService.SendAsync([emailMessage], cancellationToken);
-            res.Success = true;
+            var user = await userRepo.FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken).ConfigureAwait(false);
+            if (user != null && !user.IsDeactivated())
+            {
+                var token = Convert.ToBase64String(EmailConfirmations.GenerateNew(config, user.Email, dateTimeProvider.GetUtcNow()));
+                var emailMessage = emailMessageGenerator.GetEmailAccountOwnershipVerificationEmailMessage(user, token);
+                await emailNotificationService.SendAsync([emailMessage], cancellationToken);
+                res.Success = true;
+            }
 
         } catch {
             res.Success = false;

@@ -16,7 +16,6 @@ public class StatisticsController(
     [Authorize(Policy = Policies.UserOrAdministrator)]
     public async Task<IActionResult> GetStatiticsAsync(CancellationToken cancellationToken = default)
     {
-        //var targetUserId = userId == default ? securityContext.UserId : userId;
         var targetUserId = securityContext.UserId;
         if (!this.CanCurrentUserPerformActionOnTargetUser(targetUserId))
             return Unauthorized();

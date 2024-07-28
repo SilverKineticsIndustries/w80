@@ -21,23 +21,27 @@ public class SystemEventEntry
     [BsonDictionaryOptions(MongoDB.Bson.Serialization.Options.DictionaryRepresentation.Document)]
     public Dictionary<string,object> KeyProps { get; private set; } = [];
 
-    public static SystemEventEntry Create(ISystemEvent evnt)
+    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    public SystemEventEntry(ISystemEvent evnt)
+    #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     {
-        var entry = new SystemEventEntry();
-        entry.Id = ObjectId.GenerateNewId();
-        entry.CreatedBy = evnt.CreatedBy;
-        entry.CreatedUTC = evnt.CreatedUTC.IsMaxOrMinValue() ? DateTime.UtcNow : evnt.CreatedUTC;
-
         var type = evnt.GetType();
-        entry.EventName = type.Name;
-        entry.FullyQualifiedEventType = type.FullName;
-        entry.EntityId = evnt.EntityId;
-        entry.EntityName = evnt.EntityName;
+
+        Id = ObjectId.GenerateNewId();
+        CreatedBy = evnt.CreatedBy;
+        CreatedUTC = evnt.CreatedUTC.IsMaxOrMinValue() ? DateTime.UtcNow : evnt.CreatedUTC;
+        EventName = type.Name;
+
+        #pragma warning disable CS8601 // Possible null reference assignment.
+        FullyQualifiedEventType = type.FullName;
+        #pragma warning restore CS8601 // Possible null reference assignment.
+
+        EntityId = evnt.EntityId;
+        EntityName = evnt.EntityName;
 
         if (evnt.KeyProps != null)
-            entry.KeyProps = evnt.KeyProps.ToDictionary(x => x.Key, x => x.Value);
+            KeyProps = evnt.KeyProps.ToDictionary(x => x.Key, x => x.Value);
 
-        entry.Payload = evnt.ToBsonDocument(nominalType: type);
-        return entry;
+        Payload = evnt.ToBsonDocument(nominalType: type);
     }
 }

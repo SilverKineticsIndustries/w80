@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using SilverKinetics.w80.Common.Contracts;
 using SilverKinetics.w80.Common.Validation;
 
@@ -64,5 +65,23 @@ public static class Extensions
     public static bool IsMaxOrMinValue(this DateTime dateTime)
     {
         return IsMinValue(dateTime) || IsMaxValue(dateTime);
+    }
+
+    public static string GetRequiredValue(this IConfiguration config, string key)
+    {
+        var val = config[key];
+        if (string.IsNullOrWhiteSpace(val))
+            throw new Exception($"Required configuration {key} is missing or is empty.");
+
+        return val;
+    }
+
+    public static string GetOptionalValue(this IConfiguration config, string key, string missingValue)
+    {
+        var val = config[key];
+        if (string.IsNullOrWhiteSpace(val))
+            return missingValue;
+
+        return val;
     }
 }

@@ -24,7 +24,7 @@ public class AuthenticationController
     [HttpPost, Produces("application/json")]
     public async Task<IActionResult> LoginWithCredentialsAsync(LoginRequestDto loginRequest, CancellationToken cancellationToken)
     {
-        await _reCaptchaApplicationService.VerifyRequestNotFromBotAsync(loginRequest.Captcha, cancellationToken);
+        await _reCaptchaApplicationService.VerifyRequestNotFromBotAsync(loginRequest.Captcha ?? string.Empty, cancellationToken);
 
         var response = await _authenticationApplicationService.LoginWithCredentialsAsync(loginRequest, _cookieManager, HttpContext.GetRequestSourceInfo(), cancellationToken);
         if (response.Success)
@@ -50,8 +50,10 @@ public class AuthenticationController
     [HttpPost, Produces("application/json")]
     public async Task<IActionResult> LoginWithRefreshTokenAsync(CancellationToken cancellationToken)
     {
-        var request = new RefreshRequestDto();
-        request.RefreshToken = _cookieManager.GetCookie(Tokens.RefreshTokenCookieName);
+        var request = new RefreshRequestDto {
+            RefreshToken = _cookieManager.GetCookie(Tokens.RefreshTokenCookieName)
+        };
+
         if (string.IsNullOrWhiteSpace(request.RefreshToken))
             return Unauthorized(new ProblemDetails() {
                 Type = ProblemDetailsTypes.InvalidRefreshToken.ToString()
@@ -93,7 +95,7 @@ public class AuthenticationController
         if (response.Success)
             return Ok();
         else
-            return BadRequest(string.Join(Environment.NewLine, response.InfoMessages));
+            return BadRequest(string.Join(Environment.NewLine, response.InfoMessages ?? []));
     }
 
     [Route("/authentication/invitation/generate")]
@@ -112,7 +114,7 @@ public class AuthenticationController
         if (response.Success)
             return Ok();
         else
-            return BadRequest(string.Join(Environment.NewLine, response.InfoMessages));
+            return BadRequest(response.InfoMessages != null ? string.Join(Environment.NewLine, response.InfoMessages) : string.Empty);
     }
 
     [Route("/authentication/emailConfirmation/resend")]

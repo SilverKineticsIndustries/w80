@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using SilverKinetics.w80.Common.Security;
 using SilverKinetics.w80.Common.Configuration;
+using SilverKinetics.w80.Common;
 
 namespace SilverKinetics.w80.Application.Security;
 
@@ -29,12 +30,12 @@ public static class Tokens
     {
         var handler = new JwtSecurityTokenHandler();
         var jsonToken = handler.ReadToken(encodedToken);
-        return jsonToken as JwtSecurityToken;
+        return (JwtSecurityToken)jsonToken;
     }
 
     public static string EncodeJwtToken(IConfiguration config, DateTime utcNow, IEnumerable<Claim> claims)
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config[Keys.Secrets.JwtKey]));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.GetRequiredValue(Keys.Secrets.JwtKey)));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(

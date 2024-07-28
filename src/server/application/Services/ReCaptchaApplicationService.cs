@@ -26,6 +26,9 @@ public class ReCaptchaApplicationService(
         if (string.IsNullOrWhiteSpace(url))
             throw new Exception("ReCaptcha validation endpoint URL is missing.");
 
+        if (string.IsNullOrWhiteSpace(response))
+            throw new Exception("ReCaptcha response is missing.");
+
         try
         {
             using(var httpClient = new HttpClient())
@@ -36,7 +39,7 @@ public class ReCaptchaApplicationService(
                     verificationReponse.EnsureSuccessStatusCode();
                     var body = await verificationReponse.Content.ReadAsStringAsync(cancellationToken);
                     JObject data = JObject.Parse(body);
-                    if (data["success"].ToString() != Boolean.TrueString)
+                    if (!data.TryGetValue("success", out JToken? value) || value.ToString() != bool.TrueString)
                         throw new ReCaptchaFailedException();
                 }
             }

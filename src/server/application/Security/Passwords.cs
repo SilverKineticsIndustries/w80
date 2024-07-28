@@ -19,7 +19,8 @@ public static class Passwords
             bag.AddValidation(stringLocalizer["Password cannot be empty."]);
 
         if (password.Length < Convert.ToInt32(config[Keys.PasswordMinimumLength]))
-            bag.AddValidation(stringLocalizer["Password must be at least {0} characters long.", config[Keys.PasswordMinimumLength]]);
+            bag.AddValidation(stringLocalizer["Password must be at least {0} characters long.",
+                                config.GetRequiredValue(Keys.PasswordMinimumLength)]);
 
         if (ArePasswordEqual(current, password))
             bag.AddValidation(stringLocalizer["New password is same as current password."]);

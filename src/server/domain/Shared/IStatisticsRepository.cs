@@ -6,7 +6,7 @@ namespace SilverKinetics.w80.Domain.Shared;
 
 public interface IStatisticsRepository
 {
-    Task<Statistics?> GetSingleOrDefaultAsync(Expression<Func<Statistics, bool>> predicate, CancellationToken cancellationToken);
+    Task<Statistics?> FirstOrDefaultAsync(Expression<Func<Statistics, bool>> predicate, CancellationToken cancellationToken);
     Task<IEnumerable<Statistics>> GetManyAsync(Expression<Func<Statistics, bool>> predicate, CancellationToken cancellationToken);
 
     public Task UpdateAsync(

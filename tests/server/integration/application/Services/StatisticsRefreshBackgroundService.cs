@@ -18,8 +18,8 @@ public class StatisticsRefreshBackgroundService
 
             var appId = ObjectId.Parse(app.Id);
             var application = await ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>().AsQueryable().FirstAsync(x => x.Id == appId);
-            var stats = await ctx.Services.GetRequiredService<IStatisticsRepository>().GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
-            Assert.That(stats.ApplicationRejectionStateCounts[application.GetCurrentState().Id], Is.EqualTo(1));
+            var stats = await ctx.Services.GetRequiredService<IStatisticsRepository>().FirstOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+            Assert.That(stats?.ApplicationRejectionStateCounts[application.GetCurrentState().Id], Is.EqualTo(1));
         }
     }
 
@@ -40,8 +40,8 @@ public class StatisticsRefreshBackgroundService
             await statisticsService.ExecuteAsync(CancellationToken.None);
 
             var application = await ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>().AsQueryable().FirstAsync(x => x.Id == appId);
-            var stats = await ctx.Services.GetRequiredService<IStatisticsRepository>().GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
-            Assert.That(stats.ApplicationRejectionStateCounts[application.GetCurrentState().Id], Is.EqualTo(1));
+            var stats = await ctx.Services.GetRequiredService<IStatisticsRepository>().FirstOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+            Assert.That(stats?.ApplicationRejectionStateCounts[application.GetCurrentState().Id], Is.EqualTo(1));
         }
     }
 
@@ -64,8 +64,8 @@ public class StatisticsRefreshBackgroundService
 
             var appId = ObjectId.Parse(app1.Id);
             var application = await ctx.Services.GetRequiredService<IMongoCollection<Domain.Entities.Application>>().AsQueryable().FirstAsync(x => x.Id == appId);
-            var stats = await ctx.Services.GetRequiredService<IStatisticsRepository>().GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
-            Assert.That(stats.ApplicationRejectionStateCounts[application.GetCurrentState().Id], Is.EqualTo(2));
+            var stats = await ctx.Services.GetRequiredService<IStatisticsRepository>().FirstOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+            Assert.That(stats?.ApplicationRejectionStateCounts[application.GetCurrentState().Id], Is.EqualTo(2));
         }
     }
 
@@ -101,12 +101,12 @@ public class StatisticsRefreshBackgroundService
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var systemStateRepo = ctx.Services.GetRequiredService<ISystemStateRepository>();
-            var preExecution = await systemStateRepo.GetSingleOrDefaultAsync(CancellationToken.None);
+            var preExecution = await systemStateRepo.FirstAsync(CancellationToken.None);
 
             var statisticsService = ctx.Services.GetHostedService<Application.Services.StatisticsRefreshBackgroundService>();
             await statisticsService.ExecuteAsync(CancellationToken.None);
 
-            var postExecution = await systemStateRepo.GetSingleOrDefaultAsync(CancellationToken.None);
+            var postExecution = await systemStateRepo.FirstAsync(CancellationToken.None);
             Assert.Multiple(() =>
             {
                 Assert.That(preExecution.LastStatisticsRunUTC, Is.Not.EqualTo(postExecution.LastStatisticsRunUTC));
@@ -127,14 +127,14 @@ public class StatisticsRefreshBackgroundService
 
 
             var systemStateRepo = ctx.Services.GetRequiredService<ISystemStateRepository>();
-            var systemState = await systemStateRepo.GetSingleOrDefaultAsync(CancellationToken.None);
+            var systemState = await systemStateRepo.FirstAsync(CancellationToken.None);
             systemState.LastStatisticsRunUTC = DateTime.UtcNow.AddDays(2);
             await systemStateRepo.UpdateAsync(systemState, CancellationToken.None);
 
             var statisticsService = ctx.Services.GetHostedService<Application.Services.StatisticsRefreshBackgroundService>();
             await statisticsService.ExecuteAsync(CancellationToken.None);
 
-            var stats = await ctx.Services.GetRequiredService<IStatisticsRepository>().GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+            var stats = await ctx.Services.GetRequiredService<IStatisticsRepository>().FirstOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
             Assert.That(stats, Is.Null);
         }
     }

@@ -190,22 +190,7 @@ public class ApplicationUpsertService
     }
 
     [Test]
-    public async Task ValidateAsync_statesMissing_applicationShouldHaveListOf()
-    {
-        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
-        {
-            var app = ctx.CreateApplication();
-            app.States.Clear();
-
-            var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
-            var bag = await service.ValidateAsync(app);
-
-            Assert.That(bag.Any(x => x.Message == "An application must have a set of states."));
-        }
-    }
-
-    [Test]
-    public async Task ValidateAsync_currentStateNoSelected_applicationShouldHaveCurrentState()
+    public async Task ValidateAsync_currentStateNotSelected_applicationShouldHaveCurrentState()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
@@ -237,22 +222,6 @@ public class ApplicationUpsertService
     }
 
     [Test]
-    public async Task ValidateAsync_multipleStatesWithSameSeqNo_seqNoHasToBeUnique()
-    {
-        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
-        {
-            var app = ctx.CreateApplication();
-            foreach (var state in app.States)
-                state.SeqNo = 0;
-
-            var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
-            var bag = await service.ValidateAsync(app);
-
-            Assert.That(bag.Any(x => x.Message == "Application state sequence numbers must be unique."));
-        }
-    }
-
-    [Test]
     public async Task ValidateAsync_twoAppointmentsStartAtSameTime_twoAppointmentsCannotOverlap()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
@@ -261,18 +230,8 @@ public class ApplicationUpsertService
 
             var eventStartDate = DateTime.UtcNow;
             var eventEndDate = DateTime.UtcNow.AddHours(4);
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = eventStartDate,
-                EndDateTimeUTC = eventEndDate,
-                Description = "Interview 1"
-            });
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = eventStartDate,
-                EndDateTimeUTC = eventEndDate,
-                Description = "Interview 2"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(eventStartDate, eventEndDate, "Interview 1"));
+            app.Appointments.Add(ctx.CreateAppointment(eventStartDate, eventEndDate, "Interview 2"));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -293,19 +252,8 @@ public class ApplicationUpsertService
             var event1EndDate = now.AddHours(4);
             var event2StartDate = now.AddHours(2);
             var event2EndDate = now.AddHours(6);
-
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = event1StartDate,
-                EndDateTimeUTC = event1EndDate,
-                Description = "Interview 1"
-            });
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = event2StartDate,
-                EndDateTimeUTC = event2EndDate,
-                Description = "Interview 2"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(event1StartDate, event1EndDate, "Interview 1"));
+            app.Appointments.Add(ctx.CreateAppointment(event2StartDate, event2EndDate, "Interview 2"));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -322,13 +270,7 @@ public class ApplicationUpsertService
             var app = ctx.CreateApplication();
 
             var now = DateTime.UtcNow;
-
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = now,
-                EndDateTimeUTC = now,
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(now, now, "Interview"));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -347,13 +289,7 @@ public class ApplicationUpsertService
             var now = DateTime.UtcNow;
             var startDateTime = now;
             var endDateTime = now.Add(Constants.MinimumAppoingmentDuration).AddSeconds(-1);
-
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = startDateTime,
-                EndDateTimeUTC = endDateTime,
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(startDateTime, endDateTime, "Interview"));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -372,13 +308,7 @@ public class ApplicationUpsertService
             var now = DateTime.UtcNow;
             var startDateTime = now;
             var endDateTime = now.AddHours(-4);
-
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = startDateTime,
-                EndDateTimeUTC = endDateTime,
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(startDateTime, endDateTime, "Interview"));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -395,11 +325,7 @@ public class ApplicationUpsertService
             var app = ctx.CreateApplication();
 
             var now = DateTime.UtcNow;
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = now,
-                EndDateTimeUTC = now.AddHours(-4)
-            });
+            app.Appointments.Add(ctx.CreateAppointment(now, now.AddHours(-4), string.Empty));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -416,12 +342,10 @@ public class ApplicationUpsertService
             var app = ctx.CreateApplication();
 
             var now = DateTime.UtcNow;
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = now,
-                EndDateTimeUTC = now.AddHours(-4),
-                Description = string.Join(string.Empty, Enumerable.Repeat("A", Appointment.DescriptionMaxLength + 1))
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                now,
+                now.AddHours(-4),
+                string.Join(string.Empty, Enumerable.Repeat("A", Appointment.DescriptionMaxLength + 1))));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -436,13 +360,10 @@ public class ApplicationUpsertService
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = default,
-                EndDateTimeUTC = DateTime.UtcNow,
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                default,
+                DateTime.UtcNow,
+                "Interview"));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -457,13 +378,10 @@ public class ApplicationUpsertService
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = DateTime.UtcNow,
-                EndDateTimeUTC = default,
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                DateTime.UtcNow,
+                default,
+                "Interview"));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -483,12 +401,10 @@ public class ApplicationUpsertService
             var startDateTime = now;
             var endDateTime = now.Add(Constants.MaximumAppointmentDuration).AddSeconds(1);
 
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = startDateTime,
-                EndDateTimeUTC = endDateTime,
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                startDateTime,
+                endDateTime,
+                "Interview"));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -509,20 +425,17 @@ public class ApplicationUpsertService
             var endDateTime = now.AddHours(4);
             var objId = Guid.NewGuid();
 
-            app.Appointments.Add(new Appointment()
-            {
-                Id = objId,
-                StartDateTimeUTC = startDateTime,
-                EndDateTimeUTC = endDateTime,
-                Description = "Interview"
-            });
-            app.Appointments.Add(new Appointment()
-            {
-                Id = objId,
-                StartDateTimeUTC = startDateTime.AddDays(1),
-                EndDateTimeUTC = endDateTime.AddDays(1),
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                startDateTime,
+                endDateTime,
+                "Interview",
+                objId));
+
+            app.Appointments.Add(ctx.CreateAppointment(
+                startDateTime.AddDays(1),
+                endDateTime.AddDays(1),
+                "Interview",
+                objId));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -541,13 +454,11 @@ public class ApplicationUpsertService
             var now = DateTime.UtcNow;
             var startDateTime = now;
             var endDateTime = now.AddHours(4);
-
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = startDateTime,
-                EndDateTimeUTC = endDateTime,
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                startDateTime,
+                endDateTime,
+                "Interview",
+                Guid.Empty));
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
@@ -557,32 +468,32 @@ public class ApplicationUpsertService
     }
 
     [Test]
-    public async Task ValidateAsync_applicationStateHasDuplicateObjectId_applicationStatesEventsCannotHaveDuplicateObjectIds()
+    public async Task UpsertAsync_updateRejectionFields_rejectionFieldsAreReadOnlyAndCantBeUpdated()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.States.First().Id = app.States.Last().Id;
+            app.Rejection = new Rejection(RejectionMethod.Email, string.Empty);
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
 
-            Assert.That(bag.Any(x => x.Message == "Application state must have unique Ids."));
+            Assert.That(bag.Any(x => x.Message == "Rejection fields are read-only and cannot be modified."));
         }
     }
 
     [Test]
-    public async Task ValidateAsync_applicationStateHasEmptyObjectId_applicationStateMustHaveValidObjectIds()
+    public async Task UpsertAsync_updateAcceptanceFields_acceptanceFieldsAreReadOnlyAndCantBeUpdated()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.States.First().Id = ObjectId.Empty;
+            app.Acceptance= new Acceptance(AcceptanceMethod.Email);
 
             var service = ctx.Services.GetRequiredService<IApplicationUpsertService>();
             var bag = await service.ValidateAsync(app);
 
-            Assert.That(bag.Any(x => x.Message == "Application state must have a valid Id."));
+            Assert.That(bag.Any(x => x.Message == "Acceptance fields are read-only and cannot be modified."));
         }
     }
 }

@@ -9,7 +9,8 @@ public interface IUserRepository
     public bool QueryFiltersEnabled { set; }
 
     Task<bool> AnyAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken);
-    Task<User?> GetSingleOrDefaultAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken);
+    Task<User> FirstAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken);
+    Task<User?> FirstOrDefaultAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken);
     Task<IEnumerable<User>> GetManyAsync(Expression<Func<User, bool>> predicate, CancellationToken cancellationToken);
 
     public Task UpsertAsync(

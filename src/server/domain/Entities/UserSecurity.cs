@@ -5,11 +5,6 @@ using SilverKinetics.w80.Domain.Contracts;
 
 namespace SilverKinetics.w80.Domain.Entities;
 
-// Even though UserSecurity is not a domain ring concern, I am having problems
-// putting this entity into the application ring because StorageContext
-// is defined here (domain ring) and I need to add a line into
-// StorageContext.OnModelCreating(...) to make it aware of this entity.
-
 public sealed class UserSecurity
     : IVersionedEntity,
     IAggregateRoot
@@ -21,6 +16,11 @@ public sealed class UserSecurity
     public bool IsEmailOwnershipConfirmed { get; set; }
     public string? RefreshTokenHash { get; set; }
     public DateTime? RefreshTokenExpirationUTC { get; set; }
+
+    public UserSecurity(ObjectId id)
+    {
+        Id = id;
+    }
 
     public bool CanLogin()
     {
@@ -49,8 +49,7 @@ public sealed class UserSecurity
     public static UserSecurity InitializeInactiveUser(
         User user)
     {
-        var userSecurity = new UserSecurity();
-        userSecurity.Id = user.Id;
+        var userSecurity = new UserSecurity(user.Id);
         userSecurity.MustActivateWithInvitationCode = true;
         return userSecurity;
     }

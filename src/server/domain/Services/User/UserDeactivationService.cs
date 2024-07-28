@@ -23,7 +23,7 @@ public class UserDeactivationService(
         var now = dateTimeProvider.GetUtcNow();
         systemEventSink.Add(new UserDeactivatedEvent(securityContext.UserId, now, user, requestSourceInfo));
 
-        var userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync(x => x.Id == user.Id, cancellationToken).ConfigureAwait(false);
+        var userSecurity = await userSecurityRepo.FirstAsync(x => x.Id == user.Id, cancellationToken).ConfigureAwait(false);
         userSecurity.InvalidateRefreshToken();
 
         user.Deactivate(now);

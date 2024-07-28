@@ -4,128 +4,70 @@ namespace SilverKinetics.w80.Domain.UnitTests.Entities;
 public class Application
 {
     [Test]
-    public void InitializeApplicationStates_initStatesOnNewApplication_statesShouldBePreloadedFromGlobalList()
+    public async Task InitializeApplicationStates_initStatesOnNewApplication_statesShouldBePreloadedFromGlobalList()
     {
-        using (var ctx = TestContextFactory.Create())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var applStates = ctx.GetApplicationStates();
-            var app = new Domain.Entities.Application();
-            app.Initialize(applStates);
+            var app = new Domain.Entities.Application(ObjectId.GenerateNewId(), ctx.GetTestUserID(), applStates);
             Assert.That(app.States.Count == applStates.Count());
         }
     }
 
     [Test]
-    public void InitializeApplicationStates_initStatesOnNewApplication_activeStateShouldBeSet()
+    public async Task InitializeApplicationStates_initStatesOnNewApplication_activeStateShouldBeSet()
     {
-        using (var ctx = TestContextFactory.Create())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var applStates = ctx.GetApplicationStates();
-            var app = new Domain.Entities.Application();
-            app.Initialize(applStates);
+            var app = new Domain.Entities.Application(ObjectId.GenerateNewId(), ctx.GetTestUserID(), applStates);
 
             var selected = app.States.SingleOrDefault(x => x.IsCurrent);
-            Assert.That(selected.Name, Is.EqualTo(applStates.OrderBy(x => x.SeqNo).First().Name));
+            Assert.That(selected?.Name, Is.EqualTo(applStates.OrderBy(x => x.SeqNo).First().Name));
         }
     }
 
     [Test]
-    public void InitializeApplicationStates_reInitStatesOnExistingApplication_statesShouldBePreloadedFromGlobalList()
+    public async Task InitializeApplicationStates_passInEmptyApplicationStateList_exceptionShouldBeThrown()
     {
-        using (var ctx = TestContextFactory.Create())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
-            var applStates = ctx.GetApplicationStates();
-
-            var app = new Domain.Entities.Application();
-            app.Initialize(applStates);
-            app.States.Remove(app.States.Last());
-            app.States.Remove(app.States.First());
-
-            app.Initialize(applStates);
-            Assert.That(app.States.Count == applStates.Count());
-        }
-    }
-
-    [Test]
-    public void InitializeApplicationStates_reInitStatesOnExistingApplication_activeStateShouldBeSet()
-    {
-        using (var ctx = TestContextFactory.Create())
-        {
-            var applStates = ctx.GetApplicationStates();
-
-            var app = new Domain.Entities.Application();
-            app.Initialize(applStates);
-            app.States.Remove(app.States.Last());
-            app.States.Remove(app.States.First());
-
-            app.Initialize(applStates);
-            var selected = app.States.SingleOrDefault(x => x.IsCurrent);
-            Assert.That(selected.Name, Is.EqualTo(applStates.OrderBy(x => x.SeqNo).First().Name));
-        }
-    }
-
-    [Test]
-    public void InitializeApplicationStates_passInEmptyApplicationStateList_exceptionShouldBeThrown()
-    {
-        using (var ctx = TestContextFactory.Create())
-        {
-            var app = new Domain.Entities.Application();
             Assert.Throws(
                 Is.TypeOf<ArgumentException>()
                 .And.Message.EqualTo("Parameter states must contain a list of all application states. (Parameter 'states')"
             ),
-            () => app.Initialize(new List<ApplicationState>()));
+            () => new Domain.Entities.Application(ObjectId.GenerateNewId(), ctx.GetTestUserID(), new List<ApplicationState>()));
         }
     }
 
     [Test]
-    public void InitializeApplicationStates_passedInApplicationStateListContainsDuplicateSeqNos_exceptionShouldBeThrown()
+    public async Task InitializeApplicationStates_firstItemIsDeactivedInThePassedInApplicationStateList_deactivatedItemShouldNotBeInitialized()
     {
-        using (var ctx = TestContextFactory.Create())
-        {
-            var applStates = ctx.GetApplicationStates().ToList();
-            applStates.ForEach(x => x.SeqNo = 1);
-
-            var app = new Domain.Entities.Application();
-            Assert.Throws(
-                Is.TypeOf<ArgumentException>()
-                .And.Message.EqualTo("Each application state must contain unique sequence number. (Parameter 'states')"
-            ),
-            () => app.Initialize(applStates));
-        }
-    }
-
-    [Test]
-    public void InitializeApplicationStates_firstItemIsDeactivedInThePassedInApplicationStateList_deactivatedItemShouldNotBeInitialized()
-    {
-        using (var ctx = TestContextFactory.Create())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var applStates = ctx.GetApplicationStates().ToList();
             var deactivated = applStates.OrderBy(x => x.SeqNo).First();
             deactivated.DeactivatedUTC = DateTime.UtcNow;
 
-            var app = new Domain.Entities.Application();
-            app.Initialize(applStates);
-
+            var app = new Domain.Entities.Application(ObjectId.GenerateNewId(), ctx.GetTestUserID(), applStates);
             Assert.That(app.States.Any(x => x.Name == deactivated.Name), Is.False);
         }
     }
 
     [Test]
-    public void InitializeApplicationStates_onlyOneActiveApplicationListState_thereShouldBeAtLeastTwoActiveApplicationStates()
+    public async Task InitializeApplicationStates_onlyOneActiveApplicationListState_thereShouldBeAtLeastTwoActiveApplicationStates()
     {
-        using (var ctx = TestContextFactory.Create())
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var applStates = ctx.GetApplicationStates().ToList();
             applStates = applStates.Take(2).ToList();
             applStates.ForEach(x => x.DeactivatedUTC = DateTime.UtcNow);
 
-            var app = new Domain.Entities.Application();
             Assert.Throws(
                 Is.TypeOf<ArgumentException>()
                 .And.Message.EqualTo("There must be at least two active application states. (Parameter 'states')"
             ),
-            () => app.Initialize(applStates));
+            () => new Domain.Entities.Application(ObjectId.GenerateNewId(), ctx.GetTestUserID(), applStates));
         }
     }
 
@@ -138,14 +80,10 @@ public class Application
             var threshold = TimeSpan.FromMinutes(30);
 
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment()
-            {
-                Id = Guid.NewGuid(),
-                Description = "event one",
-                StartDateTimeUTC = now.Add(threshold).AddMinutes(10),
-                EndDateTimeUTC = now.Add(threshold).AddMinutes(10).AddHours(4),
-                ApplicationStateId = app.GetCurrentState().Id.ToString()
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                now.Add(threshold).AddMinutes(10),
+                now.Add(threshold).AddMinutes(10).AddHours(4),
+                "appointment one"));
 
             var alerts = app.GetScheduleEmailAlertsToSendOut(now, threshold);
             Assert.That(alerts.Count(), Is.Zero);
@@ -161,14 +99,10 @@ public class Application
             var threshold = TimeSpan.FromMinutes(30);
 
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment()
-            {
-                Id = Guid.NewGuid(),
-                Description = "event one",
-                StartDateTimeUTC = now.Add(threshold).AddMinutes(-1),
-                EndDateTimeUTC = now.Add(threshold).AddMinutes(10).AddHours(4),
-                ApplicationStateId = app.GetCurrentState().Id.ToString()
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                now.Add(threshold).AddMinutes(-1),
+                now.Add(threshold).AddMinutes(10).AddHours(4),
+                "appointment one"));
 
             var alerts = app.GetScheduleEmailAlertsToSendOut(now, threshold);
             Assert.That(alerts.Count(), Is.EqualTo(1));
@@ -184,14 +118,10 @@ public class Application
             var threshold = TimeSpan.FromMinutes(30);
 
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment()
-            {
-                Id = Guid.NewGuid(),
-                Description = "event one",
-                StartDateTimeUTC = now.Add(threshold),
-                EndDateTimeUTC = now.Add(threshold).AddMinutes(10).AddHours(4),
-                ApplicationStateId = app.GetCurrentState().Id.ToString()
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                now.Add(threshold),
+                now.Add(threshold).AddMinutes(10).AddHours(4),
+                "appointment one"));
 
             var alerts = app.GetScheduleEmailAlertsToSendOut(now, threshold);
             Assert.That(alerts.Count(), Is.EqualTo(1));
@@ -207,14 +137,10 @@ public class Application
             var threshold = TimeSpan.FromMinutes(30);
 
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment()
-            {
-                Id = Guid.NewGuid(),
-                Description = "event one",
-                StartDateTimeUTC = now.Subtract(threshold),
-                EndDateTimeUTC = now.Subtract(threshold).AddMinutes(10).AddHours(4),
-                ApplicationStateId = app.GetCurrentState().Id.ToString()
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                now.Subtract(threshold),
+                now.Subtract(threshold).AddMinutes(10).AddHours(4),
+                "appointment one"));
 
             var alerts = app.GetScheduleEmailAlertsToSendOut(now, threshold);
             Assert.That(alerts.Count(), Is.EqualTo(0));
@@ -230,14 +156,10 @@ public class Application
             var threshold = TimeSpan.FromMinutes(30);
 
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment()
-            {
-                Id = Guid.NewGuid(),
-                Description = "event one",
-                StartDateTimeUTC = now,
-                EndDateTimeUTC = now.AddHours(4),
-                ApplicationStateId = app.GetCurrentState().Id.ToString()
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                now,
+                now.AddHours(4),
+                "appointment one"));
 
             var alerts = app.GetScheduleEmailAlertsToSendOut(now, threshold);
             Assert.That(alerts.Count(), Is.EqualTo(0));

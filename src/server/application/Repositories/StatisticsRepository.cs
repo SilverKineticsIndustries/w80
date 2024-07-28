@@ -16,8 +16,8 @@ public class StatisticsRepository(
     public async Task UpdateAsync(Statistics update, CancellationToken cancellationToken, IClientSessionHandle? session = null)
     {
         if (session == null)
-            await statisticsSet.ReplaceOneAsync(x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
         else
-            await statisticsSet.ReplaceOneAsync(session, x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(session, x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
     }
 }

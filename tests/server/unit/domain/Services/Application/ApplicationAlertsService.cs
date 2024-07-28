@@ -26,7 +26,7 @@ public class ApplicationAlertsService
             Assert.Multiple(() =>
             {
                 Assert.That(update.Count, Is.EqualTo(0));
-                Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(0));
+                Assert.That(emailSender?.Emails.Value.Count, Is.EqualTo(0));
             });
         }
     }
@@ -52,7 +52,7 @@ public class ApplicationAlertsService
             Assert.Multiple(() =>
             {
                 Assert.That(update.Count, Is.EqualTo(1));
-                Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(1));
+                Assert.That(emailSender?.Emails.Value.Count, Is.EqualTo(1));
             });
         }
     }
@@ -72,20 +72,20 @@ public class ApplicationAlertsService
                 now.AddHours(8));
 
             var stringLocalizer = ctx.Services.GetRequiredService<IStringLocalizer<Common.Resource.Resources>>();
-            var user = await ctx.Services.GetRequiredService<IUserRepository>().GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+            var user = await ctx.Services.GetRequiredService<IUserRepository>().FirstOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
 
             var emailSender = ctx.Services.GetRequiredService<IEmailSenderService>() as EmailSenderServiceFake;
             var service = ctx.Services.GetRequiredService<IApplicationAlertsService>();
             await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
 
-            var email = emailSender.Emails.Value.First();
+            var email = emailSender?.Emails.Value.First();
             var subject = stringLocalizer["Appointment Alert"].Value;
 
             Assert.Multiple(() =>
             {
-                Assert.That(email.Subject, Is.EqualTo(subject));
-                Assert.That(email.Addresses.Contains(user.Email), Is.True);
-                Assert.That(email.Template, Is.EqualTo(TemplateType.EmailApplicationScheduleAlert));
+                Assert.That(email?.Subject, Is.EqualTo(subject));
+                Assert.That(email?.Addresses.Contains(user?.Email), Is.True);
+                Assert.That(email?.Template, Is.EqualTo(TemplateType.EmailApplicationScheduleAlert));
             });
         }
     }
@@ -111,7 +111,7 @@ public class ApplicationAlertsService
             Assert.Multiple(() =>
             {
                 Assert.That(update.Count, Is.EqualTo(1));
-                Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(1));
+                Assert.That(emailSender?.Emails.Value.Count, Is.EqualTo(1));
             });
         }
     }
@@ -134,8 +134,8 @@ public class ApplicationAlertsService
             var update = await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
             await ctx.Services.GetRequiredService<IApplicationRepository>().SetEmailNotificationSentOnAppoinmentsAsync(update, CancellationToken.None);
 
-            var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().GetSingleOrDefaultAsync(x => x.Id == app.Id, CancellationToken.None);
-            Assert.That(updatedApp.Appointments.First().EmailNotificationSent, Is.EqualTo(true));
+            var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().FirstOrDefaultAsync(x => x.Id == app.Id, CancellationToken.None);
+            Assert.That(updatedApp?.Appointments.First().EmailNotificationSent, Is.EqualTo(true));
         }
     }
 
@@ -162,7 +162,7 @@ public class ApplicationAlertsService
             Assert.Multiple(() =>
             {
                 Assert.That(update.Count, Is.EqualTo(0));
-                Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(0));
+                Assert.That(emailSender?.Emails.Value.Count, Is.EqualTo(0));
             });
         }
     }
@@ -186,8 +186,8 @@ public class ApplicationAlertsService
             var emailSender = ctx.Services.GetRequiredService<IEmailSenderService>() as EmailSenderServiceFake;
 
             var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
-            var current = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
-            var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+            var current = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+            var user = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
             user.Deactivate(DateTime.UtcNow);
             await userRepo.DeactivateAsync(user, CancellationToken.None);
 
@@ -196,7 +196,7 @@ public class ApplicationAlertsService
             Assert.Multiple(() =>
             {
                 Assert.That(update.Count, Is.EqualTo(0));
-                Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(0));
+                Assert.That(emailSender?.Emails.Value.Count, Is.EqualTo(0));
             });
         }
     }
@@ -223,14 +223,14 @@ public class ApplicationAlertsService
             var emailSender = ctx.Services.GetRequiredService<IEmailSenderService>() as EmailSenderServiceFake;
 
             var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
-            var current = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+            var current = await userRepo.FirstOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
 
             var update = await service.SendScheduleEmailAlertsAsync(CancellationToken.None);
 
             Assert.Multiple(() =>
             {
                 Assert.That(update.Count, Is.EqualTo(0));
-                Assert.That(emailSender.Emails.Value.Count, Is.EqualTo(0));
+                Assert.That(emailSender?.Emails.Value.Count, Is.EqualTo(0));
             });
         }
     }
@@ -238,19 +238,16 @@ public class ApplicationAlertsService
     private async Task<Domain.Entities.Application> CreateApplicationWithAppointmentAsync(
         TestHelper.TestContext ctx,
         ObjectId userId,
-        DateTime eventStartDateTime,
-        DateTime eventEndDateTime)
+        DateTime appointmentStartDateTime,
+        DateTime appointmentEndDateTime)
     {
         var app = ctx.CreateApplication();
         app.UserId = userId;
-        app.Appointments.Add(new Appointment()
-        {
-            ApplicationStateId = app.GetCurrentState().Id.ToString(),
-            StartDateTimeUTC = eventStartDateTime,
-            EndDateTimeUTC = eventEndDateTime,
-            Id = Guid.NewGuid(),
-            Description = "Test"
-        });
+
+        app.Appointments.Add(ctx.CreateAppointment(
+            appointmentStartDateTime,
+            appointmentEndDateTime,
+            "Test"));
 
         var appService = ctx.Services.GetRequiredService<IApplicationApplicationService>();
         await appService.UpsertAsync(ApplicationMapper.ToUpdateDTO(app), CancellationToken.None);
@@ -261,8 +258,8 @@ public class ApplicationAlertsService
     private async Task EnableEmailAlertsOnTestUserAsync(TestHelper.TestContext ctx)
     {
         var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
-        var current = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
-        var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+        var current = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+        var user = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
         user.EnableEventEmailNotifications = true;
         await userRepo.UpsertAsync(user, current, CancellationToken.None);
     }
@@ -270,8 +267,8 @@ public class ApplicationAlertsService
     private async Task DisableEmailAlertsOnTestUserAsync(TestHelper.TestContext ctx)
     {
         var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
-        var current = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
-        var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+        var current = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
+        var user = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
         user.EnableEventEmailNotifications = false;
         await userRepo.UpsertAsync(user, current, CancellationToken.None);
     }

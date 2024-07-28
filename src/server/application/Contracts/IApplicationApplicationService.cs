@@ -13,7 +13,7 @@ public interface IApplicationApplicationService
     Task<ComplexResponseDto<ApplicationViewDto>> RejectAsync(ObjectId id, RejectionDto rejection, CancellationToken cancellationToken = default);
     Task<ComplexResponseDto<ApplicationViewDto>> AcceptAsync(ObjectId id, AcceptanceDto acceptance, CancellationToken cancellationToken = default);
     Task<ComplexResponseDto<ApplicationViewDto>> UnarchiveAsync(ObjectId id, CancellationToken cancellationToken = default);
-    Task<IList<ApplicationViewDto?>> GetForUser(ObjectId userId, bool includeDeactivated = false, CancellationToken cancellationToken = default);
+    Task<IList<ApplicationViewDto>> GetForUser(ObjectId userId, bool includeDeactivated = false, CancellationToken cancellationToken = default);
     Task<IList<ValidationItemDto>> ValidateAsync(ApplicationUpdateRequestDto application, CancellationToken cancellationToken = default);
     Task<ComplexResponseDto<ApplicationViewDto>> UpsertAsync(ApplicationUpdateRequestDto application, CancellationToken cancellationToken = default);
     Task SetBrowserNotificationSentAsync(IDictionary<string, List<Guid>> evnts, CancellationToken cancellationToken = default);

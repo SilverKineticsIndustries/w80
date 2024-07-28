@@ -1,8 +1,8 @@
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using SilverKinetics.w80.Common;
 using SilverKinetics.w80.Common.Security;
 using SilverKinetics.w80.Common.Configuration;
-using SilverKinetics.w80.Common;
 
 namespace SilverKinetics.w80.Application.Security;
 
@@ -12,7 +12,7 @@ public static class Invitations
     {
         var plainText = string.Concat(email, "|", utcNow.ToISO8610String());
         var plainTextBytes = Encoding.Unicode.GetBytes(plainText);
-        return Encryption.Encrypt(plainTextBytes, config[Keys.Secrets.InvitationKey]);
+        return Encryption.Encrypt(plainTextBytes, config.GetRequiredValue(Keys.Secrets.InvitationKey));
     }
 
     public static void Decrypt(IConfiguration config, string invitationCodeBase64, out string email, out DateTime utcDateTime)
@@ -21,7 +21,8 @@ public static class Invitations
         utcDateTime = DateTime.MinValue;
 
         var invitationCodeCypherBytes = Convert.FromBase64String(invitationCodeBase64);
-        var invitationCode = Encoding.Unicode.GetString(Encryption.Decrypt(invitationCodeCypherBytes, config[Keys.Secrets.InvitationKey]));
+        var invitationCode = Encoding.Unicode.GetString(
+            Encryption.Decrypt(invitationCodeCypherBytes, config.GetRequiredValue(Keys.Secrets.InvitationKey)));
         if (!invitationCode.Contains('|'))
             return;
 

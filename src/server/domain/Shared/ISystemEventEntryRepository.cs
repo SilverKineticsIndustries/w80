@@ -7,7 +7,7 @@ namespace SilverKinetics.w80.Domain.Shared;
 
 public interface ISystemEventEntryRepository
 {
-    Task<SystemEventEntry?> GetSingleOrDefaultAsync(Expression<Func<SystemEventEntry, bool>> predicate, CancellationToken cancellationToken);
+    Task<SystemEventEntry?> FirstOrDefaultAsync(Expression<Func<SystemEventEntry, bool>> predicate, CancellationToken cancellationToken);
     Task<IEnumerable<SystemEventEntry>> GetManyAsync(Expression<Func<SystemEventEntry, bool>> predicate, CancellationToken cancellationToken);
 
     public Task InsertAsync(

@@ -16,8 +16,8 @@ public class SystemStateRepository(
     public async Task UpdateAsync(SystemState systemState, CancellationToken cancellationToken, IClientSessionHandle? session = null)
     {
         if (session == null)
-            await systemStateSet.ReplaceOneAsync(x => x.Id == systemState.Id, systemState, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(x => x.Id == systemState.Id, systemState, replaceOptions, cancellationToken).ConfigureAwait(false);
         else
-            await systemStateSet.ReplaceOneAsync(session, x => x.Id == systemState.Id, systemState, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(session, x => x.Id == systemState.Id, systemState, replaceOptions, cancellationToken).ConfigureAwait(false);
     }
 }

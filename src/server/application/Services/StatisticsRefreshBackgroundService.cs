@@ -25,7 +25,7 @@ public class StatisticsRefreshBackgroundService(
                 var mongoClient = scope.ServiceProvider.GetRequiredService<IMongoClient>();
                 var statisticsService = scope.ServiceProvider.GetRequiredService<IStatisticsGenerationService>();
                 var systemStateRepo = scope.ServiceProvider.GetRequiredService<ISystemStateRepository>();
-                var systemState = await systemStateRepo.GetSingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+                var systemState = await systemStateRepo.FirstAsync(cancellationToken).ConfigureAwait(false);
 
                 await mongoClient.WrapInTransactionAsync(async
                 (session) => {

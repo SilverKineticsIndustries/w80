@@ -15,7 +15,7 @@ public class TemplateResolver(IConfiguration config)
         var templatePath = $"{templateFullyQualifiedName}_{culture}.template";
         if (!_templateCache.ContainsKey(templatePath))
         {
-            var resource = await Resources.GetEmbeddedResourceFileAsync(_currentAssembly, templatePath);
+            var resource = await Common.Resource.Resources.GetEmbeddedResourceFileAsync(_currentAssembly, templatePath);
             _templateCache.AddOrUpdate(templatePath, resource, (s,i) => resource);
         }
         var templateBody = _templateCache[templatePath];
@@ -25,6 +25,8 @@ public class TemplateResolver(IConfiguration config)
 
     public string ReplaceParameters(string str, IDictionary<string,string>? parameters)
     {
+        parameters ??= new Dictionary<string,string>();
+
         // TODO: Maybe too crude. Have to potentially think about XSS here ...
         foreach(var parameter in parameters.Union(GetGenericReplacementParameters()))
         {
@@ -38,8 +40,8 @@ public class TemplateResolver(IConfiguration config)
     private IDictionary<string,string> GetGenericReplacementParameters()
     {
         var parameters = new Dictionary<string,string>();
-        parameters.Add("domain", config[Keys.Domain]);
-        parameters.Add("appname", config[Keys.Appname]);
+        parameters.Add("domain", config.GetRequiredValue(Keys.Domain));
+        parameters.Add("appname", config.GetOptionalValue(Keys.Appname, "W80"));
         return parameters;
     }
 

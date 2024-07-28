@@ -59,16 +59,16 @@ public class ApplicationApplicationService
             var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
 
             var app = ctx.CreateApplicationUpdateRequestDto();
-            var currenState = app.States.FirstOrDefault(x => x.IsCurrent);
+            var currenState = app.States.Single(x => x.IsCurrent);
             var response = await service.UpsertAsync(app);
-            Assume.That(response.Result.States.Where(x => x.IsCurrent == true).Count(), Is.EqualTo(1));
+            Assume.That(response?.Result?.States.Where(x => x.IsCurrent == true).Count(), Is.EqualTo(1));
 
             app.States.First(x => x.IsCurrent == true).IsCurrent = false;
             var newState = app.States.First(x => x.Id != currenState.Id);
             newState.IsCurrent = true;
 
             var ret = (await service.UpsertAsync(app)).Result;
-            Assert.That(ret.States.Where(x => x.IsCurrent == true && x.Id == newState.Id).Count(), Is.EqualTo(1));
+            Assert.That(ret?.States.Where(x => x.IsCurrent == true && x.Id == newState.Id).Count(), Is.EqualTo(1));
         }
     }
 
@@ -88,10 +88,10 @@ public class ApplicationApplicationService
 
             var app = ctx.CreateApplicationUpdateRequestDto();
             var response = (await service.UpsertAsync(app)).Result;
-            Assume.That(response.States.Count(), Is.EqualTo(applicationStates.Count));
+            Assume.That(response?.States.Count(), Is.EqualTo(applicationStates.Count));
 
             var ret = (await service.UpsertAsync(app)).Result;
-            Assert.That(ret.States.Count(), Is.EqualTo(applicationStates.Count));
+            Assert.That(ret?.States.Count(), Is.EqualTo(applicationStates.Count));
         }
     }
 
@@ -105,17 +105,18 @@ public class ApplicationApplicationService
             var applicationStates = await applicationStateSet.AsQueryable().ToListAsync();
 
             var app = ctx.CreateApplicationUpdateRequestDto();
-            var response = (await service.UpsertAsync(app)).Result;
-            Assume.That(response.States.Count(), Is.EqualTo(applicationStates.Count));
+            var response = await service.UpsertAsync(app);
+
+            Assume.That(response.Result?.States.Count, Is.EqualTo(applicationStates.Count));
             var stateToRemove = app.States.Where(x => !x.IsCurrent).First();
 
-            app.States = response.States.Where(x => x.Id != stateToRemove.Id).ToList();
+            app.States = response.Result?.States.Where(x => x.Id != stateToRemove.Id).ToList() ?? [];
 
             var ret = (await service.UpsertAsync(app)).Result;
             Assert.Multiple(() =>
             {
-                Assert.That(ret.States.Count(), Is.EqualTo(applicationStates.Count - 1));
-                Assert.That(ret.States.Count(x => x.Id == stateToRemove.Id), Is.EqualTo(0));
+                Assert.That(ret?.States.Count(), Is.EqualTo(applicationStates.Count - 1));
+                Assert.That(ret?.States.Count(x => x.Id == stateToRemove.Id), Is.EqualTo(0));
             });
         }
     }
@@ -131,9 +132,8 @@ public class ApplicationApplicationService
             app.Contacts.Add(ctx.CreateContactDto());
 
             var res = await service.UpsertAsync(app);
-            Assert.That(res.Result.Contacts.Count, Is.EqualTo(1));
+            Assert.That(res?.Result?.Contacts.Count, Is.EqualTo(1));
         }
-
     }
 
     [Test]
@@ -147,12 +147,12 @@ public class ApplicationApplicationService
             app.Contacts.Add(ctx.CreateContactDto());
 
             var res = await service.UpsertAsync(app);
-            Assume.That(res.Result.Contacts.Count, Is.EqualTo(1));
+            Assume.That(res?.Result?.Contacts.Count, Is.EqualTo(1));
 
             app.Contacts.Clear();
 
             res = await service.UpsertAsync(app);
-            Assert.That(res.Result.Contacts.Count, Is.EqualTo(0));
+            Assert.That(res?.Result?.Contacts.Count, Is.EqualTo(0));
         }
     }
 
@@ -191,7 +191,7 @@ public class ApplicationApplicationService
             });
 
             var res = await service.UpsertAsync(app);
-            Assume.That(res.Result.Contacts.Count, Is.EqualTo(3));
+            Assume.That(res?.Result?.Contacts.Count, Is.EqualTo(3));
 
             var contactToUpdate = app.Contacts.First(x => x.ContactParameter == "john.smith@w80.silverkinetics.dev");
             contactToUpdate.ContactParameter = "john.smith100@w80.silverkinetics.dev";
@@ -200,9 +200,9 @@ public class ApplicationApplicationService
 
             Assert.Multiple(() =>
             {
-                Assert.That(res.Result.Contacts.Count, Is.EqualTo(3));
-                Assert.That(res.Result.Contacts.Count(x => x.ContactParameter == "john.smith@w80.silverkinetics.dev"), Is.EqualTo(0));
-                Assert.That(res.Result.Contacts.Count(x => x.ContactParameter == "john.smith100@w80.silverkinetics.dev"), Is.EqualTo(1));
+                Assert.That(res?.Result?.Contacts.Count, Is.EqualTo(3));
+                Assert.That(res?.Result?.Contacts.Count(x => x.ContactParameter == "john.smith@w80.silverkinetics.dev"), Is.EqualTo(0));
+                Assert.That(res?.Result?.Contacts.Count(x => x.ContactParameter == "john.smith100@w80.silverkinetics.dev"), Is.EqualTo(1));
             });
         }
     }
@@ -241,7 +241,7 @@ public class ApplicationApplicationService
             });
 
             var res = await service.UpsertAsync(app);
-            Assume.That(res.Result.Contacts.Count, Is.EqualTo(3));
+            Assume.That(res?.Result?.Contacts.Count, Is.EqualTo(3));
 
             var updatedName = "John Smith Jr";
             app.Contacts.First(x => x.ContactParameter == "john.smith@w80.silverkinetics.dev").ContactName = updatedName;
@@ -249,9 +249,9 @@ public class ApplicationApplicationService
 
             Assert.Multiple(() =>
             {
-                Assert.That(res.Result.Contacts.Count, Is.EqualTo(3));
-                Assert.That(res.Result.Contacts.Count(x => x.ContactName == "John Smith"), Is.EqualTo(0));
-                Assert.That(res.Result.Contacts.Count(x => x.ContactName == updatedName), Is.EqualTo(1));
+                Assert.That(res?.Result?.Contacts.Count, Is.EqualTo(3));
+                Assert.That(res?.Result?.Contacts.Count(x => x.ContactName == "John Smith"), Is.EqualTo(0));
+                Assert.That(res?.Result?.Contacts.Count(x => x.ContactName == updatedName), Is.EqualTo(1));
             });
         }
     }
@@ -273,8 +273,8 @@ public class ApplicationApplicationService
             var res = await service.UpsertAsync(app);
             Assert.Multiple(() =>
             {
-                Assert.That(res.Result.Appointments.Count, Is.EqualTo(1));
-                Assert.That(res.Result.Appointments.Count(x =>
+                Assert.That(res?.Result?.Appointments.Count, Is.EqualTo(1));
+                Assert.That(res?.Result?.Appointments.Count(x =>
                     x.StartDateTimeUTC.ToString() == startEventDateTime.ToString()
                     && x.EndDateTimeUTC.ToString() == endEventDateTime.ToString()), Is.EqualTo(1));
             });
@@ -346,19 +346,24 @@ public class ApplicationApplicationService
                 x.StartDateTimeUTC.ToString() == event1StartDateTime.ToString()
                 && x.EndDateTimeUTC.ToString() == event1EndDateTime.ToString());
 
-            app.Appointments.Remove(toRemove);
-            res = await service.UpsertAsync(app);
-
-            Assert.Multiple(() =>
+            if (toRemove == null)
+                Assert.Fail();
+            else
             {
-                Assert.That(res.Result.Appointments.Count, Is.EqualTo(1));
-                Assert.That(res.Result.Appointments.Count(x =>
-                    x.StartDateTimeUTC.ToString() == event1StartDateTime.ToString()
-                    && x.EndDateTimeUTC.ToString() == event1EndDateTime.ToString()), Is.EqualTo(0));
-                Assert.That(res.Result.Appointments.Count(x =>
-                    x.StartDateTimeUTC.ToString() == event2StartDateTime.ToString()
-                    && x.EndDateTimeUTC.ToString() == event2EndDateTime.ToString()), Is.EqualTo(1));
-            });
+                app.Appointments.Remove(toRemove);
+                res = await service.UpsertAsync(app);
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(res?.Result?.Appointments.Count, Is.EqualTo(1));
+                    Assert.That(res?.Result?.Appointments.Count(x =>
+                        x.StartDateTimeUTC.ToString() == event1StartDateTime.ToString()
+                        && x.EndDateTimeUTC.ToString() == event1EndDateTime.ToString()), Is.EqualTo(0));
+                    Assert.That(res?.Result?.Appointments.Count(x =>
+                        x.StartDateTimeUTC.ToString() == event2StartDateTime.ToString()
+                        && x.EndDateTimeUTC.ToString() == event2EndDateTime.ToString()), Is.EqualTo(1));
+                });
+            }
         }
     }
 
@@ -384,18 +389,21 @@ public class ApplicationApplicationService
             var toUpdate = app.Appointments.Find(x =>
                 x.StartDateTimeUTC.ToString() == event1StartDateTime.ToString()
                 && x.EndDateTimeUTC.ToString() == event1EndDateTime.ToString());
+            if (toUpdate == null)
+                Assert.Fail();
+            else {
+                toUpdate.Description = "Interview with Bill from Company A";
+                res = await service.UpsertAsync(app);
 
-            toUpdate.Description = "Interview with Bill from Company A";
-            res = await service.UpsertAsync(app);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(res.Result.Appointments.Count, Is.EqualTo(2));
-                Assert.That(res.Result.Appointments.Count(
-                    x => x.Description == toUpdate.Description
-                          && x.StartDateTimeUTC.ToString() == event1StartDateTime.ToString()
-                          && x.EndDateTimeUTC.ToString() == event1EndDateTime.ToString()), Is.EqualTo(1));
-            });
+                Assert.Multiple(() =>
+                {
+                    Assert.That(res?.Result?.Appointments.Count, Is.EqualTo(2));
+                    Assert.That(res?.Result?.Appointments.Count(
+                        x => x.Description == toUpdate.Description
+                            && x.StartDateTimeUTC.ToString() == event1StartDateTime.ToString()
+                            && x.EndDateTimeUTC.ToString() == event1EndDateTime.ToString()), Is.EqualTo(1));
+                });
+            }
         }
     }
 
@@ -425,18 +433,22 @@ public class ApplicationApplicationService
                 x.StartDateTimeUTC.ToString() == event3StartDateTime.ToString()
                 && x.EndDateTimeUTC.ToString() == event3EndDateTime.ToString());
 
-            var newEvent3EndDateTime = event3EndDateTime.AddHours(4);
-            toUpdate.EndDateTimeUTC = newEvent3EndDateTime;
-            res = await service.UpsertAsync(app);
+            if (toUpdate == null)
+                Assert.Fail();
+            else {
+                var newEvent3EndDateTime = event3EndDateTime.AddHours(4);
+                toUpdate.EndDateTimeUTC = newEvent3EndDateTime;
+                res = await service.UpsertAsync(app);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(res.Result.Appointments.Count, Is.EqualTo(3));
-                Assert.That(res.Result.Appointments.Count(
-                    x => x.Description == toUpdate.Description
-                          && x.StartDateTimeUTC.ToString() == event3StartDateTime.ToString()
-                          && x.EndDateTimeUTC.ToString() == newEvent3EndDateTime.ToString()), Is.EqualTo(1));
-            });
+                Assert.Multiple(() =>
+                {
+                    Assert.That(res?.Result?.Appointments.Count, Is.EqualTo(3));
+                    Assert.That(res?.Result?.Appointments.Count(
+                        x => x.Description == toUpdate.Description
+                            && x.StartDateTimeUTC.ToString() == event3StartDateTime.ToString()
+                            && x.EndDateTimeUTC.ToString() == newEvent3EndDateTime.ToString()), Is.EqualTo(1));
+                });
+            }
         }
     }
 
@@ -454,7 +466,7 @@ public class ApplicationApplicationService
 
             Assert.Multiple(() =>
             {
-                Assert.That(res.Result.UpdatedUTC, Is.Null);
+                Assert.That(res?.Result?.UpdatedUTC, Is.Null);
                 Assert.That(appl.UpdatedUTC, Is.Null);
             });
         }
@@ -477,9 +489,8 @@ public class ApplicationApplicationService
 
             Assert.Multiple(() =>
             {
-                Assert.That(res.Result.UpdatedUTC.HasValue);
-                Assert.That(res.Result.UpdatedUTC.Value, Is.EqualTo(now).Within(10).Seconds);
-                Assert.That(appl.UpdatedUTC.Value, Is.EqualTo(now).Within(10).Seconds);
+                Assert.That(res?.Result?.UpdatedUTC, Is.EqualTo(now).Within(10).Seconds);
+                Assert.That(appl?.UpdatedUTC, Is.EqualTo(now).Within(10).Seconds);
             });
         }
     }
@@ -495,7 +506,7 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.DeactivateAsync(ObjectId.Parse(res.Result.Id));
+            res = await service.DeactivateAsync(ObjectId.Parse(res?.Result?.Id));
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assume.That(appl.DeactivatedUTC, Is.Not.Null);
 
@@ -540,7 +551,7 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.DeactivateAsync(ObjectId.Parse(res.Result.Id));
+            res = await service.DeactivateAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assert.That(appl.DeactivatedUTC, Is.EqualTo(now).Within(10).Seconds);
@@ -559,7 +570,7 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.DeactivateAsync(ObjectId.Parse(res.Result.Id));
+            res = await service.DeactivateAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assert.That(appl.DeactivatedBy, Is.EqualTo(ctx.GetCurrentUserId()));
@@ -579,7 +590,7 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.DeactivateAsync(ObjectId.Parse(res.Result.Id));
+            res = await service.DeactivateAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assume.That(appl.DeactivatedUTC, Is.Not.Null);
@@ -604,10 +615,10 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.DeactivateAsync(ObjectId.Parse(res.Result.Id));
-            Assume.That(res.Result.DeactivatedUTC, Is.Not.Null);
+            res = await service.DeactivateAsync(ObjectId.Parse(res?.Result?.Id));
+            Assume.That(res?.Result?.DeactivatedUTC, Is.Not.Null);
 
-            await service.ReactivateAsync(ObjectId.Parse(res.Result.Id));
+            await service.ReactivateAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assert.That(appl.DeactivatedUTC, Is.Null);
@@ -626,7 +637,7 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            await service.ReactivateAsync(ObjectId.Parse(res.Result.Id));
+            await service.ReactivateAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assert.That(appl.DeactivatedBy, Is.Null);
@@ -646,10 +657,10 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.DeactivateAsync(ObjectId.Parse(res.Result.Id));
-            Assume.That(res.Result.DeactivatedUTC, Is.Not.Null);
+            res = await service.DeactivateAsync(ObjectId.Parse(res?.Result?.Id));
+            Assume.That(res?.Result?.DeactivatedUTC, Is.Not.Null);
 
-            await service.ReactivateAsync(ObjectId.Parse(res.Result.Id));
+            await service.ReactivateAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assume.That(appl.DeactivatedUTC, Is.Null);
@@ -674,7 +685,7 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplication();
             var res = await service.UpsertAsync(ApplicationMapper.ToUpdateDTO(app));
 
-            res = await service.ArchiveAsync(ObjectId.Parse(res.Result.Id));
+            res = await service.ArchiveAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id == app.Id).FirstAsync();
             Assert.That(appl.ArchivedUTC, Is.EqualTo(now).Within(10).Seconds);
@@ -694,7 +705,7 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.ArchiveAsync(ObjectId.Parse(res.Result.Id));
+            res = await service.ArchiveAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstOrDefaultAsync();
             Assume.That(appl, Is.Not.Null);
@@ -721,10 +732,10 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.ArchiveAsync(ObjectId.Parse(res.Result.Id));
-            Assume.That(res.Result.ArchivedUTC, Is.Not.Null);
+            res = await service.ArchiveAsync(ObjectId.Parse(res?.Result?.Id));
+            Assume.That(res?.Result?.ArchivedUTC, Is.Not.Null);
 
-            await service.UnarchiveAsync(ObjectId.Parse(res.Result.Id));
+            await service.UnarchiveAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assert.That(appl.ArchivedUTC, Is.Null);
@@ -744,8 +755,8 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.ArchiveAsync(ObjectId.Parse(res.Result.Id));
-            await service.UnarchiveAsync(ObjectId.Parse(res.Result.Id));
+            res = await service.ArchiveAsync(ObjectId.Parse(res?.Result?.Id));
+            await service.UnarchiveAsync(ObjectId.Parse(res?.Result?.Id));
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
             Assume.That(appl.ArchivedUTC, Is.Null);
@@ -770,11 +781,11 @@ public class ApplicationApplicationService
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
 
-            res = await service.RejectAsync(ObjectId.Parse(res.Result.Id), ctx.CreateRejectionDto());
+            res = await service.RejectAsync(ObjectId.Parse(res?.Result?.Id), ctx.CreateRejectionDto());
 
             var appId = ObjectId.Parse(app.Id);
-            var appl = await applicationRepo.GetSingleOrDefaultAsync((x) => x.Id == appId, CancellationToken.None);
-            Assert.That(appl.Rejection.RejectedUTC, Is.EqualTo(now).Within(10).Seconds);
+            var appl = await applicationRepo.FirstOrDefaultAsync((x) => x.Id == appId, CancellationToken.None);
+            Assert.That(appl?.Rejection?.RejectedUTC, Is.EqualTo(now).Within(10).Seconds);
         }
     }
 
@@ -789,10 +800,10 @@ public class ApplicationApplicationService
             var now = DateTime.UtcNow;
             var app = ctx.CreateApplicationUpdateRequestDto();
             var res = await service.UpsertAsync(app);
-            res = await service.RejectAsync(ObjectId.Parse(res.Result.Id), ctx.CreateRejectionDto());
+            res = await service.RejectAsync(ObjectId.Parse(res?.Result?.Id), ctx.CreateRejectionDto());
 
             var appl = await applicationSet.AsQueryable().Where((x) => x.Id.ToString() == app.Id).FirstAsync();
-            Assume.That(appl.Rejection.RejectedUTC, Is.Not.Null);
+            Assume.That(appl.Rejection?.RejectedUTC, Is.Not.Null);
 
             var systemEventSet = ctx.Services.GetRequiredService<IMongoCollection<SystemEventEntry>>();
             var systemEvent = await systemEventSet.AsQueryable().Where((x) => x.EntityId == appl.Id && x.EntityName == nameof(Domain.Entities.Application)).FirstAsync();
@@ -898,12 +909,12 @@ public class ApplicationApplicationService
             app.Appointments.First().StartDateTimeUTC = now.AddMinutes(25);
             await service.UpsertAsync(app);
 
-            var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().GetSingleOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
-            var evnt = updatedApp.Appointments.First();
+            var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().FirstOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
+            var evnt = updatedApp?.Appointments.First();
             Assert.Multiple(() =>
             {
-                Assert.That(evnt.EmailNotificationSent, Is.False);
-                Assert.That(evnt.BrowserNotificationSent, Is.False);
+                Assert.That(evnt?.EmailNotificationSent, Is.False);
+                Assert.That(evnt?.BrowserNotificationSent, Is.False);
             });
         }
     }
@@ -937,12 +948,12 @@ public class ApplicationApplicationService
             app.Appointments.First().StartDateTimeUTC = now.AddMinutes(45);
             await service.UpsertAsync(app);
 
-            var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().GetSingleOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
-            var evnt = updatedApp.Appointments.First();
+            var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().FirstOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
+            var evnt = updatedApp?.Appointments.First();
             Assert.Multiple(() =>
             {
-                Assert.That(evnt.EmailNotificationSent, Is.False);
-                Assert.That(evnt.BrowserNotificationSent, Is.False);
+                Assert.That(evnt?.EmailNotificationSent, Is.False);
+                Assert.That(evnt?.BrowserNotificationSent, Is.False);
             });
         }
     }
@@ -977,13 +988,34 @@ public class ApplicationApplicationService
             app.Appointments.First().EndDateTimeUTC = now.AddHours(-2);
             await service.UpsertAsync(app);
 
-            var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().GetSingleOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
-            var evnt = updatedApp.Appointments.First();
+            var updatedApp = await ctx.Services.GetRequiredService<IApplicationRepository>().FirstOrDefaultAsync(x => x.Id == appId, CancellationToken.None);
+            var evnt = updatedApp?.Appointments.First();
             Assert.Multiple(() =>
             {
-                Assert.That(evnt.EmailNotificationSent, Is.True);
-                Assert.That(evnt.BrowserNotificationSent, Is.True);
+                Assert.That(evnt?.EmailNotificationSent, Is.True);
+                Assert.That(evnt?.BrowserNotificationSent, Is.True);
             });
+        }
+    }
+
+    [Test]
+    public async Task UpsertAsync_updateRejectedApplication_rejectionDataShouldNotBeModified()
+    {
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        {
+            var service = ctx.Services.GetRequiredService<IApplicationApplicationService>();
+
+            var id = Guid.NewGuid();
+            var now = DateTime.UtcNow;
+            var threshold = TimeSpan.FromMinutes(30);
+
+            var app = ctx.CreateApplicationUpdateRequestDto();
+            await service.UpsertAsync(app);
+            var appId = ObjectId.Parse(app.Id);
+
+            var rejection = ctx.CreateRejectionDto();
+            await service.RejectAsync(appId, rejection, CancellationToken.None);
+
         }
     }
 }

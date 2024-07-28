@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Localization;
+using MongoDB.Bson;
 using MongoDB.Driver.Linq;
 using SilverKinetics.w80.Common;
 using SilverKinetics.w80.Domain.Shared;
@@ -21,7 +22,7 @@ public class UserUpsertService(
 {
     public Entities.User Create(string email, string? nickname = null)
     {
-        return Entities.User.Create(email, nickname);
+        return new Entities.User(ObjectId.GenerateNewId(), Role.User, email) { Nickname = nickname };
     }
 
     public async Task UpsertAsync(Entities.User user, RequestSourceInfo requestSourceInfo, CancellationToken cancellationToken)
@@ -81,7 +82,7 @@ public class UserUpsertService(
             goto end;
         }
 
-        var recWithSameEmail = await userRepo.GetSingleOrDefaultAsync(x => x.Id != user.Id && x.Email.ToLower().Trim() == user.Email.ToLower().Trim(), cancellationToken);
+        var recWithSameEmail = await userRepo.FirstOrDefaultAsync(x => x.Id != user.Id && x.Email.ToLower().Trim() == user.Email.ToLower().Trim(), cancellationToken);
         if (recWithSameEmail is not null)
         {
             bag.Add(new ValidationItem(stringLocalizer["An account already exists with same email."]));

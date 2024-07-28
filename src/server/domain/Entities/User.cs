@@ -19,7 +19,7 @@ public class User
     [MaxLength(EmailMaxLength)]
     public string Email { get; set; }
     [MaxLength(NicknameMaxLength)]
-    public string Nickname { get; set; }
+    public string? Nickname { get; set; }
     public string TimeZone { get; set; }
     public string Culture { get; set; }
     public Role Role { get; set; }
@@ -33,6 +33,15 @@ public class User
 
     public ObjectId? DeactivatedBy { get; set; }
     public DateTime? DeactivatedUTC { get; set; }
+
+    public User(ObjectId id, Role role, string email)
+    {
+        Id = id;
+        Role = role;
+        Email = email;
+        Culture = SupportedCultures.DefaultCulture;
+        TimeZone = SupportedTimeZones.DefaultTimezone;
+    }
 
     public bool IsDeactivated()
     {
@@ -80,16 +89,6 @@ public class User
         CreatedUTC = other.CreatedUTC;
         DeactivatedBy = other.DeactivatedBy;
         DeactivatedUTC = other.DeactivatedUTC;
-    }
-
-    internal static User Create(string email, string? nickname = null)
-    {
-        var user = new User();
-        user.Email = email;
-        user.Nickname = nickname;
-        user.TimeZone = Constants.DefaultTimeZone;
-        user.Culture = SupportedCultures.DefaultCulture;
-        return user;
     }
 
     public const int EmailMaxLength = 100;

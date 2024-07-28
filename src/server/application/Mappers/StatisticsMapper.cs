@@ -20,11 +20,11 @@ public partial class StatisticsMapper
                     {
                         var state = states.TryGetValue(x.Key, out ApplicationState? value) ? value : null;
                         return
-                            new ApplicationStateCountsDto(
-                                state != null ? state.Name : stringLocalizer["Unknown"],
-                                state != null ? state.HexColor : "FFFFFF",
-                                x.Value
-                            );
+                            new ApplicationStateCountsDto() {
+                                Name = state != null ? state.Name : stringLocalizer["Unknown"],
+                                Color = state != null ? state.HexColor : "FFFFFF",
+                                Value = x.Value
+                            };
                     }
                 )
                 .ToList()

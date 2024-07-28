@@ -4,6 +4,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Configuration;
 using SilverKinetics.w80.Domain.Shared;
 using SilverKinetics.w80.Domain.Entities;
+using SilverKinetics.w80.Common.Security;
 using SilverKinetics.w80.Application.DTOs;
 using SilverKinetics.w80.Domain.Contracts;
 using SilverKinetics.w80.Common.Contracts;
@@ -12,7 +13,6 @@ using SilverKinetics.w80.Application.Mappers;
 using SilverKinetics.w80.Application.Security;
 using SilverKinetics.w80.Application.Contracts;
 using SilverKinetics.w80.Application.Exceptions;
-using SilverKinetics.w80.Common.Security;
 
 namespace SilverKinetics.w80.Application.Services;
 
@@ -43,7 +43,7 @@ public class UserApplicationService(
 
     public async Task<UserProfileViewDto?> GetProfileAsync(ObjectId id, CancellationToken cancellationToken)
     {
-        var user = await userRepo.GetSingleOrDefaultAsync((x) => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var user = await userRepo.FirstOrDefaultAsync((x) => x.Id == id, cancellationToken).ConfigureAwait(false);
         if (user is not null)
         {
             VerifyUserCanAccessUser(user.Id);
@@ -55,7 +55,7 @@ public class UserApplicationService(
 
     public async Task<UserProfileViewDto?> GetProfileFromEmailAsync(string email, CancellationToken cancellationToken)
     {
-        var user = await userRepo.GetSingleOrDefaultAsync((x) => x.Email == email, cancellationToken).ConfigureAwait(false);
+        var user = await userRepo.FirstOrDefaultAsync((x) => x.Email == email, cancellationToken).ConfigureAwait(false);
         if (user is not null)
         {
             VerifyUserCanAccessUser(user.Id);
@@ -65,37 +65,43 @@ public class UserApplicationService(
             return null;
     }
 
-    public async Task<ComplexResponseDto<UserProfileViewDto>> UpdateAsync(UserProfileUpdateRequestDto userProfile, RequestSourceInfo requestSourceInfo, CancellationToken cancellationToken)
+    public async Task<ComplexResponseDto<UserProfileViewDto>> UpdateProfileAsync(UserProfileUpdateRequestDto userProfile, RequestSourceInfo requestSourceInfo, CancellationToken cancellationToken)
     {
         var objId = ObjectId.Parse(userProfile.Id);
         VerifyUserCanAccessUser(objId);
 
-        var bag = await ValidateProfileAsync(userProfile, cancellationToken);
-        if (bag.HasErrors)
-            return
-                new ComplexResponseDto<UserProfileViewDto>(bag.ToValidationItemDtoList());
-
-        UserSecurity? userSecurity = null;
-        if (!string.IsNullOrWhiteSpace(userProfile.Password))
+        var current = await userRepo.FirstOrDefaultAsync((x) => x.Id == objId, cancellationToken).ConfigureAwait(false);
+        if (current is not null)
         {
-            userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync(x => x.Id == objId, cancellationToken).ConfigureAwait(false);
-            userSecurity.SetPassword(userProfile.Password);
+            var bag = await ValidateProfileAsync(userProfile, current, cancellationToken);
+            if (bag.HasErrors)
+                return
+                    new ComplexResponseDto<UserProfileViewDto>(bag.ToValidationItemDtoList());
+
+            UserSecurity? userSecurity = null;
+            if (!string.IsNullOrWhiteSpace(userProfile.Password))
+            {
+                userSecurity = await userSecurityRepo.FirstAsync(x => x.Id == objId, cancellationToken).ConfigureAwait(false);
+                userSecurity.SetPassword(userProfile.Password);
+            }
+
+            var entity = UserMapper.ToEntity(userProfile, current.Role);
+
+            await mongoClient.WrapInTransactionAsync(async
+            (session) => {
+                await userUpsertService.UpsertAsync(entity, requestSourceInfo, cancellationToken);
+                await userRepo.UpsertAsync(entity, current, cancellationToken, session);
+                if (userSecurity != null)
+                    await userSecurityRepo.UpsertAsync(userSecurity, cancellationToken, session);
+            },
+            cancellationToken);
+
+            return
+                new ComplexResponseDto<UserProfileViewDto>(UserMapper.ToDTO(entity));
         }
-
-        var entity = UserMapper.ToEntity(userProfile);
-        var current = await userRepo.GetSingleOrDefaultAsync((x) => x.Id == objId, cancellationToken).ConfigureAwait(false);
-
-        await mongoClient.WrapInTransactionAsync(async
-        (session) => {
-            await userUpsertService.UpsertAsync(entity, requestSourceInfo, cancellationToken);
-            await userRepo.UpsertAsync(entity, current, cancellationToken, session);
-            if (userSecurity != null)
-                await userSecurityRepo.UpsertAsync(userSecurity, cancellationToken, session);
-        },
-        cancellationToken);
-
-        return
-            new ComplexResponseDto<UserProfileViewDto>(UserMapper.ToDTO(entity));
+        else
+            return
+                new ComplexResponseDto<UserProfileViewDto>([new ValidationItemDto("Item not found.")]);
     }
 
     public async Task<ComplexResponseDto<UserViewDto>> UpsertAsync(UserUpsertRequestDto user, RequestSourceInfo requestSourceInfo, CancellationToken cancellationToken)
@@ -106,7 +112,7 @@ public class UserApplicationService(
         var objId = ObjectId.Parse(user.Id);
         VerifyUserCanAccessUser(objId);
 
-        var current = await userRepo.GetSingleOrDefaultAsync((x) => x.Id == objId, cancellationToken).ConfigureAwait(false);
+        var current = await userRepo.FirstOrDefaultAsync((x) => x.Id == objId, cancellationToken).ConfigureAwait(false);
         bool isNew = current == null;
 
         var entity = UserMapper.ToEntity(user);
@@ -115,8 +121,8 @@ public class UserApplicationService(
             return
                 new ComplexResponseDto<UserViewDto>(bag.ToValidationItemDtoList());
 
-        string invitationCode = null;
-        UserSecurity userSecurity = null;
+        string? invitationCode = null;
+        UserSecurity userSecurity = null!;
 
         await mongoClient.WrapInTransactionAsync(async
         (session) => {
@@ -129,7 +135,7 @@ public class UserApplicationService(
                 userSecurity = UserSecurity.InitializeInactiveUser(entity);
                 await userSecurityRepo.UpsertAsync(userSecurity, cancellationToken);
             } else
-                userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync((x) => x.Id == entity.Id, cancellationToken);
+                userSecurity = await userSecurityRepo.FirstAsync((x) => x.Id == entity.Id, cancellationToken);
         },
         cancellationToken);
 
@@ -144,7 +150,7 @@ public class UserApplicationService(
     {
         VerifyUserCanAccessUser(id);
 
-        var current = await userRepo.GetSingleOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        var current = await userRepo.FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
         if (current is not null)
         {
             var bag = await userDeactivationService.ValidateForDeactivationAsync(current, cancellationToken);
@@ -152,9 +158,9 @@ public class UserApplicationService(
                 return
                     new ComplexResponseDto<UserViewDto>(bag.ToValidationItemDtoList());
 
-            var userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+            var userSecurity = await userSecurityRepo.FirstAsync(x => x.Id == id, cancellationToken);
 
-            User user = null;
+            User user = null!;
             await mongoClient.WrapInTransactionAsync(async
             (session) => {
                 user = await userDeactivationService.DeactivateAsync(current, requestSourceInfo, cancellationToken);
@@ -169,18 +175,18 @@ public class UserApplicationService(
             new ComplexResponseDto<UserViewDto>([new ValidationItemDto("Item not found.")]);
     }
 
-    protected async Task<IValidationBag> ValidateProfileAsync(UserProfileUpdateRequestDto userProfile, CancellationToken cancellationToken)
+    protected async Task<IValidationBag> ValidateProfileAsync(UserProfileUpdateRequestDto userProfile, User current, CancellationToken cancellationToken)
     {
         var bag = new ValidationBag();
 
         if (!string.IsNullOrEmpty(userProfile.Password))
         {
             var objId = ObjectId.Parse(userProfile.Id);
-            var userSecurity = await userSecurityRepo.GetSingleOrDefaultAsync(x => x.Id == objId, cancellationToken).ConfigureAwait(false);
+            var userSecurity = await userSecurityRepo.FirstAsync(x => x.Id == objId, cancellationToken).ConfigureAwait(false);
             bag.Merge(Passwords.Validate(config, stringLocalizer, userProfile.Password, userSecurity));
         }
 
-        var entity = UserMapper.ToEntity(userProfile);
+        var entity = UserMapper.ToEntity(userProfile, current.Role);
         bag.Merge(await userUpsertService.ValidateProfileAsync(entity, cancellationToken));
         return bag;
     }

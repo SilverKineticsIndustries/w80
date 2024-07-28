@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace SilverKinetics.w80.TestHelper;
 
 public class TestContext
@@ -15,7 +17,7 @@ public class TestContext
     public async Task<TestContext> SeedDatabaseAsync()
     {
         await DataSeeder.SeedTestDataAsync(Services, _databaseName);
-        (Services.GetRequiredService<ISecurityContext>() as SecurityContextFake).SetToUser(this);
+        ((SecurityContextFake)Services.GetRequiredService<ISecurityContext>()).SetToUser(this);
         return this;
     }
 
@@ -68,12 +70,12 @@ public class TestContext
 
     public string GetTestUserPassword()
     {
-        return Services.GetRequiredService<IConfiguration>()["Tests_User_Password"];
+        return Config()["Tests_User_Password"] ?? throw new Exception("Missing test user password");
     }
 
     public string GetAdminUserPassword()
     {
-        return Services.GetRequiredService<IConfiguration>()["Tests_Admin_Password"];
+        return Config()["Tests_Admin_Password"] ?? throw new Exception("Missing test admin password");
     }
 
     public async Task<string> ProfileAsync(Func<Task> action)
@@ -130,6 +132,6 @@ public class TestContext
 
     private string _databaseName;
     private IMongoClient _mongoClient;
-    private static User? _testUser = null;
-    private static User? _adminUser = null;
+    private static User _testUser = null!;
+    private static User _adminUser = null!;
 }

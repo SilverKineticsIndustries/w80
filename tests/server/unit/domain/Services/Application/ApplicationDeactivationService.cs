@@ -9,13 +9,7 @@ public class ApplicationDeactivationService
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.Reject(ctx.Services.GetRequiredService<IDateTimeProvider>(),
-            new Rejection()
-            {
-                Reason = "Some reason",
-                Method = RejectionMethod.Email
-            });
-
+            app.Reject(new Rejection(RejectionMethod.Email, "Some reason"));
             var service = ctx.Services.GetRequiredService<IApplicationArchiveService>();
             var bag = await service.ValidateForArchiveAsync(app);
             Assert.That(bag.Any(x => x.Message == "Rejected applications cannot be archived."));
@@ -53,12 +47,10 @@ public class ApplicationDeactivationService
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var app = ctx.CreateApplication();
-            app.Appointments.Add(new Appointment()
-            {
-                StartDateTimeUTC = DateTime.UtcNow.AddDays(2),
-                EndDateTimeUTC = DateTime.UtcNow.AddDays(2),
-                Description = "Interview"
-            });
+            app.Appointments.Add(ctx.CreateAppointment(
+                DateTime.UtcNow.AddDays(2),
+                DateTime.UtcNow.AddDays(2),
+                "Interview"));
 
             var service = ctx.Services.GetRequiredService<IApplicationDeactivationService>();
             service.Deactivate(app);

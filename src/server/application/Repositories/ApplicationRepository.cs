@@ -12,7 +12,6 @@ public class ApplicationRepository(
     IDateTimeProvider dateTimeProvider,
     IMongoCollection<Domain.Entities.Application> applicationSet,
     ISystemEventSink systemEventSink,
-    IMongoDatabase mongoDatabase,
     ISystemEventEntryRepository systemEventEntryRepository)
         : BaseRepository<Domain.Entities.Application>(securityContext, dateTimeProvider, applicationSet),
     IApplicationRepository
@@ -27,7 +26,7 @@ public class ApplicationRepository(
         var update = Builders<Domain.Entities.Application>.Update
                         .Set(appl => appl.Acceptance, application.Acceptance);
 
-        var ret = await applicationSet.UpdateOneAsync((x) => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+        var ret = await Set.UpdateOneAsync((x) => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
         foreach(var appl in applicationsToArchive)
         {
             ApplyPreSaveActions(appl);
@@ -35,9 +34,9 @@ public class ApplicationRepository(
                     .Set(appl => appl.ArchivedUTC, appl.ArchivedUTC);
 
             if (session == null)
-                await applicationSet.UpdateOneAsync(x => x.Id == appl.Id, archive, updateOptions, cancellationToken).ConfigureAwait(false);
+                await Set.UpdateOneAsync(x => x.Id == appl.Id, archive, updateOptions, cancellationToken).ConfigureAwait(false);
             else
-                await applicationSet.UpdateOneAsync(session, x => x.Id == appl.Id, archive, updateOptions, cancellationToken).ConfigureAwait(false);
+                await Set.UpdateOneAsync(session, x => x.Id == appl.Id, archive, updateOptions, cancellationToken).ConfigureAwait(false);
         }
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }
@@ -52,9 +51,9 @@ public class ApplicationRepository(
                         .Set(appl => appl.ArchivedUTC, application.ArchivedUTC);
 
         if (session == null)
-            await applicationSet.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
         else
-            await applicationSet.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }
@@ -70,9 +69,9 @@ public class ApplicationRepository(
                         .Set(appl => appl.DeactivatedBy, application.DeactivatedBy);
 
         if (session == null)
-            await applicationSet.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
         else
-            await applicationSet.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }
@@ -88,9 +87,9 @@ public class ApplicationRepository(
                         .Set(appl => appl.DeactivatedBy, application.DeactivatedBy);
 
         if (session == null)
-            await applicationSet.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
         else
-            await applicationSet.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }
@@ -105,9 +104,9 @@ public class ApplicationRepository(
                         .Set(appl => appl.Rejection, application.Rejection);
 
         if (session == null)
-            await applicationSet.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
         else
-            await applicationSet.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }
@@ -122,9 +121,9 @@ public class ApplicationRepository(
                         .Set(appl => appl.ArchivedUTC, application.ArchivedUTC);
 
         if (session == null)
-            await applicationSet.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
         else
-            await applicationSet.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
+            await Set.UpdateOneAsync(session, x => x.Id == application.Id, update, updateOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }
@@ -137,9 +136,9 @@ public class ApplicationRepository(
         ApplyPreSaveActions(update);
 
         if (session == null)
-            await applicationSet.ReplaceOneAsync(x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
         else
-            await applicationSet.ReplaceOneAsync(session, x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
+            await Set.ReplaceOneAsync(session, x => x.Id == update.Id, update, replaceOptions, cancellationToken).ConfigureAwait(false);
 
         await PersistSystemEventsAsync(systemEventEntryRepository, systemEventSink, cancellationToken, session);
     }
@@ -168,9 +167,9 @@ public class ApplicationRepository(
         };
 
         if (session == null)
-            await applicationSet.UpdateManyAsync(appFilter, appUpdate, updateOptions, cancellationToken);
+            await Set.UpdateManyAsync(appFilter, appUpdate, updateOptions, cancellationToken);
         else
-            await applicationSet.UpdateManyAsync(session, appFilter, appUpdate, updateOptions, cancellationToken);
+            await Set.UpdateManyAsync(session, appFilter, appUpdate, updateOptions, cancellationToken);
     }
 
     public async Task SetBrowserNotificationSentOnAppointmentsAsync(
@@ -197,8 +196,8 @@ public class ApplicationRepository(
         };
 
         if (session == null)
-            await applicationSet.UpdateManyAsync(appFilter, appUpdate, updateOptions, cancellationToken);
+            await Set.UpdateManyAsync(appFilter, appUpdate, updateOptions, cancellationToken);
         else
-            await applicationSet.UpdateManyAsync(session, appFilter, appUpdate, updateOptions, cancellationToken);
+            await Set.UpdateManyAsync(session, appFilter, appUpdate, updateOptions, cancellationToken);
     }
 }

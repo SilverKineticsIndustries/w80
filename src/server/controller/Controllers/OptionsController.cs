@@ -2,12 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using SilverKinetics.w80.Application.Contracts;
 using SilverKinetics.w80.Application.Security;
-using SilverKinetics.w80.Notifications.Contracts;
 
 namespace SilverKinetics.w80.Controller.Controllers;
 
 [ApiController]
-public class OptionsController(IOptionsApplicationService optionsApplicationService, IEmailSenderService emailSender)
+public class OptionsController(IOptionsApplicationService optionsApplicationService)
     : ControllerBase
 {
     [HttpGet("/options/cultures")]

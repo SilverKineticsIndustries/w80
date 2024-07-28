@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Serilog;
@@ -10,7 +11,6 @@ using SilverKinetics.w80.Common;
 using SilverKinetics.w80.Domain.Contracts;
 using SilverKinetics.w80.Application.Security;
 using SilverKinetics.w80.Controller.Configuration;
-using Microsoft.AspNetCore.Localization;
 
 namespace SilverKinetics.w80.Controller;
 
@@ -35,7 +35,7 @@ public class Program
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Get<string>(),
                     ValidAudience = builder.Configuration.GetSection("Jwt:Issuer").Get<string>(),
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key").Get<string>()))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetRequiredValue("Jwt:Key")))
                 };
             });
 
@@ -50,7 +50,9 @@ public class Program
                 options.AddPolicy(Policies.UserOrAdministrator, policyOptions => {
                     policyOptions.RequireClaim("Role", [Role.Administrator.ToString(), Role.User.ToString()]);
                 });
+                #pragma warning disable CS8601 // Possible null reference assignment.
                 options.DefaultPolicy = options.GetPolicy(Policies.User);
+                #pragma warning restore CS8601 // Possible null reference assignment.
             });
 
         builder.Services.AddCors();

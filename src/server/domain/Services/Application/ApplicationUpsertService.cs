@@ -25,13 +25,7 @@ public class ApplicationUpsertService(
     public async Task<Entities.Application> InitializeAsync(CancellationToken cancellationToken)
     {
         var statuses = await applicationStateRepo.GetManyAsync(x => 1==1, cancellationToken);
-
-        var app = new Entities.Application();
-        app.Id = ObjectId.GenerateNewId();
-        app.Initialize(statuses);
-        app.UserId = securityContext.UserId;
-
-        return app;
+        return new Entities.Application(ObjectId.GenerateNewId(), securityContext.UserId, statuses);
     }
 
     public async Task<IEnumerable<Entities.Application>> GetOpenApplicationForUser(ObjectId userId, CancellationToken cancellationToken)
@@ -42,15 +36,15 @@ public class ApplicationUpsertService(
                                x.UserId == userId
                             && x.ArchivedUTC == null
                             && x.DeactivatedUTC == null
-                            && (x.Acceptance == null || x.Acceptance.AcceptedUTC == null)
-                            && (x.Rejection == null || x.Rejection.RejectedUTC == null)
+                            && (x.Acceptance == null || x.Acceptance.AcceptedUTC == default )
+                            && (x.Rejection == null || x.Rejection.RejectedUTC == default)
                         ,cancellationToken);
     }
 
     public async Task<Entities.Application> UpsertAsync(Entities.Application update, CancellationToken cancellationToken)
     {
         var now = dateTimeProvider.GetUtcNow();
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == update.Id, cancellationToken);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == update.Id, cancellationToken);
         if (current == null)
             systemEventSink.Add(new ApplicationInsertedEvent(securityContext.UserId, now, update));
         else
@@ -68,7 +62,7 @@ public class ApplicationUpsertService(
     public async Task<ValidationBag> ValidateAsync(Entities.Application application, CancellationToken cancellationToken = default)
     {
         var bag = new ValidationBag();
-        var current = await applicationRepo.GetSingleOrDefaultAsync(x => x.Id == application.Id, cancellationToken);
+        var current = await applicationRepo.FirstOrDefaultAsync(x => x.Id == application.Id, cancellationToken);
         if (current != null && current.IsDeactivated())
             bag.AddValidation(stringLocalizer["Deactivated application cannot be updated."]);
 
@@ -164,13 +158,13 @@ public class ApplicationUpsertService(
         }
 
         if (
-                (current != null && current.Rejection != application.Rejection)
-                || (current == null && application.Rejection != new Rejection())
+                (current != null && current.Rejection != null && current.Rejection != application.Rejection)
+                || (current == null && application.Rejection != null && application.Rejection != Rejection.Empty)
             )
             bag.AddValidation(stringLocalizer["Rejection fields are read-only and cannot be modified."]);
         if (
-                (current != null && current.Acceptance != application.Acceptance)
-                || (current == null && application.Acceptance != new Acceptance())
+                (current != null && current.Acceptance != null && current.Acceptance != application.Acceptance)
+                || (current == null && application.Acceptance != null && application.Acceptance != Acceptance.Empty)
             )
             bag.AddValidation(stringLocalizer["Acceptance fields are read-only and cannot be modified."]);
 

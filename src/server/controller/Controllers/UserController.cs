@@ -47,7 +47,7 @@ public class UserController(
         if (!this.CanCurrentUserPerformActionOnTargetUser(ObjectId.Parse(userProfile.Id)))
             return Unauthorized();
 
-        return this.OkOrValidationErrors(await userApplicationService.UpdateAsync(userProfile, HttpContext.GetRequestSourceInfo(), cancellationToken));
+        return this.OkOrValidationErrors(await userApplicationService.UpdateProfileAsync(userProfile, HttpContext.GetRequestSourceInfo(), cancellationToken));
     }
 
     [HttpPost("/user/deactivate"), Produces("application/json")]

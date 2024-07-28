@@ -19,7 +19,7 @@ public class StatisticsApplicationService(
 {
     public async Task<StatisticsDto?> GetAsync(ObjectId userId, CancellationToken cancellationToken)
     {
-        var stats = await statisticsRepository.GetSingleOrDefaultAsync((x) => x.Id == userId, cancellationToken).ConfigureAwait(false);
+        var stats = await statisticsRepository.FirstOrDefaultAsync((x) => x.Id == userId, cancellationToken).ConfigureAwait(false);
         if (stats is not null)
         {
             if (!securityContext.CanAccess(stats.Id))

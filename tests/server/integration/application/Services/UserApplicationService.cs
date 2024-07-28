@@ -6,22 +6,22 @@ namespace SilverKinetics.w80.Application.IntegrationTests.Services;
 public class UserApplicationService
 {
     [Test]
-    public async Task UpdateAsync_asNormalUserCreateNewUser_authorizationExceptionShouldBeThrownBecauseOnlyAdminCanAddUsers()
+    public async Task UpsertAsync_asNormalUserCreateNewUser_authorizationExceptionShouldBeThrownBecauseOnlyAdminCanAddUsers()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
-            var user = ctx.CreateUser("john.smith@dev.silverkinetics.com");
+            var user = ctx.CreateUserUpsertDto("john.smith@dev.silverkinetics.com");
 
             Assert.ThrowsAsync<AuthorizationException>(async () =>
             {
-                await service.UpdateAsync(UserMapper.ToUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
+                await service.UpsertAsync(user, RequestSourceInfo.Empty, CancellationToken.None);
             });
         }
     }
 
     [Test]
-    public async Task UpdateAsync_updateOwnProfile_roleShouldNotChange()
+    public async Task UpdateProfileAsync_updateOwnProfile_roleShouldNotChange()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
@@ -30,25 +30,36 @@ public class UserApplicationService
 
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = await service.GetProfileAsync(ctx.GetTestUserID(), CancellationToken.None);
-            user.Nickname = user.Nickname + " updated";
-            await service.UpdateAsync(UserMapper.ToUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
+            if (user == null)
+            {
+                Assert.Fail();
+                return;
+            }
+
+            user.Nickname += " updated";
+            await service.UpdateProfileAsync(UserMapper.ToProfileUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
 
             var afterUpdate = await set.AsQueryable().FirstAsync(x => x.Id == ctx.GetTestUserID());
-
             Assert.That(beforeUpdate.Role, Is.EqualTo(afterUpdate.Role));
         }
     }
 
     [Test]
-    public async Task UpdateAsync_asNormalUserUpdateOwnPassword_passworkShouldBeUpdated()
+    public async Task UpdateProfileAsync_asNormalUserUpdateOwnPassword_passworkShouldBeUpdated()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = await service.GetProfileAsync(ctx.GetTestUserID(), CancellationToken.None);
-            var updateRequest = UserMapper.ToUpdateDTO(user);
+            if (user == null)
+            {
+                Assert.Fail();
+                return;
+            }
+
+            var updateRequest = UserMapper.ToProfileUpdateDTO(user);
             updateRequest.Password = "longpassword456";
-            await service.UpdateAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
+            await service.UpdateProfileAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
 
             var authenticationService = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var res = await authenticationService.LoginWithCredentialsAsync(
@@ -63,7 +74,7 @@ public class UserApplicationService
     }
 
     [Test]
-    public async Task UpdateAsync_asAdminUserUpdateOwnPassword_passworkShouldBeUpdated()
+    public async Task UpdateProfileAsync_asAdminUserUpdateOwnPassword_passworkShouldBeUpdated()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
@@ -71,9 +82,15 @@ public class UserApplicationService
 
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = await service.GetProfileAsync(ctx.GetAdminUserID(), CancellationToken.None);
-            var updateRequest = UserMapper.ToUpdateDTO(user);
+            if (user == null)
+            {
+                Assert.Fail();
+                return;
+            }
+
+            var updateRequest = UserMapper.ToProfileUpdateDTO(user);
             updateRequest.Password = "longpassword456";
-            await service.UpdateAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
+            await service.UpdateProfileAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
 
             var authenticationService = ctx.Services.GetRequiredService<IAuthenticationApplicationService>();
             var res = await authenticationService.LoginWithCredentialsAsync(
@@ -88,7 +105,7 @@ public class UserApplicationService
     }
 
     [Test]
-    public async Task UpdateAsync_asNormalUserUpdateOwnPasswordWithSmallPassword_passwordLengthCannotBeLessThanMinimum()
+    public async Task UpdateProfileAsync_asNormalUserUpdateOwnPasswordWithSmallPassword_passwordLengthCannotBeLessThanMinimum()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
@@ -96,65 +113,80 @@ public class UserApplicationService
             var minLength = Convert.ToInt32(config[Keys.PasswordMinimumLength]);
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = await service.GetProfileAsync(ctx.GetTestUserID(), CancellationToken.None);
-            var updateRequest = UserMapper.ToUpdateDTO(user);
+            if (user == null)
+            {
+                Assert.Fail();
+                return;
+            }
+
+            var updateRequest = UserMapper.ToProfileUpdateDTO(user);
             updateRequest.Password = string.Join(string.Empty, Enumerable.Repeat('A', minLength - 1));
-            var res = await service.UpdateAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
+            var res = await service.UpdateProfileAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
             Assert.That(res.Errors.Any(y => y.ClientMessage == $"Password must be at least {minLength} characters long."), Is.True);
         }
     }
 
     [Test]
-    public async Task UpdateAsync_asNormalUserUpdateOwnPasswordToSamePasswordAsBefore_validationErrorShouldBeThrown()
+    public async Task UpdateProfileAsync_asNormalUserUpdateOwnPasswordToSamePasswordAsBefore_validationErrorShouldBeThrown()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var user = await service.GetProfileAsync(ctx.GetTestUserID(), CancellationToken.None);
-            var updateRequest = UserMapper.ToUpdateDTO(user);
+            if (user == null)
+            {
+                Assert.Fail();
+                return;
+            }
+            var updateRequest = UserMapper.ToProfileUpdateDTO(user);
             updateRequest.Password = "longpassword123";
-            var res = await service.UpdateAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
+            var res = await service.UpdateProfileAsync(updateRequest, RequestSourceInfo.Empty, CancellationToken.None);
             Assert.That(res.Errors.Any(y => y.ClientMessage == "New password is same as current password."), Is.True);
         }
     }
 
     [Test]
-    public async Task UpdateAsync_asAdminCreateNewUser_newUserShouldBeCreated()
+    public async Task UpsertAsync_asAdminCreateNewUser_newUserShouldBeCreated()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
-            var user = ctx.CreateUser("john.smith@dev.silverkinetics.com");
+            var user = ctx.CreateUserUpsertDto("john.smith@dev.silverkinetics.com");
 
-            await service.UpdateAsync(UserMapper.ToUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
-            var ret = service.GetProfileAsync(user.Id, CancellationToken.None);
+            await service.UpsertAsync(user, RequestSourceInfo.Empty, CancellationToken.None);
+            var ret = service.GetProfileAsync(ObjectId.Parse(user.Id), CancellationToken.None);
             Assert.That(ret, Is.Not.Null);
         }
     }
 
     [Test]
-    public async Task UpdateAsync_asAdminChangeEmailOfAnotherUser_anotherUserEmailShouldBeChanged()
+    public async Task UpsertAsync_asAdminChangeEmailOfAnotherUser_anotherUserEmailShouldBeChanged()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
             ctx.SetUserToAdmin();
 
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
-            var user = ctx.CreateUser("john.smith@dev.silverkinetics.com");
-            var ret = await service.UpdateAsync(UserMapper.ToUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
-
+            var user = ctx.CreateUserUpsertDto("john.smith@dev.silverkinetics.com");
+            var ret = await service.UpsertAsync(user, RequestSourceInfo.Empty, CancellationToken.None);
+            if (ret.Result == null)
+            {
+                Assert.Fail();
+                return;
+            }
             var updatedEmailAddress = "updated@silverkinetics.dev";
-            ret.Result.Email = updatedEmailAddress;
-            await service.UpdateAsync(UserMapper.ToUpdateDTO(ret.Result), RequestSourceInfo.Empty, CancellationToken.None);
+            user.Email = updatedEmailAddress;
+            await service.UpsertAsync(user, RequestSourceInfo.Empty, CancellationToken.None);
 
-            var updated = await service.GetProfileAsync(user.Id, CancellationToken.None);
-            Assert.That(updated.Email, Is.EqualTo(updatedEmailAddress));
+            var updated = await service.GetProfileAsync(ObjectId.Parse(user.Id), CancellationToken.None);
+            Assert.That(updated?.Email, Is.EqualTo(updatedEmailAddress));
         }
     }
 
     [Test]
-    public async Task UpdateAsync_asAdminCreateNewUserWithSameEmail_validationErrorShouldBeReturned()
+    public async Task UpsertAsync_asAdminCreateNewUserWithSameEmail_validationErrorShouldBeReturned()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
@@ -163,18 +195,18 @@ public class UserApplicationService
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
 
-            var user1 = ctx.CreateUser("john.smith@dev.silverkinetics.com");
-            await service.UpdateAsync(UserMapper.ToUpdateDTO(user1), RequestSourceInfo.Empty, CancellationToken.None);
-            Assume.That(await userRepo.GetSingleOrDefaultAsync(x => x.Id == user1.Id, CancellationToken.None), Is.Not.Null);
+            var user1 = ctx.CreateUserUpsertDto("john.smith@dev.silverkinetics.com");
+            await service.UpsertAsync(user1, RequestSourceInfo.Empty, CancellationToken.None);
+            Assume.That(await userRepo.FirstOrDefaultAsync(x => x.Id == ObjectId.Parse(user1.Id), CancellationToken.None), Is.Not.Null);
 
-            var user2 = ctx.CreateUser("john.smith@dev.silverkinetics.com");
-            var ret = await service.UpdateAsync(UserMapper.ToUpdateDTO(user2), RequestSourceInfo.Empty, CancellationToken.None);
+            var user2 = ctx.CreateUserUpsertDto("john.smith@dev.silverkinetics.com");
+            var ret = await service.UpsertAsync(user2, RequestSourceInfo.Empty, CancellationToken.None);
             Assert.That(ret.Errors.Any(x => x.ClientMessage == "An account already exists with same email."));
         }
     }
 
     [Test]
-    public async Task UpdateAsync_asNormalUserUpdateEmailOnOwnProfile_emailShouldBeUpdated()
+    public async Task UpdateProfileAsync_asNormalUserUpdateEmailOnOwnProfile_emailShouldBeUpdated()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
@@ -182,19 +214,19 @@ public class UserApplicationService
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
 
-            var updatedEmail = "john.smith_updated@dev.silverkinetics.com";
+            var updatedEmail = "john.smith_updated@silverkinetics.dev";
 
-            var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
+            var user = await userRepo.FirstAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
             user.Email = updatedEmail;
-            await service.UpdateAsync(UserMapper.ToUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
+            await service.UpdateProfileAsync(UserMapper.ToProfileUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
 
             var updated = await service.GetProfileAsync(user.Id, CancellationToken.None);
-            Assert.That(updated.Email, Is.EqualTo(updatedEmail));
+            Assert.That(updated?.Email, Is.EqualTo(updatedEmail));
         }
     }
 
     [Test]
-    public async Task UpdateAsync_asNormalUserUpdateOwnProfile_makeSureUpdatedUTCisChanged()
+    public async Task UpdateProfileAsync_asNormalUserUpdateOwnProfile_makeSureUpdatedUTCisChanged()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
@@ -202,12 +234,12 @@ public class UserApplicationService
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
             var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
 
-            var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
+            var user = await userRepo.FirstAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
             var currentUpdatedUTC = user.UpdatedUTC;
             user.Nickname = "Updated";
-            await service.UpdateAsync(UserMapper.ToUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
+            await service.UpdateProfileAsync(UserMapper.ToProfileUpdateDTO(user), RequestSourceInfo.Empty, CancellationToken.None);
 
-            user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
+            user = await userRepo.FirstAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
             Assert.Multiple(() =>
             {
                 Assert.That(user.UpdatedUTC, Is.Not.EqualTo(currentUpdatedUTC));
@@ -217,7 +249,7 @@ public class UserApplicationService
     }
 
     [Test]
-    public async Task UpdateAsync_changeUserIdOnExistingUser_authorizationExceptionShouldBeThrown()
+    public async Task UpdateProfileAsync_changeUserIdOnExistingUser_authorizationExceptionShouldBeThrown()
     {
         using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
         {
@@ -225,13 +257,13 @@ public class UserApplicationService
             var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
             var service = ctx.Services.GetRequiredService<IUserApplicationService>();
 
-            var user = await userRepo.GetSingleOrDefaultAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
+            var user = await userRepo.FirstAsync(x => x.Id == securityContext.UserId, CancellationToken.None);
             user.Id = ObjectId.GenerateNewId();
-            var userDto = UserMapper.ToUpdateDTO(user);
+            var userDto = UserMapper.ToProfileUpdateDTO(user);
 
             Assert.ThrowsAsync<AuthorizationException>(async () =>
             {
-                await service.UpdateAsync(userDto, RequestSourceInfo.Empty, CancellationToken.None);
+                await service.UpdateProfileAsync(userDto, RequestSourceInfo.Empty, CancellationToken.None);
             });
         }
     }
@@ -532,7 +564,7 @@ public class UserApplicationService
                 RequestSourceInfo.Empty,
                 CancellationToken.None
             );
-            Assert.That(ret.Result.InvitationCode, Is.Not.Empty);
+            Assert.That(ret.Result?.InvitationCode, Is.Not.Empty);
         }
     }
 
@@ -556,7 +588,7 @@ public class UserApplicationService
                 RequestSourceInfo.Empty,
                 CancellationToken.None
             );
-            Assert.That(ret.Result.Id, Is.Not.Empty);
+            Assert.That(ret?.Result?.Id, Is.Not.Empty);
         }
     }
 
@@ -584,7 +616,7 @@ public class UserApplicationService
                 CancellationToken.None
             );
 
-            var code = ret.Result.InvitationCode;
+            var code = ret?.Result?.InvitationCode ?? string.Empty;
             var config = ctx.Services.GetRequiredService<IConfiguration>();
             Invitations.Decrypt(config, code, out string email, out DateTime utcDateTime);
 

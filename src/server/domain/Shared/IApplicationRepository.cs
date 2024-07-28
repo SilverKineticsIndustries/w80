@@ -1,13 +1,13 @@
 using System.Linq.Expressions;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SilverKinetics.w80.Domain.ValueObjects;
 
 namespace SilverKinetics.w80.Domain.Shared;
 
 public interface IApplicationRepository
 {
-    Task<Entities.Application?> GetSingleOrDefaultAsync(Expression<Func<Entities.Application, bool>> predicate, CancellationToken cancellationToken);
+    Task<Entities.Application> FirstAsync(Expression<Func<Entities.Application, bool>> predicate, CancellationToken cancellationToken);
+    Task<Entities.Application?> FirstOrDefaultAsync(Expression<Func<Entities.Application, bool>> predicate, CancellationToken cancellationToken);
     Task<IEnumerable<Entities.Application>> GetManyAsync(Expression<Func<Entities.Application, bool>> predicate, CancellationToken cancellationToken);
 
     public Task UpsertAsync(

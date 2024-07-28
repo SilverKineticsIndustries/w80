@@ -38,7 +38,7 @@ public class StatisticsGenerationService(
 
         foreach(var user in users)
         {
-            var stats = statistics.FirstOrDefault(x => x.Id == user.Id) ?? Statistics.Create(user.Id);
+            var stats = statistics.FirstOrDefault(x => x.Id == user.Id) ?? new Statistics(user.Id);
             cancellationToken.ThrowIfCancellationRequested();
             if (CalculateApplicationRejectionStateCounts(user, stats, systemEvents))
                 toUpdate.Add(stats);

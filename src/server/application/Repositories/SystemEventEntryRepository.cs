@@ -21,15 +21,15 @@ public class SystemEventEntryRepository(
         var entries = new List<SystemEventEntry>();
         foreach(var systemEvent in systemEvents)
         {
-            var entry = SystemEventEntry.Create(systemEvent);
+            var entry = new SystemEventEntry(systemEvent);
             ApplyPreSaveActions(entry);
             entries.Add(entry);
         }
 
         if (session != null)
-            await systemEventEntrySet.InsertManyAsync(session, entries, insertManyOptions, cancellationToken);
+            await Set.InsertManyAsync(session, entries, insertManyOptions, cancellationToken);
         else
-            await systemEventEntrySet.InsertManyAsync(entries, insertManyOptions, cancellationToken);
+            await Set.InsertManyAsync(entries, insertManyOptions, cancellationToken);
     }
 
     protected override Task PersistSystemEventsAsync(

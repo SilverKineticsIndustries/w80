@@ -17,11 +17,11 @@ public class ApplicationRejectionService(
 {
     public void Reject(Entities.Application application, Rejection rejection)
     {
-        application.Reject(dateTimeProvider, rejection);
+        application.Reject(rejection);
         systemEventSink.Add(new ApplicationRejectedEvent(securityContext.UserId, dateTimeProvider.GetUtcNow(), application));
     }
 
-    public async Task<ValidationBag> ValidateAsync(Entities.Application application, Rejection rejection, CancellationToken cancellationToken = default)
+    public ValidationBag Validate(Entities.Application application, Rejection rejection, CancellationToken cancellationToken = default)
     {
         var bag = new ValidationBag();
 

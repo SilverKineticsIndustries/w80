@@ -8,39 +8,62 @@ using SilverKinetics.w80.Domain.Contracts;
 
 namespace SilverKinetics.w80.Application.Repositories;
 
-public abstract class BaseRepository<T>(
-    ISecurityContext securityContext,
-    IDateTimeProvider dateTimeProvider,
-    IMongoCollection<T> set
-) where T : class, IAggregateRoot
+public abstract class BaseRepository<T>
+    where T : class, IAggregateRoot
 {
+    protected BaseRepository(
+        ISecurityContext securityContext,
+        IDateTimeProvider dateTimeProvider,
+        IMongoCollection<T> set)
+    {
+        Set = set;
+        _securityContext = securityContext;
+        _dateTimeProvider = dateTimeProvider;
+    }
+
+    protected IMongoCollection<T> Set { private set; get; }
     public bool QueryFiltersEnabled { private get; set; } = true;
 
     public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await ApplyRepositoryQueryFilters(set.AsQueryable())
+        return await ApplyRepositoryQueryFilters(Set.AsQueryable())
                      .AnyAsync(predicate, cancellationToken)
                      .ConfigureAwait(false);
     }
 
-    public async Task<T?> GetSingleOrDefaultAsync(CancellationToken cancellationToken)
+    public async Task<T?> FirstOrDefaultAsync(CancellationToken cancellationToken)
     {
-        return await ApplyRepositoryQueryFilters(set.AsQueryable())
+        return await ApplyRepositoryQueryFilters(Set.AsQueryable())
                         .FirstOrDefaultAsync(cancellationToken)
                         .ConfigureAwait(false);
     }
 
-    public async Task<T?> GetSingleOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
+    public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await ApplyRepositoryQueryFilters(set.AsQueryable())
+        return await ApplyRepositoryQueryFilters(Set.AsQueryable())
                         .Where(predicate)
                         .FirstOrDefaultAsync(cancellationToken)
                         .ConfigureAwait(false);
     }
 
+    public async Task<T> FirstAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
+    {
+        return await ApplyRepositoryQueryFilters(Set.AsQueryable())
+                        .Where(predicate)
+                        .FirstAsync(cancellationToken)
+                        .ConfigureAwait(false);
+    }
+
+    public async Task<T> FirstAsync(CancellationToken cancellationToken)
+    {
+        return await ApplyRepositoryQueryFilters(Set.AsQueryable())
+                        .FirstAsync(cancellationToken)
+                        .ConfigureAwait(false);
+    }
+
     public async Task<IEnumerable<T>> GetManyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken)
     {
-        return await ApplyRepositoryQueryFilters(set.AsQueryable())
+        return await ApplyRepositoryQueryFilters(Set.AsQueryable())
                         .Where(predicate)
                         .ToListAsync(cancellationToken)
                         .ConfigureAwait(false);
@@ -53,8 +76,8 @@ public abstract class BaseRepository<T>(
         {
             if (hasCreationAudit.CreatedUTC.IsMaxOrMinValue())
             {
-                hasCreationAudit.CreatedUTC = dateTimeProvider.GetUtcNow();
-                hasCreationAudit.CreatedBy = securityContext.UserId;
+                hasCreationAudit.CreatedUTC = _dateTimeProvider.GetUtcNow();
+                hasCreationAudit.CreatedBy = _securityContext.UserId;
                 creationUpdated = true;
             }
         }
@@ -63,8 +86,8 @@ public abstract class BaseRepository<T>(
         {
             if (obj is IHasUpdateAudit hasUpdateAudit)
             {
-                hasUpdateAudit.UpdatedUTC = dateTimeProvider.GetUtcNow();
-                hasUpdateAudit.UpdatedBy = securityContext.UserId;
+                hasUpdateAudit.UpdatedUTC = _dateTimeProvider.GetUtcNow();
+                hasUpdateAudit.UpdatedBy = _securityContext.UserId;
             }
         }
     }
@@ -74,9 +97,9 @@ public abstract class BaseRepository<T>(
         {
             // Deactivation date is set in the domain most of the time and we dont want to change it.
             if (softDeletionEntity.DeactivatedUTC is null || softDeletionEntity.DeactivatedUTC.Value.IsMaxOrMinValue())
-                softDeletionEntity.DeactivatedUTC = dateTimeProvider.GetUtcNow();
+                softDeletionEntity.DeactivatedUTC = _dateTimeProvider.GetUtcNow();
 
-            softDeletionEntity.DeactivatedBy = securityContext.UserId;
+            softDeletionEntity.DeactivatedBy = _securityContext.UserId;
         }
     }
 
@@ -123,6 +146,9 @@ public abstract class BaseRepository<T>(
             throw new PersistenceException();
         */
     }
+
+    private readonly ISecurityContext _securityContext;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     internal static readonly UpdateOptions updateOptions = new() { IsUpsert = false };
     internal static readonly ReplaceOptions replaceOptions = new() { IsUpsert = true };

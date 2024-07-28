@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Driver;
 using SilverKinetics.w80.Common.Security;
@@ -9,10 +8,11 @@ public static class Extensions
 {
     public static RequestSourceInfo GetRequestSourceInfo(this HttpContext ctx)
     {
-        var ri = new RequestSourceInfo();
-        ri.IP = ctx.Connection.RemoteIpAddress.ToString();
-        ri.Host = ctx.Request.Host.Host;
-        ri.Headers = ctx.Request.Headers.GetHeadersForLogging();
+        var ri = new RequestSourceInfo {
+            IP = ctx.Connection.RemoteIpAddress != null ? ctx.Connection.RemoteIpAddress.ToString() : string.Empty,
+            Host = ctx.Request.Host.Host,
+            Headers = ctx.Request.Headers.GetHeadersForLogging()
+        };
         return ri;
     }
 

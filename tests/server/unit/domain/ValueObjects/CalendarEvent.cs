@@ -9,12 +9,8 @@ public class CalendarEvent
         using (var ctx = TestContextFactory.Create())
         {
             var now = DateTime.UtcNow;
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now;
-            evnt.EndDateTimeUTC = now.AddHours(4);
-
-            var ret = evnt.IsOverlapping(startDateTime: now.AddHours(-4), endDateTime: now.AddHours(-3));
+            var appoint = ctx.CreateAppointment(now, now.AddHours(4));
+            var ret = appoint.IsOverlapping(startDateTime: now.AddHours(-4), endDateTime: now.AddHours(-3));
             Assert.That(ret, Is.False);
         }
     }
@@ -25,12 +21,8 @@ public class CalendarEvent
         using (var ctx = TestContextFactory.Create())
         {
             var now = DateTime.UtcNow;
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now;
-            evnt.EndDateTimeUTC = now.AddHours(4);
-
-            var ret = evnt.IsOverlapping(startDateTime: now.AddHours(-4), endDateTime: now);
+            var appoint = ctx.CreateAppointment(now, now.AddHours(4));
+            var ret = appoint.IsOverlapping(startDateTime: now.AddHours(-4), endDateTime: now);
             Assert.That(ret, Is.True);
         }
     }
@@ -41,12 +33,8 @@ public class CalendarEvent
         using (var ctx = TestContextFactory.Create())
         {
             var now = DateTime.UtcNow;
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now;
-            evnt.EndDateTimeUTC = now.AddHours(4);
-
-            var ret = evnt.IsOverlapping(startDateTime: now.AddHours(-4), endDateTime: now.AddHours(2));
+            var appoint = ctx.CreateAppointment(now, now.AddHours(4));
+            var ret = appoint.IsOverlapping(startDateTime: now.AddHours(-4), endDateTime: now.AddHours(2));
             Assert.That(ret, Is.True);
         }
     }
@@ -57,12 +45,8 @@ public class CalendarEvent
         using (var ctx = TestContextFactory.Create())
         {
             var now = DateTime.UtcNow;
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now;
-            evnt.EndDateTimeUTC = now.AddHours(4);
-
-            var ret = evnt.IsOverlapping(startDateTime: now.AddHours(1), endDateTime: now.AddHours(2));
+            var appoint = ctx.CreateAppointment(now, now.AddHours(4));
+            var ret = appoint.IsOverlapping(startDateTime: now.AddHours(1), endDateTime: now.AddHours(2));
             Assert.That(ret, Is.True);
         }
     }
@@ -73,12 +57,8 @@ public class CalendarEvent
         using (var ctx = TestContextFactory.Create())
         {
             var now = DateTime.UtcNow;
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now;
-            evnt.EndDateTimeUTC = now.AddHours(4);
-
-            var ret = evnt.IsOverlapping(startDateTime: now.AddHours(2), endDateTime: now.AddHours(6));
+            var appoint = ctx.CreateAppointment(now, now.AddHours(4));
+            var ret = appoint.IsOverlapping(startDateTime: now.AddHours(2), endDateTime: now.AddHours(6));
             Assert.That(ret, Is.True);
         }
     }
@@ -89,12 +69,8 @@ public class CalendarEvent
         using (var ctx = TestContextFactory.Create())
         {
             var now = DateTime.UtcNow;
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now;
-            evnt.EndDateTimeUTC = now.AddHours(4);
-
-            var ret = evnt.IsOverlapping(startDateTime: now.AddHours(4), endDateTime: now.AddHours(8));
+            var appoint = ctx.CreateAppointment(now, now.AddHours(4));
+            var ret = appoint.IsOverlapping(startDateTime: now.AddHours(4), endDateTime: now.AddHours(8));
             Assert.That(ret, Is.True);
         }
     }
@@ -105,12 +81,8 @@ public class CalendarEvent
         using (var ctx = TestContextFactory.Create())
         {
             var now = DateTime.UtcNow;
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now;
-            evnt.EndDateTimeUTC = now.AddHours(4);
-
-            var ret = evnt.IsOverlapping(startDateTime: now.AddHours(6), endDateTime: now.AddHours(8));
+            var appoint = ctx.CreateAppointment(now, now.AddHours(4));
+            var ret = appoint.IsOverlapping(startDateTime: now.AddHours(6), endDateTime: now.AddHours(8));
             Assert.That(ret, Is.False);
         }
     }
@@ -122,12 +94,8 @@ public class CalendarEvent
         {
             var now = DateTime.UtcNow;
             var threshold = TimeSpan.FromMinutes(30);
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now.AddHours(1);
-            evnt.EndDateTimeUTC = now.AddHours(2);
-
-            var ret = evnt.IsNowWithinThresholdOfEventStart(now, threshold);
+            var appoint = ctx.CreateAppointment(now.AddHours(1), now.AddHours(2));
+            var ret = appoint.IsNowWithinThresholdOfEventStart(now, threshold);
             Assert.That(ret, Is.False);
         }
     }
@@ -139,12 +107,8 @@ public class CalendarEvent
         {
             var now = DateTime.UtcNow;
             var threshold = TimeSpan.FromMinutes(30);
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now.AddHours(-2);
-            evnt.EndDateTimeUTC = now.AddHours(-1);
-
-            var ret = evnt.IsNowWithinThresholdOfEventStart(now, threshold);
+            var appoint = ctx.CreateAppointment(now.AddHours(-2), now.AddHours(-1));
+            var ret = appoint.IsNowWithinThresholdOfEventStart(now, threshold);
             Assert.That(ret, Is.False);
         }
     }
@@ -156,12 +120,8 @@ public class CalendarEvent
         {
             var now = DateTime.UtcNow;
             var threshold = TimeSpan.FromMinutes(30);
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now.AddMinutes(30);
-            evnt.EndDateTimeUTC = now.AddHours(2);
-
-            var ret = evnt.IsNowWithinThresholdOfEventStart(now, threshold);
+            var appoint = ctx.CreateAppointment(now.AddMinutes(30), now.AddHours(2));
+            var ret = appoint.IsNowWithinThresholdOfEventStart(now, threshold);
             Assert.That(ret, Is.True);
         }
     }
@@ -173,12 +133,8 @@ public class CalendarEvent
         {
             var now = DateTime.UtcNow;
             var threshold = TimeSpan.FromMinutes(30);
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now.AddHours(-2);
-            evnt.EndDateTimeUTC = now.AddMinutes(30);
-
-            var ret = evnt.IsNowWithinThresholdOfEventStart(now, threshold);
+            var appoint = ctx.CreateAppointment(now.AddHours(-2), now.AddMinutes(30));
+            var ret = appoint.IsNowWithinThresholdOfEventStart(now, threshold);
             Assert.That(ret, Is.False);
         }
     }
@@ -189,12 +145,8 @@ public class CalendarEvent
         {
             var now = DateTime.UtcNow;
             var threshold = TimeSpan.FromMinutes(30);
-
-            var evnt = new Appointment();
-            evnt.StartDateTimeUTC = now.AddMinutes(15);
-            evnt.EndDateTimeUTC = now.AddHours(2);
-
-            var ret = evnt.IsNowWithinThresholdOfEventStart(now, threshold);
+            var appoint = ctx.CreateAppointment(now.AddMinutes(15), now.AddHours(2));
+            var ret = appoint.IsNowWithinThresholdOfEventStart(now, threshold);
             Assert.That(ret, Is.True);
         }
     }

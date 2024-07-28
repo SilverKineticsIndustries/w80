@@ -10,16 +10,16 @@ public class RequestSecurityContext
 {
     public Role Role { get; private set; }
     public ObjectId UserId { get; private set; }
-    public string Language { get; }
-    public string Region { get; }
+    public string Language { get; } = null!;
+    public string Region { get; } = null!;
 
     public RequestSecurityContext(IHttpContextAccessor httpContextAccessor)
     {
         var user = httpContextAccessor?.HttpContext?.User;
-        if (user is not null && user.Identity.IsAuthenticated)
+        if (user is not null && user.Identity != null && user.Identity.IsAuthenticated)
         {
-            UserId = ObjectId.Parse(user.Claims.FirstOrDefault(x => x.Type == "ID").Value);
-            Role = (Role)Enum.Parse(typeof(Role), user.Claims.FirstOrDefault(x => x.Type == "Role").Value);
+            UserId = ObjectId.Parse(user.Claims.First(x => x.Type == "ID").Value);
+            Role = (Role)Enum.Parse(typeof(Role), user.Claims.First(x => x.Type == "Role").Value);
 
             var culture = user.Claims.FirstOrDefault(x => x.Type == "Culture");
             var cultureParts = (culture != null ? culture.Value : SupportedCultures.DefaultCulture).Split("-");
