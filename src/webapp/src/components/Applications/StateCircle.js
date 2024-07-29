@@ -15,7 +15,7 @@ const styles = createUseStyles({
 const StateCircle = ({color}) =>
 {
     const classes = styles();
-    const colorValue = color.indexOf("var") == -1 ? "#" + color : color;
+    const colorValue = color.indexOf("var") === -1 ? "#" + color : color;
     return(
         <div className={classes.circle} style={{ backgroundColor: colorValue }} />
     )

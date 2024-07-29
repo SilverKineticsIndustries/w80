@@ -6,7 +6,7 @@ import { get } from '../../helpers/api';
 import { getUserProfile, updateUserProfile } from '../../services/userService';
 import ValidationPanel from '../../common/ValidationPanel';
 import ModalWrapper from '../../common/ModalWrapper';
-import { sortByName, onUpdateField, getUserCulture } from '../../helpers/common';
+import { sortByName, onUpdateField } from '../../helpers/common';
 import { setBrowserNotificationsEnabledFlag } from '../../helpers/users';
 import { apiDirectDecorator, apiDecoratorOptions } from '../../helpers/api';
 import { StatusContext } from '../../App';

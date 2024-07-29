@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { createUseStyles } from 'react-jss';
 
@@ -51,5 +51,3 @@ export default function ValidationPanel ({data})
         </React.Fragment>
     )
 }
-
-//export default memo(ValidationPanel);

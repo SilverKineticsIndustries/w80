@@ -6,15 +6,24 @@ import calendar from '../../assets/calendar.png';
 
 const styles = createUseStyles({
     wrapper: {
-        cursor: "pointer",
-        width: "360px",
         whiteSpace: "nowrap",
+        verticalAlign: "bottom",
+    },
+    appointmentIcon: {
+        verticalAlign: "middle",
+        marginRight: "8px"
+    },
+    appointmentButton: {
+        cursor: "pointer",
+        background: "transparent",
+        border: "none"
+    },
+    appointmentTitle: {
+        maxWidth: "170px",
+        display: "inline-block",
         overflow: "hidden",
         textOverflow: "ellipsis",
-        verticalAlign: "top",
-        '&:hover ': {
-            textDecoration: "underline"
-        }
+        verticalAlign: "bottom"
     }
 })
 
@@ -32,10 +41,10 @@ const CalendarLink = ({appointment}) => {
         {appointment &&
             <React.Fragment>
                 <div className={classes.wrapper}>
-                    <img src={calendar} width="20px" height="20px" style={{marginRight: '8px'}} alt='Calendar' />
-                    <a onClick={() => openCalendarItem()}>
-                        {printLocalizedShortDate(appointment.startDateTimeUTC)} - {appointment.description}
-                    </a>
+                    <img src={calendar} width="20px" height="20px" className={classes.appointmentIcon} alt='Calendar' />
+                    <button className={classes.appointmentButton} onClick={() => openCalendarItem()}>
+                        {printLocalizedShortDate(appointment.startDateTimeUTC)} - <span className={classes.appointmentTitle}>{appointment.description}</span>
+                    </button>
                 </div>
             </React.Fragment>
         }
