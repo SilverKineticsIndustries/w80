@@ -1,12 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { createUseStyles } from 'react-jss'
 import { createPortal } from 'react-dom';
-import { UserContext } from '../App';
-import { post } from '../helpers/api';
+import { StatusContext, UserContext } from '../App';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import UserProfile from '../components/UserProfile/UserProfile';
 import UserManagementList from '../components/UserManagement/UserManagementList';
 import { getAccessTokenClaimValue, clearAccessToken } from '../helpers/accessTokensStorage';
+import { apiDecoratorOptions, apiDirectDecorator } from '../helpers/api';
+import { logout } from '../services/autheticationService';
 
 const styles = createUseStyles({
     wrapper: {
@@ -17,7 +19,7 @@ const styles = createUseStyles({
     expander: {
         display: "block",
         position: "relative",
-        fontSize: "50px",
+        fontSize: "3.4rem",
         cursor: "pointer",
         opacity: ".8",
         transition: "0.3s",
@@ -46,18 +48,27 @@ export default function ExpanderMenu()
 {
     const classes = styles();
     const navigate = useNavigate();
+    const { t } = useTranslation(null, { keyPrefix: "common"});
+    const { setLoading, setServerErrorMessage } = useContext(StatusContext);
     const { setCurrentUser } = useContext(UserContext);
     const [userProfileVisible, setUserProfileVisible] = useState(false);
     const [userManagementVisible, setUserManagementVisible] = useState(false);
 
-    const onLogout = () => {
-        post("/authentication/logout", {}, true, true)
-        .finally(() => {
-            clearAccessToken();
-            setCurrentUser();
-            navigate('/');
-        });
-    }
+    const onLogout = useCallback(() => {
+        apiDirectDecorator(
+            async () => await logout(),
+            apiDecoratorOptions(
+                { setLoading, setServerErrorMessage },
+                () => {},
+                () => {},
+                null,
+                () => {
+                    clearAccessToken();
+                    setCurrentUser();
+                    navigate("/");
+                }))
+            ();
+    }, [setLoading, setServerErrorMessage, navigate, setCurrentUser]);
 
     const role = getAccessTokenClaimValue('Role');
     const isAdministrator = role === 'Administrator';
@@ -68,9 +79,9 @@ export default function ExpanderMenu()
                 &#10050;
             </div>
             <div className={classes.menu} data-test="header-expandermenu">
-                <button className='header-menu-button' data-test="header-showprofile" onClick={() => setUserProfileVisible(true)}>Profile</button>
-                {isAdministrator && <button className='header-menu-button' data-test="header-showusermanagement" onClick={() => setUserManagementVisible(true)}>User Management</button>}
-                <button className='header-menu-button' data-test="header-logout" onClick={() => onLogout()}>Logout</button>
+                <button className='header-menu-button' data-test="header-showprofile" onClick={() => setUserProfileVisible(true)}>{t("profile")}</button>
+                {isAdministrator && <button className='header-menu-button' data-test="header-showusermanagement" onClick={() => setUserManagementVisible(true)}>{t("user-management")}</button>}
+                <button className='header-menu-button' data-test="header-logout" onClick={() => onLogout()}>{t("logout")}</button>
             </div>
             {userProfileVisible && createPortal(
                 <UserProfile onClose={() => setUserProfileVisible(false)} />,

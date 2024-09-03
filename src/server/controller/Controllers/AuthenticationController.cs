@@ -12,10 +12,11 @@ public class AuthenticationController
     : ControllerBase
 {
     public AuthenticationController(
+        IConfiguration configuration,
         IAuthenticationApplicationService authenticationApplicationService,
         IReCaptchaApplicationService reCaptchaApplicationService)
     {
-        _cookieManager = new CookieManager(this);
+        _cookieManager = new CookieManager(this, configuration);
         _reCaptchaApplicationService = reCaptchaApplicationService;
         _authenticationApplicationService = authenticationApplicationService;
     }

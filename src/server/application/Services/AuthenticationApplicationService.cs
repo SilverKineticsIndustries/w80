@@ -85,7 +85,7 @@ public class AuthenticationApplicationService(
                 response.RefreshToken = GenerateRefreshToken(userSecurity, now);
                 response.RefreshTokenExpirationUTC = userSecurity.RefreshTokenExpirationUTC ?? null;
                 await userSecurityRepo.UpsertAsync(userSecurity, cancellationToken, session);
-                cookieManager.SetCookie(Tokens.RefreshTokenCookieName, response.RefreshToken, response.RefreshTokenExpirationUTC, includePath: true);
+                cookieManager.SetCookie(Tokens.RefreshTokenCookieName, response.RefreshToken, response.RefreshTokenExpirationUTC);
             },
         cancellationToken);
 
@@ -155,8 +155,7 @@ public class AuthenticationApplicationService(
         cookieManager.SetCookie(
             Tokens.RefreshTokenCookieName,
             response.RefreshToken,
-            expirationDate: response.RefreshTokenExpirationUTC,
-            includePath: true);
+            expirationDate: response.RefreshTokenExpirationUTC);
 
         return response;
     }

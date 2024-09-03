@@ -28,7 +28,7 @@ public class ApplicationAlertsService(
         var threshold = TimeSpan.FromMinutes(Convert.ToInt32(configuration[Keys.EmailAlertThresholdInMinutes]));
 
         foreach(var user in await userRepo.GetManyAsync(x =>
-            x.DeactivatedUTC == null && x.EnableEventEmailNotifications == true,
+            x.DeactivatedUTC == null && x.EnableAppointmentEmailNotifications == true,
             cancellationToken))
         {
             foreach(var application in await applicationRepo.GetManyAsync(x => x.UserId == user.Id, cancellationToken).ConfigureAwait(false))

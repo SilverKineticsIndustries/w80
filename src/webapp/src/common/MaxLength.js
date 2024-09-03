@@ -11,17 +11,19 @@ const styles = createUseStyles({
 })
 
 const MaxLength = ({val, max}) => {
+
     const classes = styles();
-    const threshold =  (val || 0).length / Number(max) > 0.75;
+    const len = (val || "").length;
+    const threshold =  len / Number(max) > 0.75;
 
     return (
-        <React.Fragment>
-        {threshold &&
+        <>
+        {max && threshold &&
             <span className={classes.wrapper}>
-                {(val || 0).length}/{max}
+                {len}/{max}
             </span>
         }
-        </React.Fragment>
+        </>
     )
 }
 

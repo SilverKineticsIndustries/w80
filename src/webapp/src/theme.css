@@ -10,12 +10,13 @@
   --page-background: rgb(240,240,240) radial-gradient(circle, rgba(240,240,240,1) 0%, rgba(97,97,97,1) 100%);
 
   --regular-text: #2b2b2b;
-  --info-border: #c2c2c2;
-
-  --error-border:  #ddb8b8;
-  --error-header: #f10f0f;
   --error-text: #820000;
+
+  --info-border: #c2c2c2;
+  --error-border:  #ddb8b8;
 
   --rejected: #c80000;
   --accepted: #43f000;
+
+  --error-header: #f10f0f;
 }

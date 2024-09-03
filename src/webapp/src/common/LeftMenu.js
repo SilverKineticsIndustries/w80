@@ -28,17 +28,17 @@ const styles = createUseStyles({
 const LeftMenu = () =>
 {
     const classes = styles();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "common"});
 
     return (
-        <ul className={classes.list} data-test="left-menu">
-            <LeftMenuItem path='/open' img={applications} tooltip={t("common.view-open-applications")} dataTest="left-menu-open" />
-            <LeftMenuItem path='/calendar' img={calendar} tooltip={t("common.view-calendar")} dataTest="left-menu-calendar" />
-            <LeftMenuItem path='/archived' img={archive} tooltip={t("common.view-archived-applications")} dataTest="left-menu-archived" />
-            <LeftMenuItem path='/accepted' img={accept} tooltip={t("common.view-accepted-applications")} dataTest="left-menu-accepted" />
-            <LeftMenuItem path='/rejected' img={reject} tooltip={t("common.view-rejected-applications")} dataTest="left-menu-rejected" />
-            <LeftMenuItem path='/statistics' img={stats} tooltip={t("common.view-statistics")} dataTest="left-menu-statistics" />
-        </ul>
+        <menu className={classes.list} data-test="left-menu">
+            <LeftMenuItem path='/open' img={applications} tooltip={t("view-open-applications")} dataTest="left-menu-open" />
+            <LeftMenuItem path='/calendar' img={calendar} tooltip={t("view-calendar")} dataTest="left-menu-calendar" />
+            <LeftMenuItem path='/archived' img={archive} tooltip={t("view-archived-applications")} dataTest="left-menu-archived" />
+            <LeftMenuItem path='/accepted' img={accept} tooltip={t("view-accepted-applications")} dataTest="left-menu-accepted" />
+            <LeftMenuItem path='/rejected' img={reject} tooltip={t("view-rejected-applications")} dataTest="left-menu-rejected" />
+            <LeftMenuItem path='/statistics' img={stats} tooltip={t("view-statistics")} dataTest="left-menu-statistics" />
+        </menu>
     )
 }
 

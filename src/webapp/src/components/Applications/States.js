@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback, memo } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useDispatch } from 'react-redux';
 import { changeApplicationState } from '../../store/applications/thunks';
@@ -12,15 +12,17 @@ const styles = createUseStyles({
     }
 })
 
-export default function States({app, allowStateChange=false})
+const isRejected = (app) => !!app?.rejection?.rejectedUTC;
+
+const States = ({app, allowStateChange=false}) =>
 {
     const classes = styles();
     const dispatch = useDispatch();
-    const statusContext = useContext(StatusContext);
+    const { setLoading, setServerErrorMessage } = useContext(StatusContext);
     const [selectedState, setSelectedState] = useState(app.states.find((x) => x.isCurrent));
     const sortedStates = app.states.toSorted((a,b) => { return a.seqNo - b.seqNo });
 
-    const onApplicationStateChange = (e) => {
+    const onApplicationStateChange = useCallback((e) => {
         let changed =  structuredClone(app);
         changed.states.find((x) => x.isCurrent).isCurrent = false;
         changed.states.find((x) => x.id === e.target.value).isCurrent = true;
@@ -28,18 +30,16 @@ export default function States({app, allowStateChange=false})
         dispatch(apiDispatchDecorator(
             async (dispatch, getState) => await changeApplicationState(dispatch, getState, changed),
             apiDecoratorOptions(
-                statusContext,
+                { setLoading, setServerErrorMessage },
                 () => setSelectedState(changed.states.find((x) => x.isCurrent)),
                 null, e.target
             )));
-    }
-
-    const isRejected = !!app?.rejection?.rejectedUTC;
+    }, [app, dispatch, setLoading, setServerErrorMessage]);
 
     return(
         <div className={classes.wrapper}>
-            {!isRejected &&
-                <React.Fragment>
+            {!isRejected(app) &&
+                <>
                     <StateCircle color={selectedState.hexColor} />
                     {allowStateChange &&
                         <div className="center">
@@ -56,9 +56,11 @@ export default function States({app, allowStateChange=false})
                         </div>
                     }
                     {!allowStateChange && <div className="center">{sortedStates.find((x) => x.isCurrent)?.name}</div>}
-                </React.Fragment>
+                </>
             }
-            {isRejected && <StateCircle color="var(--error-text)" />}
+            {isRejected(app) && <StateCircle color="var(--error-text)" />}
         </div>
     )
 }
+
+export default memo(States);

@@ -260,7 +260,7 @@ public class ApplicationAlertsService
         var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
         var current = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
         var user = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
-        user.EnableEventEmailNotifications = true;
+        user.EnableAppointmentEmailNotifications = true;
         await userRepo.UpsertAsync(user, current, CancellationToken.None);
     }
 
@@ -269,7 +269,7 @@ public class ApplicationAlertsService
         var userRepo = ctx.Services.GetRequiredService<IUserRepository>();
         var current = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
         var user = await userRepo.FirstAsync(x => x.Id == ctx.GetCurrentUserId(), CancellationToken.None);
-        user.EnableEventEmailNotifications = false;
+        user.EnableAppointmentEmailNotifications = false;
         await userRepo.UpsertAsync(user, current, CancellationToken.None);
     }
 }

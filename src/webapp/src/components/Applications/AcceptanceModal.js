@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useContext } from 'react';
+import React, { useState, useReducer, useContext, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
 import ModalWrapper from '../../common/ModalWrapper';
 import ValidationPanel from '../../common/ValidationPanel';
@@ -48,9 +48,9 @@ export default function AcceptanceModal({applicationId, onClose})
 {
     const classes = styles();
     const dispatch = useDispatch();
-    const { t } = useTranslation();
-    const statusContext = useContext(StatusContext);
+    const { setLoading, setServerErrorMessage } = useContext(StatusContext);
     const [validationErrors, setValidationErrors] = useState([]);
+    const { t } = useTranslation(null, { keyPrefix: "application" });
 
     const [acceptance, setAcceptance] = useReducer(acceptanceReducer, {
         method: "",
@@ -67,54 +67,54 @@ export default function AcceptanceModal({applicationId, onClose})
         onClose();
     }
 
-    const onAccept = (e) => {
+    const onAccept = useCallback((e) => {
         dispatch(apiDispatchDecorator(
             async (dispatch, getState) => await acceptApplication(dispatch, getState, applicationId, acceptance),
             apiDecoratorOptions(
-                statusContext,
+                { setLoading, setServerErrorMessage },
                 () => onClose(),
                 (valErr) => setValidationErrors(valErr),
                 e.target))
         );
-    }
+    },[applicationId, acceptance, dispatch, onClose, setLoading, setServerErrorMessage]);
 
     return (
         <ModalWrapper>
             <fieldset className={classes.fieldSetContainer}>
                 <div className={classes.formHeader}>
-                    {t("application.acceptance-information")}
+                    {t("acceptance-information")}
                 </div>
                 <form>
                     <div className={classes.fieldContainer}>
                         <label>
-                            <div className={classes.labelText}>{t("application.acceptance-method")}:</div>
+                            <div className={classes.labelText}>{t("acceptance-method")}:</div>
                             <select name="method" value={acceptance.method} onChange={onFieldChange} required={true}
                                 className={classes.inputControl} autoFocus={true} autoComplete="false">
-                                <option key={0} value=''>{t("application.acceptance-select-method")}</option>
-                                <option key={1} value='Email'>{t("application.acceptance-method-email")}</option>
-                                <option key={2} value='Phone'>{t("application.acceptance-method-phone")}</option>
-                                <option key={3} value='InPerson'>{t("application.acceptance-method-in-person")}</option>
+                                <option key={0} value=''>{t("acceptance-select-method")}</option>
+                                <option key={1} value='Email'>{t("acceptance-method-email")}</option>
+                                <option key={2} value='Phone'>{t("acceptance-method-phone")}</option>
+                                <option key={3} value='InPerson'>{t("acceptance-method-in-person")}</option>
                             </select>
                         </label>
                     </div>
                     <div className={classes.fieldContainer}>
                         <label>
-                            <div className={classes.labelText}>{t("application.acceptance-response-text")}:</div>
+                            <div className={classes.labelText}>{t("acceptance-response-text")}:</div>
                             <textarea name="responseText" type="text" required={true} value={acceptance.responseText}
                                 onChange={onFieldChange} className={classes.inputControl} autoComplete="false" rows={10} />
                         </label>
                     </div>
                     <div className={classes.fieldContainer}>
                         <label>
-                            <div className={classes.labelText}>{t("application.acceptance-archive-apps")}</div>
+                            <div className={classes.labelText}>{t("acceptance-archive-apps")}</div>
                             <input type="checkbox" required={true} value={acceptance.archiveOpenApplications}
                                 onChange={onFieldChange} className={classes.inputControl} />
                         </label>
                     </div>
                     {validationErrors?.length > 0 && <ValidationPanel data={validationErrors} />}
                     <div className="center">
-                        <button className='editor-button' onClick={onAccept}>{t("application.acceptance-accept")}</button>
-                        <button className='editor-button' onClick={onCancel}>{t("application.acceptance-cancel")}</button>
+                        <button className='editor-button' onClick={onAccept}>{t("acceptance-accept")}</button>
+                        <button className='editor-button' onClick={onCancel}>{t("acceptance-cancel")}</button>
                     </div>
                 </form>
             </fieldset>

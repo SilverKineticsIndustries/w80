@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import "dayjs/locale/de";
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { Calendar as BigCalendar, dayjsLocalizer } from "react-big-calendar";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
@@ -11,7 +11,7 @@ import { selectCalendarAppointmentsForApplications} from "../../store/applicatio
 
 const localizer = dayjsLocalizer(dayjs)
 
-export default function Calendar()
+const Calendar = () =>
 {
     dayjs.locale(getUserCulture());
     const [searchParams] = useSearchParams();
@@ -53,8 +53,10 @@ export default function Calendar()
                 />
             </div>
         <div>
-            {editingAppointment && <Appointment selectedAppointment={editingAppointment} onClose={() => setEditingAppointment()}/>}
+            {editingAppointment && <Appointment selectedAppointment={editingAppointment} onClose={setEditingAppointment}/>}
         </div>
     </div>
   );
 }
+
+export default memo(Calendar);

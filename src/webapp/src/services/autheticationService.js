@@ -16,6 +16,10 @@ export function login(email, password, captcha=null) {
     return post("/authentication/login", { email: email, password: password, captcha: captcha}, true);
 }
 
+export function logout() {
+    return post("/authentication/logout", {}, true, true);
+}
+
 export function processInvitation(invitationCode, email, password) {
     return post("/authentication/invitation", { invitationCode: invitationCode, email: email, password: password}, true);
 }

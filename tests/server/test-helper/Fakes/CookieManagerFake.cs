@@ -12,7 +12,7 @@ public class CookieManagerFake
         return string.Empty;
     }
 
-    public void SetCookie(string name, string value, DateTime? expirationDate = null, bool isRefreshToken = false)
+    public void SetCookie(string name, string value, DateTime? expirationDate = null)
     {
         if (Cookies.Value.ContainsKey(name))
             Cookies.Value[name] = value;

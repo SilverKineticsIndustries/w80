@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
-import { createUseStyles } from 'react-jss';
 import OpenUrl from './OpenUrl';
+import { createUseStyles } from 'react-jss';
+import { useTranslation } from 'react-i18next';
 import CopyToClipboard from './CopyToClipboard';
 
 const styles = createUseStyles({
@@ -21,22 +22,23 @@ const styles = createUseStyles({
 
 const InfoPanel = ({header, message, showCopyToClipboard, onHide}) =>
 {
-    var classes = styles();
+    const classes = styles();
+    const { t } = useTranslation(null, { keyPrefix: "common"});
 
     return (
         <div className={classes.wrapper} data-test="info-panel">
             {header &&
                 <div data-test="info-panel-header">
-                     {header}
+                    {header}
                 </div>
             }
             <div className={classes.details} data-test="info-panel-details">
                 {message}
-                {showCopyToClipboard && <CopyToClipboard value={message}/>}
+                {showCopyToClipboard && <CopyToClipboard value={message} />}
                 <OpenUrl value={message} />
             </div>
             <div className="center">
-                <button className='editor-button' onClick={onHide} data-test="info-panel-ok">Ok</button>
+                <button className='editor-button' onClick={onHide} data-test="info-panel-ok">{t("ok")}</button>
             </div>
         </div>
     )

@@ -18,25 +18,25 @@ const styles = createUseStyles({
 const RejectionModal = ({rejection}) =>
 {
     const classes = styles();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "application" });
 
     return (
-        <React.Fragment>
+        <>
             {rejection.rejectedUTC &&
                 <fieldset className={classes.fieldset}>
-                    <legend>{t("application.rejected")}</legend>
+                    <legend>{t("rejected")}</legend>
                     <div>
                         {printLocalizedDate(rejection.rejectedUTC)}
                     </div>
                     <div>
-                        {t("application.rejection-method")}: {rejection.method}
+                        {t("rejection-method")}: {rejection.method}
                     </div>
                     <div>
-                        {t("application.rejection-reason")}: {rejection.reason}
+                        {t("rejection-reason")}: {rejection.reason}
                     </div>
                 </fieldset>
             }
-        </React.Fragment>
+        </>
     )
 }
 

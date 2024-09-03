@@ -16,7 +16,7 @@ const Notifications = () =>
 {
     const interval = useRef(null);
     const dispatch = useDispatch();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "notifications"});
     const title = t('alert');
 
     const appointments = useSelector(selectCalendarAppointmentsForApplications);
@@ -41,8 +41,8 @@ const Notifications = () =>
                     if (diffMinutes < 0 && absMinutes < alertThresholdInMinutes)
                     {
                         const appId = appointment.applicationId;
-                        const companyName = appIdAndCompanyNameList.find(x => x.id === appId).companyName ?? t('notifications.unknown-company');
-                        const body = t('notifications.have-appointment', { companyName: companyName, minutes: Math.floor(absMinutes) });
+                        const companyName = appIdAndCompanyNameList.find(x => x.id === appId).companyName ?? t("unknown-company");
+                        const body = t("have-appointment", { companyName: companyName, minutes: Math.floor(absMinutes) });
                         new Notification(title, { body, icon });
                         toUpdate[appId] = [...(toUpdate[appId] || []), appointment.id];
                     }
@@ -70,7 +70,7 @@ const Notifications = () =>
     }
 
     return (
-        <React.Fragment/>
+        <></>
   );
 }
 

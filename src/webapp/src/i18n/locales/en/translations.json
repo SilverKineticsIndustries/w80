@@ -13,7 +13,12 @@
         "email-confirmation-sent": "An email has been sent to the address which you have provided. Please open the email and click on the link inside to confirm your email address. Afterwards, you will be able to login to the application."
     },
     "common": {
+        "ok": "Ok",
+        "profile": "Profile",
+        "user-management": "User Management",
+        "logout": "Logout",
         "copy-to-clipboard": "Copy to clipboard",
+        "copied": "Copied to clipboard",
         "open-url": "Open URL in another window/tab",
         "validation-errors-found": "validation error(s) found.",
         "browser-no-support": "Your browser does not support copying to the clipboard.",
@@ -27,7 +32,8 @@
         "view-statistics": "View statistics",
         "network-error": "A network error has occured. Check your internet and try again or wait a few minutes and try again.",
         "cancelled-error":  "The server took too long to respond and your request was cancelled. Wait a couple of minutes and try again.",
-        "bad-response-error": "An error has occured on the server. Wait a couple of minutes and try again."
+        "bad-response-error": "An error has occured on the server. Wait a couple of minutes and try again.",
+        "request-timed-out": "The request has timed out. Please try again."
     },
     "notifications": {
         "alert": "Alert",
@@ -92,7 +98,8 @@
         "appointment-description": "Description",
         "save": "Save",
         "delete": "Delete",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "add-edit-appointment": "Add/Edit Appointment"
     },
     "application": {
         "acceptance-information": "Acceptance Information",

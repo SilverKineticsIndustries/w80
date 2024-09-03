@@ -23,8 +23,8 @@ public class User
     public string TimeZone { get; set; }
     public string Culture { get; set; }
     public Role Role { get; set; }
-    public bool EnableEventBrowserNotifications { get; set; }
-    public bool EnableEventEmailNotifications { get; set; }
+    public bool EnableAppointmentBrowserNotifications { get; set; }
+    public bool EnableAppointmentEmailNotifications { get; set; }
 
     public ObjectId CreatedBy { set; get; }
     public DateTime CreatedUTC { set; get; }

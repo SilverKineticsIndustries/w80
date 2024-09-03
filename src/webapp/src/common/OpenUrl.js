@@ -5,14 +5,16 @@ import { useTranslation } from 'react-i18next';
 import { isValidHttpUrl } from '../helpers/common';
 
 const OpenUrl = ({value}) => {
-    const { t } = useTranslation();
+
+    const { t } = useTranslation(null, { keyPrefix: "common"});
+
     if (isValidHttpUrl(value))
         return (
-            <ToolButton onClick={() => window.open(value)} img={openurl} tooltip={t('common.open-url')}
-                height="20px" width="20px" dataTest="open-url" />
+            <ToolButton onClick={() => window.open(value)} img={openurl}
+                tooltip={t("open-url")} height="20px" width="20px" dataTest="open-url" />
         )
     else
-        return <React.Fragment />;
+        return <></>;
 }
 
 export default memo(OpenUrl);

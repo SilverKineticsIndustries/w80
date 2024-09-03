@@ -1,11 +1,18 @@
-describe('Logout', () => {
-    it('User can logout', () => {
+describe("Logout", () => {
+    it("User can logout", () => {
 
         cy.visit('/');
 
         cy.logout();
 
-        cy.get('[data-test="login-email"]')
-          .should('be.visible');
+        cy.sel("login-email")
+          .should("be.visible");
+
+        cy.getCookie('_rt')
+          .should("not.exist");
+
+        // TODO: Access token is not getting cleared, not sure why ...
+        //expect(sessionStorage.getItem("at")).to.be.null;
+
     })
 });

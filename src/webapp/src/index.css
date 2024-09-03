@@ -40,6 +40,7 @@ legend {
   padding-right: 8px;
   border: 1px solid #707070;
   border-radius: 4px;
+  font-variant-caps: all-petite-caps;
 }
 
 table {
@@ -113,7 +114,13 @@ pre {
   filter: invert(1);
   transition-duration: .2s;
 }
-.toolbar-button:active{
+.toolbar-button:active {
+  background-color: transparent;
+  -webkit-filter: invert(1);
+  filter: invert(1);
+  transition-duration: .2s;
+}
+.toolbar-button > img:active {
   background-color: transparent;
   -webkit-filter: invert(1);
   filter: invert(1);
@@ -278,5 +285,25 @@ path.recharts-pie-label-line {
 }
 
 .no-border {
-  border: none
+  border: none;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-2 {
+  flex: 2;
+}
+
+.flex-3 {
+  flex: 3;
+}
+
+.flex-4 {
+  flex: 4;
+}
+
+.flex-5 {
+  flex: 5;
 }

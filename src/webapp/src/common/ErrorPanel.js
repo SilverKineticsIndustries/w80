@@ -17,13 +17,13 @@ const styles = createUseStyles({
 const ErrorPanel = ({msg, headerMsg='', dontDisplayHeader=false}) =>
 {
     const classes = styles();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "common"});
 
     return (
        <div className={classes.wrapper} data-test="error-panel">
             {!dontDisplayHeader &&
                 <div className={classes.header} data-test="error-header">
-                    { headerMsg || t("common.error-occured") }
+                    { headerMsg || t("error-occured") }
                 </div>
             }
             <div className={classes.details} data-test="error-details">

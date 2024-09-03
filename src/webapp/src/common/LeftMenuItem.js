@@ -11,12 +11,12 @@ const LeftMenuItem = ({path, img, tooltip}) =>
     const selectedClass = location.pathname.toLowerCase() === path.toLowerCase() ? "left-menu-item-selected" : "";
 
     return (
-        <React.Fragment>
+        <>
             <li data-tooltip-id={uniqueid} className={`left-menu-item ${selectedClass}`} onClick={() => navigator(path)}>
                 <img src={img} height={50} width={50} alt={tooltip} />
             </li>
             <Tooltip id={uniqueid} delayShow="100" place="top">{tooltip}</Tooltip>
-        </React.Fragment>
+        </>
     )
 }
 

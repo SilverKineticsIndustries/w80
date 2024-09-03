@@ -21,8 +21,8 @@ public partial class UserMapper
             Nickname = profile.Nickname,
             TimeZone = profile.TimeZone ?? SupportedTimeZones.DefaultTimezone,
             Culture = profile.Culture ?? SupportedCultures.DefaultCulture,
-            EnableEventBrowserNotifications = profile.EnableEventBrowserNotifications,
-            EnableEventEmailNotifications = profile.EnableEventEmailNotifications
+            EnableAppointmentBrowserNotifications = profile.EnableAppointmentBrowserNotifications,
+            EnableAppointmentEmailNotifications = profile.EnableAppointmentEmailNotifications
         };
     }
     public static partial User ToEntity(UserUpsertRequestDto user);

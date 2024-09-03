@@ -8,8 +8,8 @@ public record UserProfileUpdateRequestDto
     public string? Nickname { get; set; }
     public string? Culture { get; set; }
     public string? Password { get; set; }
-    public bool EnableEventBrowserNotifications { get; set; }
-    public bool EnableEventEmailNotifications { get; set; }
+    public bool EnableAppointmentBrowserNotifications { get; set; }
+    public bool EnableAppointmentEmailNotifications { get; set; }
     public DateTime? UpdatedUTC { get; set; }
     public DateTime? CreatedUTC { get; set; }
 }

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, memo } from 'react';
 import { createUseStyles } from 'react-jss';
 import LoginPanel from './LoginPanel';
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +25,7 @@ const styles = createUseStyles({
     }
 })
 
-export default function Login()
+const Login = () =>
 {
     const classes = styles();
     const navigate = useNavigate();
@@ -46,3 +46,5 @@ export default function Login()
             </div>
         )
 }
+
+export default memo(Login);

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, memo, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useNavigate } from 'react-router-dom';
 import ErrorPanel from '../../common/ErrorPanel';
@@ -37,18 +37,23 @@ const styles = createUseStyles({
 
 const capchaKey = process.env.REACT_APP_CAPTCHA_SITE_KEY;
 
-export default function LoginPanel()
+const LoginPanel = () =>
 {
     const classes = styles();
     const recaptcha = useRef();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "login" });
     const [searchParams] = useSearchParams();
     const emailCode = searchParams.get("code");
 
     const navigate = useNavigate();
     const [loginErrorMessage, setLoginErrorMessage] = useState();
     const [invitationCodeSubmitted, setInvitationCodeSubmitted] = useState();
-    const [form, setFormData] = useState({email: '', password: '', invitationCode: '', isExistingMember: false});
+    const [form, setFormData] = useState({
+        email: "",
+        password: "",
+        invitationCode: "",
+        isExistingMember: false
+    });
 
     const { setCurrentUser } = useContext(UserContext);
     const { setServerErrorMessage } = useContext(StatusContext);
@@ -58,30 +63,26 @@ export default function LoginPanel()
         setFormData((prevFormData) => ({ ...prevFormData, [event.target.name]: val }));
     };
 
-    const resetCaptcha = () => {
-        recaptcha.current.reset();
-    }
-
-    const handleError = (err, check401=false) => {
+    const handleError = useCallback((err, check401=false) => {
         if (!err.response)
             setServerErrorMessage(err.code);
         else
         {
             if (check401 && err.response.status === 401) {
-                setLoginErrorMessage(t('login.invalid-credentials'));
+                setLoginErrorMessage(t('invalid-credentials'));
                 return;
             }
 
             if (err.response?.data?.type === "CAPTCHA_FAILED") {
-                resetCaptcha();
+                recaptcha.current.reset();
                 setLoginErrorMessage(err.response.data.detail);
             }
             else
                 setLoginErrorMessage(err.message);
         }
-    }
+    }, [setServerErrorMessage, setLoginErrorMessage, t]);
 
-    const onFormSubmit = (e) => {
+    const onFormSubmit = useCallback((e) => {
         e.preventDefault();
         setLoginErrorMessage();
         setServerErrorMessage();
@@ -119,7 +120,7 @@ export default function LoginPanel()
                 handleError(err);
             });
         }
-    }
+    },[form.email, form.invitationCode, form.isExistingMember, form.password, handleError, navigate, setCurrentUser, setServerErrorMessage]);
 
     return (
         <div className={classes.wrapper}>
@@ -127,52 +128,54 @@ export default function LoginPanel()
             {!emailCode &&
                 <fieldset>
                     {!invitationCodeSubmitted &&
-                        <React.Fragment>
+                        <>
                             <div className={classes.registrationMessage}>
                                 <span className={classes.registrationMessageIcon}>&#10034;</span>
-                                {t('login.registration-closed')}
+                                {t("registration-closed")}
                             </div>
                             <form onSubmit={onFormSubmit}>
                                 <label className="field-container">
-                                    <div className="field-label">{t('login.already-member')}</div>
+                                    <div className="field-label">{t("already-member")}</div>
                                     <input type="checkbox" value={form.isExistingMember} name="isExistingMember"
                                         className="field-control" onChange={handleChange} autoComplete='false'
                                         data-test="login-already-member" />
                                 </label>
                                 {!form.isExistingMember &&
                                     <label className="field-container">
-                                        <div className="field-label">{t('login.invitation-code')}:</div>
-                                        <input type="text" size="26" value={form.invitationCode || ''} name="invitationCode"
+                                        <div className="field-label">{t("invitation-code")}:</div>
+                                        <input type="text" size="26" value={form.invitationCode || ""} name="invitationCode"
                                             className="field-control" onChange={handleChange} required={true}
                                             autoComplete='false' data-test="login-invitation-code" />
                                     </label>
                                 }
                                 <label className="field-container">
-                                    <div className="field-label">{t('login.email')}:</div>
-                                    <input type="text" required={true} size="26" value={form.email || ''} name="email"
+                                    <div className="field-label">{t("email")}:</div>
+                                    <input type="text" required={true} size="26" value={form.email || ""} name="email"
                                         className="field-control" onChange={handleChange} autoComplete='false'
                                         data-test="login-email" />
                                 </label>
                                 <label className="field-container">
-                                    <div className="field-label">{t('login.password')}:</div>
-                                    <input type="password" required={true} size="26" value={form.password || ''} name="password"
+                                    <div className="field-label">{t("password")}:</div>
+                                    <input type="password" required={true} size="26" value={form.password || ""} name="password"
                                         className="field-control" onChange={handleChange} autoComplete='false'
                                         data-test="login-password" />
                                 </label>
                                 <div className="editor-buttons-container">
                                     {!form.isExistingMember ?
-                                        <button className='editor-button' type="submit" data-test="login-join">{t('login.join')}</button>
-                                        : <button className='editor-button' type="submit" data-test="login-login">{t('login.login')}</button>
+                                        <button className="editor-button" type="submit" data-test="login-join">{t("join")}</button>
+                                        : <button className="editor-button" type="submit" data-test="login-login">{t("login")}</button>
                                     }
                                     {capchaKey && <ReCAPTCHA ref={recaptcha} className={classes.captchaBox} sitekey={capchaKey} />}
                                 </div>
                             </form>
-                        </React.Fragment>
+                        </>
                     }
-                    {invitationCodeSubmitted && <div>{t('login.email-confirmation-sent')}</div>}
+                    {invitationCodeSubmitted && <div>{t("email-confirmation-sent")}</div>}
                     {loginErrorMessage && <ErrorPanel msg={loginErrorMessage} dontDisplayHeader={true} />}
                 </fieldset>
             }
         </div>
     )
 }
+
+export default memo(LoginPanel)

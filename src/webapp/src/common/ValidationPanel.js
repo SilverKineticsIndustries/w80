@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createUseStyles } from 'react-jss';
 
@@ -25,18 +25,20 @@ const styles = createUseStyles({
     }
 })
 
-export default function ValidationPanel ({data})
+const getClientMessages = (data) => (data || []).filter(x => Object.hasOwn(x, 'clientMessage')).map(x => x["clientMessage"]);
+
+const ValidationPanel = ({data}) =>
 {
     const classes = styles();
-    const { t } = useTranslation();
-    const messages = (data || []).filter(x => Object.hasOwn(x, 'clientMessage')).map(x => x["clientMessage"]);
+    const messages = getClientMessages(data);
+    const { t } = useTranslation(null, { keyPrefix: "common"});
 
     return (
-        <React.Fragment>
+        <>
             {messages?.length > 0 &&
                 <div data-test="validation-panel">
                     <fieldset className={classes.fieldset}>
-                    <legend className={classes.headerMessage}>{messages.length} {t('common.validation-errors-found')}</legend>
+                    <legend className={classes.headerMessage}>{messages.length} {t("validation-errors-found")}</legend>
                         <ul className={classes.errorMessageList} data-test="validation-items-list">
                             {messages.map((x, idx) =>
                                 <li key={idx}>
@@ -48,6 +50,8 @@ export default function ValidationPanel ({data})
                     </fieldset>
                 </div>
             }
-        </React.Fragment>
+        </>
     )
 }
+
+export default memo(ValidationPanel);

@@ -24,38 +24,38 @@ const styles = createUseStyles({
     }
 })
 
+const displayErrorMessage = (t, serverErrorMessage) => {
+    switch (serverErrorMessage) {
+        case "ERR_NETWORK":
+            return t("network-error")
+        case "ERR_CANCELLED":
+            return t("cancelled-error")
+        case "ERR_BAD_RESPONSE":
+            return t("bad-response-error")
+        case "ECONNABORTED":
+            return t("request-timed-out")
+        default:
+            return serverErrorMessage;
+    }
+}
+
 const StatusPanel = () =>
 {
     const classes = styles();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "common" });
     const { loading, serverErrorMessage } = useContext(StatusContext);
     const isLoading = loading > 0;
     const hasError = !!serverErrorMessage;
 
-    const displayErrorMessage = (serverErrorMessage) => {
-        switch (serverErrorMessage) {
-            case "ERR_NETWORK":
-                return t("common.network-error")
-            case "ERR_CANCELLED":
-                return t("common.cancelled-error")
-            case "ERR_BAD_RESPONSE":
-                return t("common.bad-response-error")
-            case "ECONNABORTED":
-                return ""; // TODO
-            default:
-                return serverErrorMessage;
-        }
-    }
-
     return (
-        <React.Fragment>
+        <>
             {hasError && !isLoading &&
                 <div className={classes.error} data-test="status-panel">
-                    <div data-test="status-panel-message">{displayErrorMessage(serverErrorMessage)}</div>
+                    <div data-test="status-panel-message">{displayErrorMessage(t, serverErrorMessage)}</div>
                 </div>
             }
             {!hasError && isLoading && <Spinner />}
-        </React.Fragment>
+        </>
     )
 }
 

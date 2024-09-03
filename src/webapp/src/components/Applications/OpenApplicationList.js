@@ -1,14 +1,26 @@
-import React from 'react';
-import ApplicationList from './ApplicationList';
+import React, { memo } from 'react';
+import ApplicationContainerList from './ApplicationContainerList';
 import { useTranslation } from 'react-i18next';
-import { selectCurrentApplicationIds } from '../../store/applications/selectors';
+import { selectOpenApplicationIds } from '../../store/applications/selectors';
 
-export default function OpenApplicationList() {
-    const { t } = useTranslation();
+const OpenApplicationList = () => {
+
+    const { t } = useTranslation(null, { keyPrefix: "application" });
+
     return (
-        <ApplicationList
-            headerLabel={t("application.open-applications")}
-            selector={selectCurrentApplicationIds}
-            allowUnarchive={false} />
+        <ApplicationContainerList
+            headerLabel={t("open-applications")}
+            selector={selectOpenApplicationIds}
+            allowNew={true}
+            allowEdit={true}
+            allowDelete={true}
+            allowArchive={true}
+            allowUnarchive={false}
+            allowReject={true}
+            allowExpand={true}
+            allowAccept={true}
+            allowStateChange={true} />
     )
 }
+
+export default memo(OpenApplicationList);

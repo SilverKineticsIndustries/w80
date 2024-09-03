@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createUseStyles } from 'react-jss';
 
@@ -22,43 +22,39 @@ const styles = createUseStyles({
 const CompensationEdit = ({application, onFieldChange }) =>
 {
     const classes = styles();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "application" });
 
-    const handleNumberChange = (e) => {
+    const handleNumberChange = useCallback((e) => {
         e.target.value = e.target.value.replace(/\D/g, '');
         onFieldChange(e, true);
-    }
+    },[onFieldChange]);
 
     return (
         <fieldset>
-            <legend>{t("application.compensation")}</legend>
+            <legend>{t("compensation")}</legend>
             <div className={classes.flex}>
                 <div className={classes.control}>
                     <label>
-                        <div className={classes.fieldLabel}>{t("application.compensation-type")}:</div>
+                        <div className={classes.fieldLabel}>{t("compensation-type")}:</div>
                         <select name="compensationType" value={application.compensationType || ""} onChange={onFieldChange}>
-                            <option value="Salary">{t("application.compensation-type-salary")}</option>
-                            <option value="Hourly">{t("application.compensation-type-hourly")}</option>
-                            <option value="OneTime">{t("application.compensation-type-one-time")}</option>
+                            <option value="Salary">{t("compensation-type-salary")}</option>
+                            <option value="Hourly">{t("compensation-type-hourly")}</option>
+                            <option value="OneTime">{t("compensation-type-one-time")}</option>
                         </select>
                     </label>
                 </div>
                 <div className={classes.control}>
                     <label>
-                        <div className={classes.fieldLabel}>{t("application.compensation-min")}:</div>
-                        <input name="compensationMin"
-                            type="text"
-                            autoComplete="off"
+                        <div className={classes.fieldLabel}>{t("compensation-min")}:</div>
+                        <input name="compensationMin" type="text" autoComplete="off"
                             value={(application.compensationMin || "").toLocaleString()}
                             onChange={handleNumberChange} />
                     </label>
                 </div>
                 <div className={classes.control}>
                     <label>
-                        <div className={classes.fieldLabel}>{t("application.compensation-max")}:</div>
-                        <input name="compensationMax"
-                            type="text"
-                            autoComplete="off"
+                        <div className={classes.fieldLabel}>{t("compensation-max")}:</div>
+                        <input name="compensationMax" type="text" autoComplete="off"
                             value={(application.compensationMax || "").toLocaleString()}
                             onChange={handleNumberChange} />
                     </label>

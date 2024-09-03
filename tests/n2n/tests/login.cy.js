@@ -1,7 +1,8 @@
 describe('Login', () => {
+
     it('User can login with correct credentials', () => {
 
-      cy.get("[data-test='greeter-useridentifier']")
+      cy.sel("greeter-useridentifier")
         .should("contain", Cypress.env("USER_EMAIL"))
 
       cy.window()
@@ -15,19 +16,19 @@ describe('Login', () => {
 
       cy.visit("/")
 
-      cy.get('[data-test="login-already-member"]')
+      cy.sel("login-already-member")
           .check();
 
-      cy.get('[data-test="login-email"]')
+      cy.sel("login-email")
         .type("invalidemail");
 
-      cy.get('[data-test="login-password"]')
+      cy.sel("login-password")
         .type("invalidpassword");
 
-      cy.get('[data-test="login-login"]')
+      cy.sel("login-login")
         .click();
 
-      cy.get("[data-test='error-details']")
+      cy.sel("error-details")
         .should("contain", "Invalid credentials.");
     });
 });

@@ -1,20 +1,26 @@
-import React from 'react';
-import ApplicationList from './ApplicationList';
+import React, { memo } from 'react';
+import ApplicationContainerList from './ApplicationContainerList';
 import { useTranslation } from 'react-i18next';
 import { selectRejectedApplicationIds } from '../../store/applications/selectors';
 
-export default function RejectedApplicationList() {
-    const { t } = useTranslation();
+const RejectedApplicationList = () => {
+
+    const { t } = useTranslation(null, { keyPrefix: "application" });
+
     return (
-        <ApplicationList
-            headerLabel={t("application.rejected-applications")}
+        <ApplicationContainerList
+            headerLabel={t("rejected-applications")}
             selector={selectRejectedApplicationIds}
+            allowNew={false}
             allowEdit={false}
             allowDelete={true}
             allowArchive={false}
             allowUnarchive={false}
             allowReject={false}
             allowExpand={true}
-            allowAccept={false} />
+            allowAccept={false}
+            allowStateChange={false} />
     )
 }
+
+export default memo(RejectedApplicationList);

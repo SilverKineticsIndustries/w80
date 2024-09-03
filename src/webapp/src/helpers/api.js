@@ -83,13 +83,14 @@ async function getWorkingAccessToken(forceNewToken=false) {
     return token;
 }
 
-function apiDecoratorOptions(statusContext, onOk, onValidationError, target)
+function apiDecoratorOptions(statusContext, onOk, onValidationError, target, onFinally)
 {
     return {
         statusContext: statusContext || { setLoading: () => {}, setServerErrorMessage: () => {} },
         onOk:  onOk || function () {},
         onValidationError: onValidationError || function () {},
-        target: target || {}
+        target: target || {},
+        onFinally: onFinally || function () {}
     }
 };
 
@@ -116,6 +117,7 @@ function apiDispatchDecorator(func, options)
         finally {
             options.statusContext.setLoading(false);
             options.target.disabled = false;
+            options.onFinally();
         }
     }
 }
@@ -142,6 +144,7 @@ function apiDirectDecorator(func, options)
         finally {
             options.statusContext.setLoading(false);
             options.target.disabled = false;
+            options.onFinally();
         }
     }
 }

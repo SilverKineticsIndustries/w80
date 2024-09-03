@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useContext } from 'react';
+import React, { useState, useReducer, useContext, memo, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
 import ModalWrapper from '../../common/ModalWrapper';
 import ValidationPanel from '../../common/ValidationPanel';
@@ -48,14 +48,14 @@ const appointmentReducer = (state, action) => {
     }
 }
 
-export default function Appointment({selectedAppointment, onClose})
+const Appointment = ({selectedAppointment, onClose}) =>
 {
     const classes = styles();
     const store = useStore();
     const dispatch = useDispatch();
-    const { t } = useTranslation();
-    const statusContext = useContext(StatusContext);
+    const { t } = useTranslation(null, { keyPrefix: "calendar" });
     const [validationErrors, setValidationErrors] = useState([]);
+    const { setLoading, setServerErrorMessage } = useContext(StatusContext);
 
     const appIdAndCompanyNameList = useSelector(selectListOfApplicationIdAndApplicationCompany);
     const [appointment, setAppointment] = useReducer(appointmentReducer, selectedAppointment || {
@@ -66,25 +66,25 @@ export default function Appointment({selectedAppointment, onClose})
         endDateTimeUTC: ""
     });
 
-    const onFieldChange = (e) => {
+    const onFieldChange = useCallback((e) => {
         onUpdateField(e, setAppointment);
-    }
+    },[setAppointment]);
 
-    const onCancel = (e) => {
+    const onCancel = useCallback((e) => {
         e.preventDefault();
         onClose();
-    }
+    },[onClose]);
 
-    const onModify = (e, isDelete=false) => {
+    const onModify = useCallback((e, isDelete=false) => {
         e.preventDefault();
         setValidationErrors([]);
 
         if (!appointment.applicationId) {
-            setValidationErrors((state) => [...state, createdValidationError(t("calendar.application-cannot-be-empty"))]);
+            setValidationErrors((state) => [...state, createdValidationError(t("application-cannot-be-empty"))]);
             return false;
         }
         if (!appointment.description) {
-            setValidationErrors((state) => [...state, createdValidationError(t("calendar.description-cannot-be-empty"))]);
+            setValidationErrors((state) => [...state, createdValidationError(t("description-cannot-be-empty"))]);
             return false;
         }
 
@@ -110,23 +110,23 @@ export default function Appointment({selectedAppointment, onClose})
         dispatch(apiDispatchDecorator(
             async (dispatch, getState) => await updateApplicationCalendarAppointments(dispatch, getState, app),
             apiDecoratorOptions(
-                statusContext,
+                { setLoading, setServerErrorMessage },
                 () => onClose(),
                 (err) => setValidationErrors(err),
                 e.target))
         );
-    }
+    },[appointment, dispatch, onClose, store, t, setLoading, setServerErrorMessage]);
 
     return (
         <ModalWrapper>
             <fieldset className={classes.fieldSetContainer}>
                 <div className={classes.formHeader}>
-                    Add/Edit Appointment
+                    {t("add-edit-appointment")}
                 </div>
                 <form>
                     <div className={classes.fieldContainer}>
                         <label>
-                            <div className={classes.labelText}>{t("calendar.start")}</div>
+                            <div className={classes.labelText}>{t("start")}</div>
                             <span>
                                 <input type="datetime-local" value={dateTimeToInputDateTimeLocalString(appointment.startDateTimeUTC)}
                                     onChange={onFieldChange} name="startDateTimeUTC" />
@@ -135,7 +135,7 @@ export default function Appointment({selectedAppointment, onClose})
                     </div>
                     <div className={classes.fieldContainer}>
                         <label>
-                            <div className={classes.labelText}>{t("calendar.end")}</div>
+                            <div className={classes.labelText}>{t("end")}</div>
                             <span>
                                 <input type="datetime-local" value={dateTimeToInputDateTimeLocalString(appointment.endDateTimeUTC)}
                                     onChange={onFieldChange} name="endDateTimeUTC" />
@@ -144,10 +144,10 @@ export default function Appointment({selectedAppointment, onClose})
                     </div>
                     <div className={classes.fieldContainer}>
                         <label>
-                            <div className={classes.labelText}>{t("calendar.application")}</div>
+                            <div className={classes.labelText}>{t("application")}</div>
                             <select name="applicationId" onChange={onFieldChange} className={classes.inputControl}
                                 value={appointment.applicationId || ""} autoComplete='false'>
-                                <option>{t("calendar.select-application")}</option>
+                                <option>{t("select-application")}</option>
                                 {
                                     appIdAndCompanyNameList.map((i, idx) =>
                                         <option key={idx} value={i.id}>{i.companyName}</option>
@@ -158,7 +158,7 @@ export default function Appointment({selectedAppointment, onClose})
                     </div>
                     <div className={classes.fieldContainer}>
                         <label>
-                            <div className={classes.labelText}>{t("calendar.appointment-description")}</div>
+                            <div className={classes.labelText}>{t("appointment-description")}</div>
                             <textarea name="description" type="text" required={true} value={appointment.description || ""}
                                 onChange={onFieldChange} className={classes.inputControl} autoComplete='false'
                                 autoFocus={true} rows={8} />
@@ -167,12 +167,14 @@ export default function Appointment({selectedAppointment, onClose})
                     </div>
                     {validationErrors?.length > 0 && <ValidationPanel data={validationErrors} />}
                     <div className="center">
-                        <button className="editor-button" onClick={onModify}>{t("calendar.save")}</button>
-                        <button className="editor-button" onClick={(e) => onModify(e, true)}>{t("calendar.delete")}</button>
-                        <button className="editor-button" onClick={onCancel}>{t("calendar.cancel")}</button>
+                        <button className="editor-button" onClick={onModify}>{t("save")}</button>
+                        <button className="editor-button" onClick={(e) => onModify(e, true)}>{t("delete")}</button>
+                        <button className="editor-button" onClick={onCancel}>{t("cancel")}</button>
                     </div>
                 </form>
             </fieldset>
         </ModalWrapper>
     )
 }
+
+export default memo(Appointment);

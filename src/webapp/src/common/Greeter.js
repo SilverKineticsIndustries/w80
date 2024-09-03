@@ -29,27 +29,28 @@ const uniqueid = uuidv4();
 const Greeter = () => {
 
     const classes = styles();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "common"});
     const { currentUser } = useContext(UserContext);
 
     if (currentUser)
     {
         const role = getAccessTokenClaimValue('Role');
         const isAdmin = role === 'Administrator';
+
         return (
             <div className={classes.wrapper} data-test="greeter">
                 {isAdmin &&
-                    <React.Fragment>
-                        <img data-tooltip-id={uniqueid} className={classes.admin} src={admin} height={20} width={20} alt={t("common.administrator")} />
-                        <Tooltip id={uniqueid} delayShow="100" place="top">{t("common.administrator")}</Tooltip>
-                    </React.Fragment>
+                    <>
+                        <img data-tooltip-id={uniqueid} className={classes.admin} src={admin} height={20} width={20} alt={t("administrator")} />
+                        <Tooltip id={uniqueid} delayShow="100" place="top">{t("administrator")}</Tooltip>
+                    </>
                 }
                 <span className={classes.useridentifier} data-test="greeter-useridentifier">{currentUser.email}</span>
             </div>
         )
     }
     else
-        return (<React.Fragment/>)
+        return (<></>)
 }
 
 export default memo(Greeter);

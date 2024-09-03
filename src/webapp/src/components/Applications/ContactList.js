@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react'
+import React, { useState, memo, useCallback } from 'react'
 import { createUseStyles } from 'react-jss'
 import ContactEdit from './ContactEdit';
 import edit from '../../assets/edit.png';
@@ -21,36 +21,36 @@ const styles = createUseStyles({
 
 const displayContactRole = (t, role) => {
     if (role === 'Recruiter')
-        return t("application.contact-role-recruiter");
+        return t("contact-role-recruiter");
     else if (role === 'HiringManager')
-        return t("application.contact-role-hiring-manager");
+        return t("contact-role-hiring-manager");
     else if (role === 'HumanResources')
-        return t("application.contact-role-human-resources");
+        return t("contact-role-human-resources");
     else if (role === 'TeamMember')
-        return t("application.contact-role-team-member");
+        return t("contact-role-team-member");
     else if (role === 'Other')
-        return t("application.contact-role-other");
+        return t("contact-role-other");
 }
 
-const ContactList = ({contacts, onUpdate, allowEdit=true}) =>
+const ContactList = ({contacts, onUpdate, allowEdit=true, dataTestInstanceId=""}) =>
 {
     const classes = styles();
-    const { t } = useTranslation();
+    const { t } = useTranslation(null, { keyPrefix: "application" });
     const [editingContact, setEditingContact] = useState();
 
-    const onAddClick = () => {
-        let newContact = {};
+    const onAddClick = useCallback(() => {
+        const newContact = {};
         newContact.type = 'Email';
         newContact.role = 'Recruiter';
-        newContact.seqNo = contacts.length > 0 ? Math.max( ...contacts.map((x) => x.seqNo)) + 1 : 1;
+        newContact.seqNo = (contacts || []).length > 0 ? Math.max( ...contacts.map((x) => x.seqNo)) + 1 : 1;
         setEditingContact(newContact);
-    }
+    }, [setEditingContact, contacts]);
 
-    const onEditClick = (contact) => {
+    const onEditClick = useCallback((contact) => {
         setEditingContact(contact);
-    }
+    }, [setEditingContact]);
 
-    const onUpsertClick = (updatedContact) => {
+    const onUpsertClick = useCallback((updatedContact) => {
         var items = structuredClone(contacts);
         var item = items.find((x) => x.seqNo === updatedContact.seqNo);
         if (!item)
@@ -60,29 +60,25 @@ const ContactList = ({contacts, onUpdate, allowEdit=true}) =>
 
         setEditingContact();
         onUpdate(items);
-    }
+    }, [contacts, setEditingContact, onUpdate]);
 
-    const onDeleteClick = (deletedContact) => {
-        var items = structuredClone(contacts);
+    const onDeleteClick = useCallback((deletedContact) => {
+        var items = structuredClone(contacts || []);
         const updated = items.filter(x => x.seqNo !== deletedContact.seqNo);
         onUpdate(updated);
-    }
-
-    const onCancelEdit = () => {
-        setEditingContact();
-    }
+    },[contacts, onUpdate]);
 
     return (
         <div className={classes.wrapper}>
-            {allowEdit && !editingContact && <ToolButton onClick={onAddClick} disabled={editingContact} img={add} tooltip={("t.applications.add-new-contact")}/>}
-            {allowEdit && editingContact && <ContactEdit contact={editingContact} onUpdate={onUpsertClick} onCancel={onCancelEdit} />}
+            {allowEdit && !editingContact && <ToolButton onClick={onAddClick} disabled={editingContact} img={add} tooltip={t("add-new-contact")}/>}
+            {allowEdit && editingContact && <ContactEdit contact={editingContact} onUpdate={onUpsertClick} onCancel={() => setEditingContact(null)} dataTestInstanceId={dataTestInstanceId} />}
             <table className={classes.table}>
                 <thead>
                     <tr>
                         {allowEdit && <th/>}
-                        <th>{t("application.contact-name")}</th>
-                        <th>{t("application.contact-role")}</th>
-                        <th>{t("application.contact-parameter")}</th>
+                        <th>{t("contact-name")}</th>
+                        <th>{t("contact-role")}</th>
+                        <th>{t("contact-parameter")}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,18 +87,26 @@ const ContactList = ({contacts, onUpdate, allowEdit=true}) =>
                             <tr key={idx}>
                                 {allowEdit &&
                                     <td>
-                                        <ToolButton onClick={() => onDeleteClick(contact)} disabled={editingContact} img={remove} tooltip={t("application.delete-contact")}/>
-                                        <ToolButton onClick={() => onEditClick(contact)} disabled={editingContact} img={edit} tooltip={t("application.edit-contact")}/>
+                                        <ToolButton onClick={() => onDeleteClick(contact)} disabled={editingContact}
+                                            img={remove} tooltip={t("delete-contact")} data-test={`contact-list-${dataTestInstanceId}-${idx}-delete`} />
+                                        <ToolButton onClick={() => onEditClick(contact)} disabled={editingContact}
+                                            img={edit} tooltip={t("edit-contact")} data-test={`contact-list-${dataTestInstanceId}-${idx}-edit`}/>
                                     </td>
                                 }
                                 <td>
-                                    {contact.contactName}
+                                    <span data-test={`contact-list-${dataTestInstanceId}-${idx}-name`}>
+                                        {contact.contactName}
+                                    </span>
                                 </td>
                                 <td>
-                                    {displayContactRole(t, contact.role)}
+                                    <span data-test={`contact-list-${dataTestInstanceId}-${idx}-role`}>
+                                        {displayContactRole(t, contact.role)}
+                                    </span>
                                 </td>
                                 <td>
-                                    {contact.contactParameter}
+                                    <span data-test={`contact-list-${dataTestInstanceId}-${idx}-parameter`}>
+                                        {contact.contactParameter}
+                                    </span>
                                     {contact.type === 'Email' &&
                                         <CopyToClipboard value={contact.contactParameter} />
                                     }

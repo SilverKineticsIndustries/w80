@@ -19,6 +19,7 @@ public static class Keys
     public const string EmailAlertThresholdInMinutes = "EmailAlertThresholdInMinutes";
     public const string ReCaptchaEnabled = "ReCaptcha:Enabled";
     public const string ReCaptchaValidationEndpointURL = "ReCaptcha:ValidationEndpointURL";
+    public const string RefreshCookiePath = "RefreshCookiePath";
 
     public static class Secrets
     {

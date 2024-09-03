@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, memo } from 'react';
 import { createUseStyles } from 'react-jss';
 import { PieChart, Pie, Cell } from 'recharts';
 import { useTranslation } from 'react-i18next';
@@ -14,28 +14,28 @@ const styles = createUseStyles({
 
 const renderLabel = (entry) => { return entry.name; }
 
-export default function Statistics() {
+const Statistics = () => {
 
     const classes = styles();
-    const { t } = useTranslation();
-    const statusContext = useContext(StatusContext);
+    const { t } = useTranslation(null, { keyPrefix: "statistics" });
+    const { setLoading, setServerErrorMessage } = useContext(StatusContext);
     const [appRejectionStateCounts, setAppRejectionStateCounts] = useState([]);
 
     useEffect(() => {
         apiDirectDecorator(
             async () => await getStatistics(),
             apiDecoratorOptions(
-                statusContext,
+                { setLoading, setServerErrorMessage },
                 (data) => setAppRejectionStateCounts(data?.applicationRejectionStateCounts ?? []),
                 () => {}))
             ();
-    },[]);
+    },[setLoading, setServerErrorMessage]);
 
     return (
         <div className={classes.wrapper}>
             <div>
                 <fieldset>
-                    <legend>{t("statistics.rejection-state-counts")}</legend>
+                    <legend>{t("rejection-state-counts")}</legend>
                         <PieChart width={500} height={400}>
                             <Pie label={renderLabel}
                                 dataKey="value"
@@ -44,7 +44,7 @@ export default function Statistics() {
                                 data={appRejectionStateCounts}
                                 cx="50%"
                                 cy="50%"
-                                name={t("statistics.rejection-state-counts")}
+                                name={t("rejection-state-counts")}
                                 outerRadius={80}>
 
                                 {appRejectionStateCounts.map((entry, index) => (
@@ -57,3 +57,5 @@ export default function Statistics() {
         </div>
     )
 }
+
+export default memo(Statistics);

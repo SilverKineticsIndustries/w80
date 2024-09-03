@@ -7,6 +7,6 @@ public record UserProfileViewDto
     public string? TimeZone { get; set; }
     public string? Nickname { get; set; }
     public string? Culture { get; set; }
-    public bool EnableEventBrowserNotifications { get; set; }
-    public bool EnableEventEmailNotifications { get; set; }
+    public bool EnableAppointmentBrowserNotifications { get; set; }
+    public bool EnableAppointmentEmailNotifications { get; set; }
 }

@@ -1,13 +1,22 @@
+before(() => {
+    cy.cloneDb();
+});
+
+after(() => {
+    cy.restoreDb();
+});
+
 beforeEach(function () {
+
     if (this.currentTest._testConfig.unverifiedTestConfig.skipBeforeEach)
-        cy.log('Skipping beforeEach..')
+        cy.log("Skipping beforeEach ...")
     else
     {
         const email = Cypress.env("USER_EMAIL");
         const password = Cypress.env("USER_PASSWORD");
         cy.loginAsUser(email, password);
     }
-  });
+});
 
 Cypress.Commands.add('showUserMenu', () => {
 
@@ -31,7 +40,7 @@ Cypress.Commands.add('loginAsUser', (email, password) => {
           .type(password, { log: false });
 
         cy.get('[data-test="login-login"]')
-          .click();
+         .click();
 
         cy.location().should((loc) => {
            expect(loc.hash).to.eq('#/open')
@@ -48,5 +57,13 @@ Cypress.Commands.add('logout', () => {
 });
 
 Cypress.Commands.add('sel', (selector, ...args) => {
-    return cy.get(`[data-test=${selector}]`, ...args)
+    return cy.get(`[data-test="${selector}"]`, ...args)
+});
+
+Cypress.Commands.add('cloneDb', () => {
+    cy.task("cloneDb");
+});
+
+Cypress.Commands.add('restoreDb', () => {
+    cy.task("restoreDb");
 });

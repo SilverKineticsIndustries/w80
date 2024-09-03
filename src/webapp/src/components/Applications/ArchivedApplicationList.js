@@ -1,20 +1,26 @@
-import React from 'react';
-import ApplicationList from './ApplicationList'
+import React, { memo } from 'react';
+import ApplicationContainerList from './ApplicationContainerList'
 import { useTranslation } from 'react-i18next';
 import { selectArchivedApplicationIds } from '../../store/applications/selectors';
 
-export default function ArchivedApplicationList() {
-    const { t } = useTranslation();
+const ArchivedApplicationList = () => {
+
+    const { t } = useTranslation(null, { keyPrefix: "application" });
+
     return (
-        <ApplicationList
-            headerLabel={t("application.archived-applications")}
+        <ApplicationContainerList
+            headerLabel={t("archived-applications")}
             selector={selectArchivedApplicationIds}
+            allowNew={false}
             allowEdit={false}
             allowDelete={true}
             allowArchive={false}
             allowUnarchive={true}
             allowReject={false}
             allowExpand={true}
+            allowCollapse={true}
             allowStateChange={false}  />
     )
 }
+
+export default memo(ArchivedApplicationList);

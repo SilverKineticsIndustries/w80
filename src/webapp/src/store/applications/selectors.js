@@ -1,32 +1,50 @@
+import { createSelector } from '@reduxjs/toolkit'
+
+const selectApplicationsDict = state => state.applications.dict;
+
+export const selectListOfApplicationIdAndApplicationCompany = createSelector(
+  [selectApplicationsDict],
+  (applicationsDict) => Object.values(applicationsDict)
+    .map(({ companyName, id }) => ({ companyName, id })),
+);
+
+export const selectCalendarAppointmentsForApplications = createSelector(
+  [selectApplicationsDict],
+  (applicationsDict) => Object.values(applicationsDict)
+    .reduce((arr, curr) => arr.concat(curr.appointments.map((x) => ({...x, "startDateTimeUTC": new Date(x.startDateTimeUTC), "endDateTimeUTC": new Date(x.endDateTimeUTC), "applicationId": curr.id}) )), [])
+);
+
+export const selectNewlyAddedApplication = createSelector(
+    [selectApplicationsDict],
+    (applicationsDict) => Object.values(applicationsDict).find(x => x.isNew)
+);
+
 export const selectApplicationById = (state, id) => state.applications.dict[id];
-export const selectNewlyAddedApplication = state => Object.values(state.applications.dict).find(x => x.isNew);
-export const selectListOfApplicationIdAndApplicationCompany = state => Object.values(state.applications.dict).map((x) => ({"id": x.id, "companyName": x.companyName}));
-export const selectCalendarAppointmentsForApplications = state => Object.values(state.applications.dict).reduce((arr, curr) => arr.concat(curr.appointments.map((x) => ({...x, "startDateTimeUTC": new Date(x.startDateTimeUTC), "endDateTimeUTC": new Date(x.endDateTimeUTC), "applicationId": curr.id}) )), [])
 
-const _selectCurrentApplicationIds = (state, appFilter, sort, termFilter) =>
+const _selectCurrentApplicationIds = (state, selection, filter) =>
 {
-    let items = Object.values(state.applications.dict).filter(appFilter);
-    if (termFilter)
-        items = items.filter(termFilter);
+    let items = Object.values(state.applications.dict).filter(selection);
+    if (filter.term)
+        items = items.filter(filter.term);
 
-    if (sort)
-        return items.sort(sort).map(x => x.id);
+    if (filter.sort)
+        return items.sort(filter.sort).map(x => x.id);
     else
         return items.map(x => x.id);
 }
 
-export const selectAcceptedApplicationIds = (state, sort, termFilter) => {
-    return _selectCurrentApplicationIds(state, (x) => x.acceptance?.acceptedUTC && !x.deactivatedUTC, sort, termFilter)
+export const selectAcceptedApplicationIds = (state, filter) => {
+    return _selectCurrentApplicationIds(state, (x) => x.acceptance?.acceptedUTC && !x.deactivatedUTC, filter)
 }
 
-export const selectCurrentApplicationIds = (state, sort, termFilter) => {
-    return _selectCurrentApplicationIds(state, (x) => !x.rejection?.rejectedUTC && !x.acceptance?.acceptedUTC && !x.deactivatedUTC && !x.archivedUTC, sort, termFilter)
+export const selectOpenApplicationIds = (state, filter) => {
+    return _selectCurrentApplicationIds(state, (x) => !x.rejection?.rejectedUTC && !x.acceptance?.acceptedUTC && !x.deactivatedUTC && !x.archivedUTC, filter)
 }
 
-export const selectArchivedApplicationIds = (state, sort, termFilter) => {
-    return _selectCurrentApplicationIds(state, (x) => !x.deactivatedUTC && x.archivedUTC, sort, termFilter)
+export const selectArchivedApplicationIds = (state, filter) => {
+    return _selectCurrentApplicationIds(state, (x) => !x.deactivatedUTC && x.archivedUTC, filter)
 }
 
-export const selectRejectedApplicationIds = (state, sort, termFilter) => {
-    return _selectCurrentApplicationIds(state, (x) => x.rejection.rejectedUTC && !x.deactivatedUTC && !x.archivedUTC, sort, termFilter)
+export const selectRejectedApplicationIds = (state, filter) => {
+    return _selectCurrentApplicationIds(state, (x) => x.rejection.rejectedUTC && !x.deactivatedUTC && !x.archivedUTC, filter)
 }

@@ -13,7 +13,12 @@
         "email-confirmation-sent": "Eine E-Mail wurde an die von Ihnen angegebene Adresse gesendet. Bitte öffnen Sie die E-Mail und klicken Sie auf den darin enthaltenen Link, um Ihre E-Mail-Adresse zu bestätigen. Anschließend können Sie sich bei der Anwendung anmelden."
     },
     "common": {
+        "ok": "Ok",
+        "profile": "Profil",
+        "user-management": "Benutzerverwaltung",
+        "logout": "Logout",
         "copy-to-clipboard": "In die Zwischenablage kopieren",
+        "copied": "In die Zwischenablage kopiert",
         "open-url": "URL in separatem Fenster/Tab öffnen",
         "validation-errors-found": " validierungsfehler gefunden.",
         "browser-no-support": "Ihr Browser unterstützt das Kopieren in die Zwischenablage nicht.",
@@ -27,7 +32,8 @@
         "view-statistics": "Statistiken anzeigen",
         "network-error": "Es ist ein Netzwerkfehler aufgetreten. Überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut oder warten Sie ein paar Minuten und versuchen Sie es erneut.",
         "cancelled-error":  "Die Antwort des Servers hat zu lange gedauert und Ihre Anfrage wurde abgebrochen. Warten Sie ein paar Minuten und versuchen Sie es erneut.",
-        "bad-response-error": "Auf dem Server ist ein Fehler aufgetreten. Warten Sie ein paar Minuten und versuchen Sie es erneut."
+        "bad-response-error": "Auf dem Server ist ein Fehler aufgetreten. Warten Sie ein paar Minuten und versuchen Sie es erneut.",
+        "request-timed-out": "Bei der Anforderung ist eine Zeitüberschreitung aufgetreten. Bitte versuchen Sie es erneut."
     },
     "notifications": {
         "alert": "Alarm",
@@ -92,7 +98,8 @@
         "appointment-description": "Beschreibung",
         "save": "Speichern",
         "delete": "Löschen",
-        "cancel": "Stornieren"
+        "cancel": "Stornieren",
+        "add-edit-appointment": "Termin hinzufügen/bearbeiten"
     },
     "application": {
         "acceptance-information": "Akzeptanzinformationen",

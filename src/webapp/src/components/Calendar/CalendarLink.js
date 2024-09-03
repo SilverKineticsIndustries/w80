@@ -37,18 +37,16 @@ const CalendarLink = ({appointment}) => {
     }
 
     return (
-        <React.Fragment>
+        <>
         {appointment &&
-            <React.Fragment>
-                <div className={classes.wrapper}>
-                    <img src={calendar} width="20px" height="20px" className={classes.appointmentIcon} alt='Calendar' />
-                    <button className={classes.appointmentButton} onClick={() => openCalendarItem()}>
-                        {printLocalizedShortDate(appointment.startDateTimeUTC)} - <span className={classes.appointmentTitle}>{appointment.description}</span>
-                    </button>
-                </div>
-            </React.Fragment>
+            <div className={classes.wrapper}>
+                <img src={calendar} width="20px" height="20px" className={classes.appointmentIcon} alt='Calendar' />
+                <button className={classes.appointmentButton} onClick={() => openCalendarItem()}>
+                    {printLocalizedShortDate(appointment.startDateTimeUTC)} - <span className={classes.appointmentTitle}>{appointment.description}</span>
+                </button>
+            </div>
         }
-        </React.Fragment>
+        </>
     )
 }
 
