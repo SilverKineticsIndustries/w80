@@ -19,6 +19,8 @@ init:                    ## Initialize development environment
 	if [ "$$setinotify" = "Y" ]; then 																										\
 		sudo bash -c 'echo 256 > /proc/sys/fs/inotify/max_user_instances'; 																	\
     fi
+	@echo ">> Symlinking to .githooks ..." 
+	@git config --local core.hooksPath .githooks\
 	@echo W80_Database__Name=W80 >> .env
 	@echo W80_CaptchaKey= >> .env
 	@echo DBPORT=15000 >> .env
