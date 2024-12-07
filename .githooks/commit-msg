@@ -1,0 +1,10 @@
+#!/bin/bash
+
+HOOK_FILE=$1
+COMMIT_MSG=`head -n1 $HOOK_FILE`
+if [[ ! $COMMIT_MSG =~ [\#][0-9]+ ]]; then
+  echo "ERROR! Commit message is missing ticket number (Ex: #123)."
+  exit 1
+fi
+
+
