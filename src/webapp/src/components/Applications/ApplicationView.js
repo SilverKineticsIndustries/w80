@@ -88,10 +88,8 @@ const styles = createUseStyles({
     }
 })
 
-const displayWorkSetting = (t, val) =>
-{
-    switch (val)
-    {
+const displayWorkSetting = (t, val) => {
+    switch (val) {
         case 'Hybrid':
             return t("work-setting-hybrid");
         case 'OnSite':
@@ -103,11 +101,9 @@ const displayWorkSetting = (t, val) =>
     }
 }
 
-const displayPositionType = (t, val) =>
-{
-    switch (val)
-    {
-        case 'Fulltime':{
+const displayPositionType = (t, val) => {
+    switch (val) {
+        case 'Fulltime': {
             return t("position-type-fulltime");
         }
         case 'Parttime': {
@@ -138,16 +134,16 @@ const industry = (val, industries) => {
         return industries.find(x => x.value === val)?.name;
 }
 
-const ApplicationView = ({id, onBeginEdit, allowEdit = false,
-    allowDelete=false, allowArchive=false, allowUnarchive=false, allowReject=false, allowExpand=false,
-    allowStateChange=false, allowAccept=false }) => {
+const ApplicationView = ({ id, onBeginEdit, allowEdit = false,
+    allowDelete = false, allowArchive = false, allowUnarchive = false, allowReject = false, allowExpand = false,
+    allowStateChange = false, allowAccept = false }) => {
 
     const classes = styles();
     const dispatch = useDispatch();
     const [expanded, setExpanded] = useState(false);
     const { setLoading, setServerErrorMessage } = useContext(StatusContext);
     const industries = useSelector(selectIndusties);
-    const { t } = useTranslation(null, { keyPrefix: "application"});
+    const { t } = useTranslation(null, { keyPrefix: "application" });
     const [showRejectionModal, setShowRejectionModal] = useState(false);
     const [showAcceptanceModal, setShowAcceptanceModal] = useState(false);
     const application = useSelector(state => structuredClone(selectApplicationById(state, id)));
@@ -157,46 +153,46 @@ const ApplicationView = ({id, onBeginEdit, allowEdit = false,
             async (dispatch, getState) => await deactivateApplication(dispatch, getState, application.id),
             apiDecoratorOptions({ setLoading, setServerErrorMessage }, null, null, e))
         );
-    },[dispatch, application.id, setLoading, setServerErrorMessage]);
+    }, [dispatch, application.id, setLoading, setServerErrorMessage]);
 
     const onArchiveClick = useCallback((e) => {
         dispatch(apiDispatchDecorator(
             async (dispatch, getState) => await archiveApplication(dispatch, getState, application.id),
             apiDecoratorOptions({ setLoading, setServerErrorMessage }, null, null, e))
         );
-    },[dispatch, application.id, setLoading, setServerErrorMessage]);
+    }, [dispatch, application.id, setLoading, setServerErrorMessage]);
 
     const onUnarchiveClick = useCallback((e) => {
         dispatch(apiDispatchDecorator(
             async (dispatch, getState) => await unarchiveApplication(dispatch, getState, application.id),
             apiDecoratorOptions({ setLoading, setServerErrorMessage }, null, null, e))
         );
-    },[dispatch, application.id, setLoading, setServerErrorMessage]);
+    }, [dispatch, application.id, setLoading, setServerErrorMessage]);
 
     const onRejectedClick = useCallback(() => {
         setShowRejectionModal(true);
-    },[]);
+    }, []);
 
     const onAcceptedClick = useCallback(() => {
         setShowAcceptanceModal(true);
-    },[]);
+    }, []);
 
     const nextAppnt = nextAppointment(application);
 
-    return(
-        <div className={classes.wrapper}>
+    return (
+        <div className={classes.wrapper} data-test={`application-view-id-${id}`}>
             <div className={classes.headerInfoContainer}>
                 <div className="flex-1">
                     {!application.rejection.rejectedUTC && !application.acceptance.acceptedUTC &&
                         <States app={application} allowStateChange={allowStateChange} />
                     }
-                    {application.rejection.rejectedUTC && <RejectionInfo rejection={application.rejection} /> }
+                    {application.rejection.rejectedUTC && <RejectionInfo rejection={application.rejection} />}
                     {application.acceptance.acceptedUTC && <AcceptanceInfo acceptance={application.acceptance} />}
                 </div>
                 <div className="flex-5">
                     <div className="nowrap">
                         <div className={classes.viewFieldName}>{t("company-name")}:</div>
-                        <span className={classes.viewFieldValue} style={{fontWeight: "bolder" }}
+                        <span className={classes.viewFieldValue} style={{ fontWeight: "bolder" }}
                             data-test={`application-view-${id}-company-name`}>
                             {application.companyName}
                         </span>
@@ -212,7 +208,7 @@ const ApplicationView = ({id, onBeginEdit, allowEdit = false,
                         <span className={classes.viewFieldName}>{t("compensation")}:</span>
                         <span className={classes.viewFieldValue}>
                             <CompensationView min={application.compensationMin} max={application.compensationMax}
-                                type={application.compensationType} dataTestPrefix={`application-view-${id}`}/>
+                                type={application.compensationType} dataTestPrefix={`application-view-${id}`} />
                         </span>
                     </div>
                 </div>
@@ -221,7 +217,7 @@ const ApplicationView = ({id, onBeginEdit, allowEdit = false,
                         {nextAppnt &&
                             <div>
                                 <fieldset>
-                                    <legend style={{margin:"0 auto"}}>Next Appointment</legend>
+                                    <legend style={{ margin: "0 auto" }}>Next Appointment</legend>
                                     <CalendarLink appointment={nextAppnt} />
                                 </fieldset>
                             </div>
@@ -240,11 +236,11 @@ const ApplicationView = ({id, onBeginEdit, allowEdit = false,
                     {allowAccept && <ToolButton onClick={(e) => onAcceptedClick(e)}
                         img={accept} tooltip={t("accept-application")} height="36px" width="36px" dataTest={`application-view-${id}-accept`} />}
                     {allowReject && <ToolButton onClick={(e) => onRejectedClick(e)}
-                        img={reject} tooltip={t("reject-application")} height="36px" width="36px" dataTest={`application-view-${id}-reject`}  />}
+                        img={reject} tooltip={t("reject-application")} height="36px" width="36px" dataTest={`application-view-${id}-reject`} />}
                     {allowExpand && !expanded && <ToolButton onClick={() => setExpanded(true)}
-                        img={expand} height="36px" width="36px" dataTest={`application-view-${id}-expand`}  />}
+                        img={expand} height="36px" width="36px" dataTest={`application-view-${id}-expand`} />}
                     {allowExpand && expanded && <ToolButton onClick={() => setExpanded(false)}
-                        img={collapse} height="36px" width="36px" dataTest={`application-view-${id}-collapse`}  />}
+                        img={collapse} height="36px" width="36px" dataTest={`application-view-${id}-collapse`} />}
                 </div>
             </div>
             {expanded &&
@@ -296,14 +292,14 @@ const ApplicationView = ({id, onBeginEdit, allowEdit = false,
                                         {application.travelRequirements}
                                     </span>
                                 </div>
-                                <fieldset style={{ "width": "100%"}}>
+                                <fieldset style={{ "width": "100%" }}>
                                     <legend>{t("posting-source")}</legend>
                                     <div>
                                         <span data-test={`application-view-${id}-source`}>{application.sourceOfJobPosting}</span>
                                         <OpenUrl value={application.sourceOfJobPosting} />
                                     </div>
                                 </fieldset>
-                                <fieldset style={{ "width": "100%"}}>
+                                <fieldset style={{ "width": "100%" }}>
                                     <legend>{t("additional-info")}</legend>
                                     <div className={classes.additionalInfoValue} data-test={`application-view-${id}-additional-info`}>
                                         {(application.additionalInfo || "").replace('\n', "<br/>")}
@@ -320,8 +316,8 @@ const ApplicationView = ({id, onBeginEdit, allowEdit = false,
                     </div>
                 </>
             }
-            {showRejectionModal && <RejectionModal applicationId={application.id} onClose={() => setShowRejectionModal(false)}/>}
-            {showAcceptanceModal && <AcceptanceModal applicationId={application.id} onClose={() => setShowAcceptanceModal(false)}/>}
+            {showRejectionModal && <RejectionModal applicationId={application.id} onClose={() => setShowRejectionModal(false)} />}
+            {showAcceptanceModal && <AcceptanceModal applicationId={application.id} onClose={() => setShowAcceptanceModal(false)} />}
         </div>
     )
 }

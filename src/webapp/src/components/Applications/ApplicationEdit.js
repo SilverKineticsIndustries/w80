@@ -113,7 +113,7 @@ const ApplicationEdit = ({id, onCompleteEdit}) => {
     }
 
     return(
-        <div className={classes.wrapper}>
+        <div className={classes.wrapper} data-test={`application-edit-id-${id}`} >
             <fieldset className={classes.fieldGroup}>
                 <legend>Company Information</legend>
                 <div className={classes.field}>

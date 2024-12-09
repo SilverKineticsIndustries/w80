@@ -191,6 +191,9 @@
         "unarchive-application": "Anwendung dearchivieren",
         "confirm-unarchive-application": "Sind Sie sicher, dass Sie die Archivierung dieser Anwendung aufheben möchten?",
         "accept-application": "Markieren Sie die Bewerbung als angenommen",
-        "reject-application": "Antrag als abgelehnt markieren"
+        "reject-application": "Antrag als abgelehnt markieren",
+        "move-to-next-state": "Anwendung in den nächsten Status verschieben",
+        "move-to-prev-state": "In den vorherigen Zustand wechseln",
+        "appl-state-icon": "Symbol für den Anwendungsstatus"
     }
 }

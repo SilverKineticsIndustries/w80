@@ -8,14 +8,14 @@ public record State
     public ObjectId Id { get; private set; }
     public bool IsCurrent { get; set; }
     public string Name { get; private set; }
-    public string HexColor { get; private set; }
+    public string Resource { get; private set; }
     public int SeqNo { get; private set; }
 
-    public State(ObjectId id, string name, string hexColor, int seqNo)
+    public State(ObjectId id, string name, string resource, int seqNo)
     {
         Id = id;
         Name = name;
-        HexColor = hexColor;
+        Resource = resource;
         SeqNo = seqNo;
     }
 
@@ -23,7 +23,7 @@ public record State
     {
         Id = applicationState.Id;
         Name = applicationState.Name;
-        HexColor = applicationState.HexColor;
+        Resource = applicationState.Resource;
         SeqNo = applicationState.SeqNo;
     }
 }
