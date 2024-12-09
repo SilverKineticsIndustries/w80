@@ -18,9 +18,9 @@ init:                    ## Initialize development environment
 	@read -p ">> Do you want to set /proc/sys/fs/inotify/max_user_instances to 256? (Required by cypress n2n tests) Y/N (default N):" setinotify; 		\
 	if [ "$$setinotify" = "Y" ]; then 																										\
 		sudo bash -c 'echo 256 > /proc/sys/fs/inotify/max_user_instances'; 																	\
-    fi
+    fi                                                                          
 	@echo ">> Symlinking to .githooks ..." 
-	@git config --local core.hooksPath .githooks\
+	git config --local core.hooksPath .githooks/
 	@echo W80_Database__Name=W80 >> .env
 	@echo W80_CaptchaKey= >> .env
 	@echo DBPORT=15000 >> .env
