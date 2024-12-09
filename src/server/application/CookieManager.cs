@@ -41,7 +41,14 @@ public class CookieManager
     public void RemoveCookie(string name)
     {
         if (_controllerBase.Request.Cookies.ContainsKey(name))
-            _controllerBase.Response.Cookies.Delete(name);
+        {
+            if (name == Tokens.RefreshTokenCookieName)
+            {
+                _controllerBase.Response.Cookies.Delete(name,
+                    new CookieOptions() { Path = _configuration.GetOptionalValue(Keys.RefreshCookiePath, "/")});
+            } else
+                _controllerBase.Response.Cookies.Delete(name);
+        }
     }
 
     private readonly ControllerBase _controllerBase;

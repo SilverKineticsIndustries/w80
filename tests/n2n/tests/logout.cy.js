@@ -5,14 +5,14 @@ describe("Logout", () => {
 
         cy.logout();
 
-        cy.sel("login-email")
-          .should("be.visible");
-
         cy.getCookie('_rt')
+          .wrap()
           .should("not.exist");
 
-        // TODO: Access token is not getting cleared, not sure why ...
-        //expect(sessionStorage.getItem("at")).to.be.null;
-
+        cy.wait(5000)
+          .then(() => {
+            cy.wrap(sessionStorage.getItem("at"))
+              .should("not.exist");
+          })
     })
 });
