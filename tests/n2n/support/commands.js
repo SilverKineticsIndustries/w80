@@ -52,7 +52,7 @@ Cypress.Commands.add('logout', () => {
 
     cy.showUserMenu();
 
-    cy.get('[data-test="header-logout"]')
+    cy.sel('header-logout')
       .click();
 });
 
