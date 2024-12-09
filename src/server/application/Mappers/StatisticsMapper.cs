@@ -22,7 +22,7 @@ public partial class StatisticsMapper
                         return
                             new ApplicationStateCountsDto() {
                                 Name = state != null ? state.Name : stringLocalizer["Unknown"],
-                                Color = state != null ? state.HexColor : "FFFFFF",
+                                Color = "FFFFFF",
                                 Value = x.Value
                             };
                     }
