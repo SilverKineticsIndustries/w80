@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getStatistics } from '../../services/statisticsService';
 import { StatusContext } from '../../App';
 import { apiDirectDecorator, apiDecoratorOptions } from '../../helpers/api'
+import { generateRandomColor } from '../../helpers/common';
 
 const styles = createUseStyles({
     wrapper: {
@@ -26,7 +27,11 @@ const Statistics = () => {
             async () => await getStatistics(),
             apiDecoratorOptions(
                 { setLoading, setServerErrorMessage },
-                (data) => setAppRejectionStateCounts(data?.applicationRejectionStateCounts ?? []),
+                (data) => {
+                    const counts = data?.applicationRejectionStateCounts ?? [];
+                    counts.map((x) => x.color = generateRandomColor());
+                    setAppRejectionStateCounts(counts);
+                },
                 () => {}))
             ();
     },[setLoading, setServerErrorMessage]);

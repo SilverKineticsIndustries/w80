@@ -67,4 +67,12 @@ const onUpdateField = (e, setFunc) => {
     }
 }
 
-export { sortByName, sortById, isValidHttpUrl, getUserCulture, createdValidationError, onUpdateField }
+const generateRandomColor = () => {
+    return "".concat(("0" + Math.ceil(new Number(Math.random() * 254)).toString(16)).slice(-2).toUpperCase(),
+                     ("0" + Math.ceil(new Number(Math.random() * 254)).toString(16)).slice(-2).toUpperCase(),
+                     ("0" + Math.ceil(new Number(Math.random() * 254)).toString(16)).slice(-2).toUpperCase(),
+                    "a0");
+}
+
+
+export { sortByName, sortById, isValidHttpUrl, getUserCulture, createdValidationError, onUpdateField, generateRandomColor }
