@@ -19,7 +19,8 @@ const OpenApplicationList = () => {
             allowReject={true}
             allowExpand={true}
             allowAccept={true}
-            allowStateChange={true} />
+            allowStateChange={true}
+            allowSorting={true} />
     )
 }
 

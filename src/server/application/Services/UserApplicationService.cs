@@ -175,6 +175,21 @@ public class UserApplicationService(
             new ComplexResponseDto<UserViewDto>([new ValidationItemDto("Item not found.")]);
     }
 
+    public async Task UpdateApplicationSortAndFilterAsync(ObjectId id, string json, CancellationToken cancellationToken)
+    {
+        VerifyUserCanAccessUser(id);
+
+        var current = await userRepo.FirstOrDefaultAsync(x => x.Id == id, cancellationToken).ConfigureAwait(false);
+        if (current is not null)
+        {
+            current.ApplicationSearchAndSortJSON = json;
+            if (!userUpsertService.IsApplicationSortAndFilterValid(current, EmptyValidationBag.Instance.Value))
+                throw new InvalidOperationException("Invalid data passed to user application sort and filter");
+
+            await userRepo.UpsertAsync(current, current, cancellationToken);
+        }
+    }
+
     protected async Task<IValidationBag> ValidateProfileAsync(UserProfileUpdateRequestDto userProfile, User current, CancellationToken cancellationToken)
     {
         var bag = new ValidationBag();

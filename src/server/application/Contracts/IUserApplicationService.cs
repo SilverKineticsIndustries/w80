@@ -9,6 +9,7 @@ public interface IUserApplicationService
     Task<IList<UserViewDto>> GetAllAsync(CancellationToken cancellationToken);
     Task<UserProfileViewDto?> GetProfileAsync(ObjectId id, CancellationToken cancellationToken);
     Task<UserProfileViewDto?> GetProfileFromEmailAsync(string email, CancellationToken cancellationToken);
+    Task UpdateApplicationSortAndFilterAsync(ObjectId id, string json, CancellationToken cancellationToken);
     Task<ComplexResponseDto<UserProfileViewDto>> UpdateProfileAsync(UserProfileUpdateRequestDto userProfile, RequestSourceInfo requestSourceInfo, CancellationToken cancellationToken );
     Task<ComplexResponseDto<UserViewDto>> UpsertAsync(UserUpsertRequestDto user, RequestSourceInfo requestSourceInfo, CancellationToken cancellationToken);
     Task<ComplexResponseDto<UserViewDto>> DeactivateAsync(ObjectId id, RequestSourceInfo requestSourceInfo, CancellationToken cancellationToken = default);

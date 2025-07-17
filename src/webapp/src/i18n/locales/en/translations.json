@@ -192,8 +192,8 @@
         "confirm-unarchive-application": "Are you sure you want to unarchive this application?",
         "accept-application": "Mark Application Accepted",
         "reject-application": "Mark Application Rejected",
-        "move-to-next-state": "Move Application to Next State",
-        "move-to-prev-state": "Move Application to Previous State",
+        "move-to-next-state": "Move Application to: {{nextStateName}} State",
+        "move-to-prev-state": "Move Application to: {{prevStateName}} State",
         "appl-state-icon": "Application state icon"
     }
 }

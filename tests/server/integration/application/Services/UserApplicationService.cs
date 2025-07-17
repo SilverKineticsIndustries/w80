@@ -666,4 +666,30 @@ public class UserApplicationService
             Assert.That(user.IsDeactivated(), Is.False);
         }
     }
+
+    [Test]
+    public async Task UpdateApplicationSortAndFilterAsync_userChangesFilter_filterShouldBePersisted()
+    {
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        {
+            string filterJson = "{\"sort\": \"abc\"}";
+            var service = ctx.Services.GetRequiredService<IUserApplicationService>();
+            await service.UpdateApplicationSortAndFilterAsync(ctx.GetCurrentUserId(), filterJson, CancellationToken.None);
+            var user = await ctx.Services.GetRequiredService<IMongoCollection<User>>().AsQueryable().FirstAsync(x => x.Id == ctx.GetCurrentUserId());
+            Assert.That(user.ApplicationSearchAndSortJSON, Is.EqualTo(filterJson));
+        }
+    }
+
+    [Test]
+    public async Task UpdateApplicationSortAndFilterAsync_valueInsertedLargerThanMax_exceptionShouldBeThrown()
+    {
+        using (var ctx = await TestContextFactory.Create().SeedDatabaseAsync())
+        {
+            string filterJson = string.Join(string.Empty, Enumerable.Repeat('A', User.ApplicationSearchAndSortJSONMaxLength + 1));
+            var service = ctx.Services.GetRequiredService<IUserApplicationService>();
+            Assert.ThrowsAsync<InvalidOperationException>(async () => {
+                await service.UpdateApplicationSortAndFilterAsync(ctx.GetCurrentUserId(), filterJson, CancellationToken.None);
+            });
+        }
+    }
 }

@@ -14,7 +14,6 @@ public static class Claims
        claims.Add(new Claim("Culture", user.Culture));
        claims.Add(new Claim("Timezone", user.TimeZone));
        claims.Add(new Claim("Role", user.Role.ToString()));
-       claims.Add(new Claim("BrowserNotificationsEnabled", user.EnableAppointmentBrowserNotifications.ToString()));
        return claims;
     }
 }

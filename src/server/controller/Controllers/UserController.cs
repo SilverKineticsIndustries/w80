@@ -2,10 +2,10 @@ using MongoDB.Bson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using SilverKinetics.w80.Domain.Contracts;
+using SilverKinetics.w80.Application;
 using SilverKinetics.w80.Application.DTOs;
 using SilverKinetics.w80.Application.Contracts;
 using SilverKinetics.w80.Application.Security;
-using SilverKinetics.w80.Application;
 
 namespace SilverKinetics.w80.Controller.Controllers;
 
@@ -59,5 +59,17 @@ public class UserController(
             return Unauthorized();
 
         return this.OkOrValidationErrors(await userApplicationService.DeactivateAsync(objectId, HttpContext.GetRequestSourceInfo(), cancellationToken));
+    }
+
+    [HttpPost("/user/applSortAndFilter")]
+    [Authorize(Policy = Policies.UserOrAdministrator)]
+    public async Task<IActionResult> UpdateUserApplicationSortAndFilterAsync([FromQuery]string userId, [FromBody]dynamic json, CancellationToken cancellationToken)
+    {
+        var objectId = ObjectId.Parse(userId);
+        if (!this.CanCurrentUserPerformActionOnTargetUser(objectId))
+            return Unauthorized();
+
+        await userApplicationService.UpdateApplicationSortAndFilterAsync(objectId, json.ToString(), cancellationToken);
+        return Ok();
     }
 }

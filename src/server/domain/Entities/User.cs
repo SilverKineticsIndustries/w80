@@ -25,6 +25,8 @@ public class User
     public Role Role { get; set; }
     public bool EnableAppointmentBrowserNotifications { get; set; }
     public bool EnableAppointmentEmailNotifications { get; set; }
+    [MaxLength(ApplicationSearchAndSortJSONMaxLength)]
+    public string? ApplicationSearchAndSortJSON { get; set; }
 
     public ObjectId CreatedBy { set; get; }
     public DateTime CreatedUTC { set; get; }
@@ -93,6 +95,7 @@ public class User
 
     public const int EmailMaxLength = 100;
     public const int NicknameMaxLength = 50;
+    public const int ApplicationSearchAndSortJSONMaxLength = 1000;
 
     #region [ IVersionedEntity ]
 

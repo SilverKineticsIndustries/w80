@@ -24,11 +24,11 @@ export const selectApplicationById = (state, id) => state.applications.dict[id];
 const _selectCurrentApplicationIds = (state, selection, filter) =>
 {
     let items = Object.values(state.applications.dict).filter(selection);
-    if (filter.term)
-        items = items.filter(filter.term);
+    if (filter.termFunc)
+        items = items.filter(filter.termFunc);
 
-    if (filter.sort)
-        return items.sort(filter.sort).map(x => x.id);
+    if (filter.sortFunc)
+        return items.sort(filter.sortFunc).map(x => x.id);
     else
         return items.map(x => x.id);
 }

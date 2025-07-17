@@ -7,9 +7,8 @@ import { getUserProfile, updateUserProfile } from '../../services/userService';
 import ValidationPanel from '../../common/ValidationPanel';
 import ModalWrapper from '../../common/ModalWrapper';
 import { sortByName, onUpdateField } from '../../helpers/common';
-import { setBrowserNotificationsEnabledFlag } from '../../helpers/users';
 import { apiDirectDecorator, apiDecoratorOptions } from '../../helpers/api';
-import { StatusContext } from '../../App';
+import { StatusContext, UserContext } from '../../App';
 import { useTranslation } from 'react-i18next';
 import MaxLength from '../../common/MaxLength';
 
@@ -69,6 +68,7 @@ const UserProfile = ({onClose}) =>
     const [validationErrors, setValidationErrors] = useState([]);
     const { t, i18n } = useTranslation(null, { keyPrefix: "user-profile"});
     const { setLoading, setServerErrorMessage } = useContext(StatusContext);
+    const { setCurrentUser } = useContext(UserContext);
 
     const [userProfile, setUserProfile] = useReducer(userProfileReducer, {
         email: "",
@@ -90,7 +90,7 @@ const UserProfile = ({onClose}) =>
 
     const onUpdate = (e) => {
         e.preventDefault();
-        setBrowserNotificationsEnabledFlag(userProfile.enableAppointmentBrowserNotifications);
+        setCurrentUser(userProfile);
         requestNotificationPermissions(userProfile)
         .then(() => {
             apiDirectDecorator(

@@ -84,7 +84,10 @@ const States = ({app, allowStateChange=false}) =>
     const onMoveToNextState = (e) => { onStateChange(e, nextState); }
     const onMoveToPrevState = (e) => { onStateChange(e, prevState); }
 
-    const stateName = getStateName(sortedStates, selectedState.id);
+    const currentStateName = getStateName(sortedStates, selectedState.id);
+    const nextStateName = nextState ? getStateName(sortedStates, nextState) : null;
+    const prevStateName = prevState ? getStateName(sortedStates, prevState) : null;
+
     const stateImage = `${process.env.PUBLIC_URL}/states/${getStateImage(sortedStates, selectedState.id)}`;
 
     return(
@@ -98,7 +101,7 @@ const States = ({app, allowStateChange=false}) =>
                                 onClick={onMoveToPrevState}>
                             &#9667;
                         </button>
-                        <Tooltip id={prevStateUniqueid} delayShow="100" place="top">{t("move-to-prev-state")}</Tooltip>
+                        <Tooltip id={prevStateUniqueid} delayShow="100" place="top">{t("move-to-prev-state", {prevStateName: prevStateName})}</Tooltip>
                     </>
                 }
             </div>
@@ -107,8 +110,8 @@ const States = ({app, allowStateChange=false}) =>
                     height={44} width={44}
                     src={stateImage}
                     data-test={`state-label-${app.id}`}
-                    alt={stateName} />
-                <Tooltip id={labelUniqueid} delayShow="100" place="top">{stateName}</Tooltip>
+                    alt={currentStateName} />
+                <Tooltip id={labelUniqueid} delayShow="100" place="top">{currentStateName}</Tooltip>
             </div>
             <div className={classes.nextStateContainer}>
                 {allowStateChange && nextState &&
@@ -119,7 +122,7 @@ const States = ({app, allowStateChange=false}) =>
                                 onClick={onMoveToNextState}>
                             &#9657;
                         </button>
-                        <Tooltip id={nextStateUniqueid} delayShow="100" place="top">{t("move-to-next-state")}</Tooltip>
+                        <Tooltip id={nextStateUniqueid} delayShow="100" place="top">{t("move-to-next-state", {nextStateName: nextStateName})}</Tooltip>
                     </>
                 }
             </div>

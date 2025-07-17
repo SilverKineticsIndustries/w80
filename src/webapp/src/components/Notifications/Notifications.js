@@ -1,9 +1,9 @@
-import React, { useRef, memo } from "react";
+import React, { useRef, useContext, memo } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { useTranslation } from 'react-i18next';
+import { UserContext } from '../../App';
 import { markSent } from "../../store/applications/thunks";
-import { getBrowserNotificationsEnabledFlag } from "../../helpers/users";
 import { numbOfMinutesFromNowToDate } from "../../helpers/dates";
 import { apiDispatchDecorator, apiDecoratorOptions } from "../../helpers/api";
 import { selectCalendarAppointmentsForApplications, selectListOfApplicationIdAndApplicationCompany} from "../../store/applications/selectors";
@@ -18,11 +18,12 @@ const Notifications = () =>
     const dispatch = useDispatch();
     const { t } = useTranslation(null, { keyPrefix: "notifications"});
     const title = t('alert');
+    const { currentUser }= useContext(UserContext);
 
     const appointments = useSelector(selectCalendarAppointmentsForApplications);
     const appIdAndCompanyNameList = useSelector(selectListOfApplicationIdAndApplicationCompany);
 
-    if (getBrowserNotificationsEnabledFlag()
+    if (currentUser.enableAppointmentBrowserNotifications
         && checkInterval
         && checkInterval > 1000
         && Notification.permission

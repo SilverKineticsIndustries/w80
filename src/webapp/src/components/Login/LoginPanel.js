@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 import EmailVerification from './EmailVerification';
 import { useSearchParams } from "react-router-dom";
 import ReCAPTCHA from 'react-google-recaptcha';
-import { setBrowserNotificationsEnabledFlag } from '../../helpers/users';
+import { getUserProfile } from '../../services/userService';
 import { login, processInvitation } from '../../services/autheticationService';
-import { setAccessToken, getUserFromAccessToken } from '../../helpers/accessTokensStorage';
+import { setAccessToken } from '../../helpers/accessTokensStorage';
 
 const styles = createUseStyles({
     wrapper: {
@@ -101,10 +101,15 @@ const LoginPanel = () =>
             login(form.email, form.password, captchaValue)
             .then((res) => {
                 setAccessToken(res.data.accessToken);
-                const user = getUserFromAccessToken();
-                setCurrentUser(user);
-                setBrowserNotificationsEnabledFlag(user.browserNotificationsEnabled);
-                navigate('/open');
+                getUserProfile()
+                    .then((res) => {
+                        setCurrentUser(res.data);
+                        navigate('/open');
+                    })
+                    .catch((err) => {
+                        setCurrentUser();
+                        handleError(err, true);
+                    });
             })
             .catch((err) => {
                 setCurrentUser();

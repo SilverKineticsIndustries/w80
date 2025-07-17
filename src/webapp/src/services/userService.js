@@ -22,3 +22,7 @@ export function upsertUser(user) {
 export function deactivateUser(userId) {
     return post("/user/deactivate?userId=" + userId);
 }
+
+export function updateApplicationSortAndFilter(userId, json) {
+    return post("/user/applSortAndFilter?userId=" + userId, json);
+}

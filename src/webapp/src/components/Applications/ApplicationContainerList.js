@@ -1,15 +1,10 @@
 import React, { useState, useContext, memo } from 'react';
 import { createUseStyles } from 'react-jss';
-import { useSelector, useDispatch } from 'react-redux';
-import { createNewApplication } from '../../store/applications/thunks';
-import { selectNewlyAddedApplication } from '../../store/applications/selectors';
+import { useSelector } from 'react-redux';
 import ApplicationContainer from './ApplicationContainer';
-import { StatusContext } from '../../App';
-import ToolButton from '../../common/ToolButton';
-import add from '../../assets/add.png';
-import { useTranslation } from 'react-i18next';
-import { apiDispatchDecorator, apiDecoratorOptions } from '../../helpers/api';
 import ApplicationSearchBar from './ApplicationSearchBar';
+import { getFilter } from '../../services/applicationService';
+import { UserContext } from '../../App';
 
 const styles = createUseStyles({
     wrapper: {
@@ -43,40 +38,25 @@ const styles = createUseStyles({
     }
 })
 
-const ApplicationContainerList = ({selector, headerLabel, allowNew, ...props}) =>
-{
+const ApplicationContainerList = ({ selector, headerLabel, allowNew, ...props }) => {
     const classes = styles();
-    const dispatch = useDispatch();
-    const [filter, setFilter] = useState({});
-    const { t } = useTranslation(null, { keyPrefix: "application" });
-    const newAppAdded = useSelector(selectNewlyAddedApplication);
-    const { setLoading, setServerErrorMessage } = useContext(StatusContext);
+
+    const { currentUser } = useContext(UserContext);
+    const init = getFilter(currentUser.applicationSearchAndSortJSON);
+    const [filter, setFilter] = useState(init);
     const applicationIds = useSelector((state) => selector(state, filter)) || [];
 
-    const onNewClick = (e) => {
-        e.preventDefault();
-        dispatch(apiDispatchDecorator(
-            async (dispatch, getState) => await createNewApplication(dispatch, getState, (data) => {
-                data.positionType = 'Fulltime';
-                data.workSetting = 'OnSite';
-                data.compensationType = 'Salary';
-            }),
-            apiDecoratorOptions({ setLoading, setServerErrorMessage }, null, null, e.target))
-        );
-    }
-
-    return(
+    return (
         <div className={classes.wrapper}>
             <div className={classes.toolbar}>
-                {allowNew && <ToolButton onClick={onNewClick} disabled={newAppAdded} img={add} dataTest="application-add-new" tooltip={t("create-new-app")} />}
-                <ApplicationSearchBar onFilterChange={(e) => setFilter(e)} isDisabled={newAppAdded} />
+                <ApplicationSearchBar onFilterChanged={(e) => setFilter(e)} allowNew={allowNew} allowSorting={props.allowSorting} />
                 {headerLabel && <div className={classes.headerText}>{headerLabel}</div>}
             </div>
             <div className={classes.applications}>
                 {applicationIds.map((id, idx) =>
                     <React.Fragment key={idx}>
                         <ApplicationContainer key={id} id={id} {...props} />
-                        {(applicationIds.length - 1 !== idx) && <hr key={`hr-${idx}`}/>}
+                        {(applicationIds.length - 1 !== idx) && <hr key={`hr-${idx}`} />}
                     </React.Fragment>
                 )}
             </div>

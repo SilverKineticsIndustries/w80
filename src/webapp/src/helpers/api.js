@@ -133,6 +133,7 @@ function apiDirectDecorator(func, options)
             options.statusContext.setLoading(true);
             var res = await func();
             options.onOk(res?.data);
+            options.statusContext.setServerErrorMessage();
         }
         catch (err)
         {

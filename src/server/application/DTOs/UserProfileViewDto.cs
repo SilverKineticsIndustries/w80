@@ -9,4 +9,5 @@ public record UserProfileViewDto
     public string? Culture { get; set; }
     public bool EnableAppointmentBrowserNotifications { get; set; }
     public bool EnableAppointmentEmailNotifications { get; set; }
+    public string? ApplicationSearchAndSortJSON { get; set; }
 }

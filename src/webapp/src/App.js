@@ -9,7 +9,7 @@ import Statistics from './components/Statistics/Statistics';
 import ArchivedApplicationList from './components/Applications/ArchivedApplicationList';
 import RejectedApplicationList from './components/Applications/RejectedApplicationList';
 import Calendar from './components/Calendar/Calendar';
-import { getUserFromAccessToken } from './helpers/accessTokensStorage';
+import { getAccessTokenClaimValue } from './helpers/accessTokensStorage';
 import RequireAuthRoute from './common/RequireAuthRoute';
 import { queryApplicationsForUser } from './store/applications/thunks';
 import { queryIndustries } from './store/industries/thunks';
@@ -19,7 +19,7 @@ import { apiDispatchDecorator, apiDecoratorOptions } from './helpers/api';
 import AcceptedApplicationList from './components/Applications/AcceptedApplicationList';
 import { useTranslation } from 'react-i18next';
 import Notifications from './components/Notifications/Notifications';
-import { getUserCulture } from './helpers/common';
+import { getUserProfile } from './services/userService';
 
 const UserContext = createContext();
 const StatusContext = createContext();
@@ -44,24 +44,34 @@ export default function App()
   const { i18n } = useTranslation();
   const [loading, setLoading] = useState(0);
   const [serverErrorMessage, setServerErrorMessage] = useState();
-  const [currentUser, setCurrentUser] = useState(getUserFromAccessToken());
+  const [currentUserId] = useState(getAccessTokenClaimValue("ID"))
+  const [currentUser, setCurrentUser] = useState();
 
   useEffect(() => {
-    if (currentUser)
+    if (currentUserId)
     {
-      var culture = getUserCulture();
-      i18n.changeLanguage(culture);
+      dispatch(apiDispatchDecorator(
+        async () => await getUserProfile(),
+        apiDecoratorOptions(
+          { setLoading, setServerErrorMessage },
+          (user) => {
+            setCurrentUser(user);
+            i18n.changeLanguage(user.culture);
 
-      dispatch(apiDispatchDecorator(
-        async (dispatch, getState) => await queryApplicationsForUser(dispatch, getState, currentUser.id),
-        apiDecoratorOptions({ setLoading, setServerErrorMessage }))
-      );
-      dispatch(apiDispatchDecorator(
-        async (dispatch, getState) => await queryIndustries(dispatch, getState),
-        apiDecoratorOptions({ setLoading, setServerErrorMessage }))
-      );
+            dispatch(apiDispatchDecorator(
+              async (dispatch, getState) => await queryApplicationsForUser(dispatch, getState, user.id),
+              apiDecoratorOptions({ setLoading, setServerErrorMessage }))
+            );
+            dispatch(apiDispatchDecorator(
+              async (dispatch, getState) => await queryIndustries(dispatch, getState),
+              apiDecoratorOptions({ setLoading, setServerErrorMessage }))
+            );
+          }
+        )
+      ));
+
     }
-  },[currentUser, dispatch, i18n]);
+  },[currentUserId, dispatch, i18n]);
 
   return (
     <StatusContext.Provider value={{loading, setLoading, serverErrorMessage, setServerErrorMessage}}>

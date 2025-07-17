@@ -33,18 +33,3 @@ export function getAccessTokenClaimValue(type)
         }
     }
 }
-
-export function getUserFromAccessToken()
-{
-    const token = getAccessToken();
-    if (token)
-    {
-        try
-        {
-            const decoded = jwtDecode(token);
-            return { email: decoded.Email, id: decoded.ID, browserNotificationsEnabled: decoded.BrowserNotificationsEnabled };
-        } catch (err) {
-            return;
-        }
-    }
-}

@@ -11,4 +11,5 @@ public interface IUserUpsertService
     Task UpsertAsync(User[] users, RequestSourceInfo requestSourceInfo, CancellationToken cancellationToken);
     Task<IValidationBag> ValidateProfileAsync(User user, CancellationToken cancellationToken);
     Task<IValidationBag> ValidateFullyAsync(User user, CancellationToken cancellationToken);
+    bool IsApplicationSortAndFilterValid(Entities.User user, IValidationBag bag);
 }

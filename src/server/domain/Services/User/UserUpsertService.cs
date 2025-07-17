@@ -58,6 +58,19 @@ public class UserUpsertService(
         return await InternalValidateAsync(true, user, cancellationToken);
     }
 
+    public bool IsApplicationSortAndFilterValid(Entities.User user, IValidationBag bag)
+    {
+        if (user.ApplicationSearchAndSortJSON != null
+            && user.ApplicationSearchAndSortJSON.Length > Entities.User.ApplicationSearchAndSortJSONMaxLength)
+            {
+                bag.Add(new ValidationItem(
+                    stringLocalizer["Application search and sort filter cannot be greater then {0}",
+                                Entities.User.ApplicationSearchAndSortJSONMaxLength]));
+                return false;
+            }
+        return true;
+    }
+
     protected async Task<IValidationBag> InternalValidateAsync(bool fullValidation, Entities.User user, CancellationToken cancellationToken)
     {
         var bag = new ValidationBag();
@@ -113,6 +126,8 @@ public class UserUpsertService(
             if (!SupportedTimeZones.TimeZones.ContainsKey(user.TimeZone))
                 bag.Add(new ValidationItem(stringLocalizer["Timezone {0} is not a supported timezone.", user.TimeZone]));
         }
+
+        IsApplicationSortAndFilterValid(user, bag);
 
         end:
             return bag;
