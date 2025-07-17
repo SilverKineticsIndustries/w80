@@ -102,7 +102,8 @@ describe("Application", () => {
 
             cy.visit("/");
 
-            cy.sel('sort-type-filter').select('CompanyName');
+            const sortType = 'CompanyName';
+            cy.sel('sort-type-filter').select(sortType);
             cy.sel('sort-type-invert-filter').check();
 
             cy.logout();
@@ -111,7 +112,7 @@ describe("Application", () => {
             const password = Cypress.env("USER_PASSWORD");
             cy.loginAsUser(email, password);
 
-            cy.sel('sort-type-filter').should('have.value', 'CompanyName100');
+            cy.sel('sort-type-filter').should('have.value', sortType);
             cy.sel('sort-type-invert-filter').should('be.checked');
 
         });
