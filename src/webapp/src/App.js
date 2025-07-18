@@ -44,8 +44,16 @@ export default function App()
   const { i18n } = useTranslation();
   const [loading, setLoading] = useState(0);
   const [serverErrorMessage, setServerErrorMessage] = useState();
-  const [currentUserId] = useState(getAccessTokenClaimValue("ID"))
-  const [currentUser, setCurrentUser] = useState();
+  const [currentUserId, setCurrentUserId] = useState(getAccessTokenClaimValue("ID"))
+  const [currentUser, setCurrentUserData] = useState();
+
+  const setCurrentUser = (user) => {
+    setCurrentUserData(user);
+    if (user)
+      setCurrentUserId(user.id);
+    else
+      setCurrentUserId();
+  };
 
   useEffect(() => {
     if (currentUserId)
