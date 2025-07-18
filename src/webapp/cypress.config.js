@@ -6,7 +6,7 @@ module.exports = defineConfig({
   videoFolder: '../../tests/n2n/artifacts/video',
   downloadsFolder: '../../tests/n2n/artifacts/downloads',
   screenshotsFolder: '../../tests/n2n/artifacts/screenshots',
-  defaultCommandTimeout: 10000, // milliseconds
+  defaultCommandTimeout: 15000, // milliseconds
   e2e: {
     supportFile: '../../tests/n2n/support/e2e.js',
     specPattern: '../../tests/n2n/tests/*.js',

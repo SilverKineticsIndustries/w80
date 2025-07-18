@@ -32,8 +32,15 @@ const isValidHttpUrl = (val) => {
     return url.protocol === "http:" || url.protocol === "https:";
 }
 
-const getUserCulture = () => {
+const getUserLocale = () => {
     var culture = getAccessTokenClaimValue('Culture');
+    if (!culture || culture.indexOf('-') === -1)
+        return 'en';
+    else
+        return culture.split('-')[0];
+}
+
+const getLocaleFromCulture = (culture) => {
     if (!culture || culture.indexOf('-') === -1)
         return 'en';
     else
@@ -75,4 +82,4 @@ const generateRandomColor = () => {
 }
 
 
-export { sortByName, sortById, isValidHttpUrl, getUserCulture, createdValidationError, onUpdateField, generateRandomColor }
+export { sortByName, sortById, isValidHttpUrl, getUserLocale, getLocaleFromCulture, createdValidationError, onUpdateField, generateRandomColor }

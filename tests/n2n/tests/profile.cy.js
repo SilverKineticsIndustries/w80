@@ -82,7 +82,37 @@ describe("Profile", () => {
       cy.sel("profile-culture")
         .should("have.value", "de-DE");
 
-      // Reset back to English so our tests run find (where we need to check content)
+      // Reset back to English so our tests other tests will work (where we need to check content, etc)
+      cy.sel("profile-culture")
+        .select("en-US")
+
+      cy.sel("profile-save")
+        .click()
+    })
+
+
+    it("User culture change should change labels accordingly", () => {
+
+      cy.visit('/');
+      cy.showUserMenu();
+
+      cy.sel("header-showprofile")
+        .click();
+
+      cy.sel("profile-culture")
+        .select("de-DE")
+
+      cy.sel("profile-save")
+        .click()
+
+      cy.showUserMenu()
+        .sel("header-showprofile")
+        .click();
+
+      cy.sel("profile-nickname-label")
+        .should("have.text", "Spitzname:")
+
+      // Reset back to English so our tests other tests will work (where we need to check content, etc)
       cy.sel("profile-culture")
         .select("en-US")
 

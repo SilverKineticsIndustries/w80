@@ -1,15 +1,15 @@
-import { getUserCulture } from "./common";
+import { getLocaleFromCulture } from "./common";
 
-export function printLocalizedDate(date)
+export function printLocalizedDate(culture, date)
 {
-    const locale = getUserCulture();
-    return new Intl.DateTimeFormat(locale, {year: 'numeric', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'}).format(new Date(date));
+    return new Intl.DateTimeFormat(getLocaleFromCulture(culture),
+        {year: 'numeric', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'}).format(new Date(date));
 }
 
-export function printLocalizedShortDate(date)
+export function printLocalizedShortDate(culture, date)
 {
-    const locale = getUserCulture();
-    return new Intl.DateTimeFormat(locale, {year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit'}).format(new Date(date));
+    return new Intl.DateTimeFormat(getLocaleFromCulture(culture),
+        {year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit'}).format(new Date(date));
 }
 
 export function numbOfMinutesFromNowToDate(date)
@@ -17,13 +17,14 @@ export function numbOfMinutesFromNowToDate(date)
     return (new Date() - date) / (1000 * 60);
 }
 
-export function printUtcShortDate(date)
+export function printUtcShortDate(culture, date)
 {
     if (date)
     {
-        const locale = getUserCulture();
-        return new Intl.DateTimeFormat(locale, {year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: "GMT"}).format(new Date(date));
-    } else
+        return new Intl.DateTimeFormat(getLocaleFromCulture(culture),
+            {year: '2-digit', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: "GMT"}).format(new Date(date));
+    }
+    else
         return '';
 }
 

@@ -1,9 +1,6 @@
-import React, { memo } from 'react';
+import { useContext, memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getUserCulture } from '../../helpers/common';
-
-const culture = getUserCulture();
-const currencySymbol = (0).toLocaleString(culture, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/\d/g, '').trim()
+import { UserContext } from '../../App';
 
 const displayCompensationType = (type, t) =>
 {
@@ -19,7 +16,7 @@ const displayCompensationType = (type, t) =>
     }
 }
 
-const displayCompensation = (onlyMin, onlyMax, min, max) => {
+const displayCompensation = (currencySymbol, onlyMin, onlyMax, min, max) => {
     if (onlyMin)
         return ">= " + currencySymbol + min.toLocaleString();
     else if (onlyMax)
@@ -30,6 +27,10 @@ const displayCompensation = (onlyMin, onlyMax, min, max) => {
 
 const CompensationView = ({min, max, type, dataTestPrefix=""}) =>
 {
+    const { currentUser } = useContext(UserContext);
+    const currencySymbol = (0).toLocaleString(currentUser.culture,
+        { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/\d/g, '').trim()
+
     const { t } = useTranslation(null, { keyPrefix: "application" });
 
     const onlyMin = !!min && !!!max;
@@ -39,7 +40,7 @@ const CompensationView = ({min, max, type, dataTestPrefix=""}) =>
     if (display)
         return (
             <span >
-                <span data-test={`${dataTestPrefix}-compensation`}>{displayCompensation(onlyMin, onlyMax, min, max)}</span>
+                <span data-test={`${dataTestPrefix}-compensation`}>{displayCompensation(currencySymbol, onlyMin, onlyMax, min, max)}</span>
                 &nbsp;
                 <span data-test={`${dataTestPrefix}-compensation-type`}>{displayCompensationType(type, t)}</span>
             </span>

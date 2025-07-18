@@ -1,19 +1,23 @@
 import dayjs from "dayjs";
 import "dayjs/locale/de";
-import React, { useState, memo } from "react";
+import { useState, useContext, memo } from "react";
+import { UserContext } from "../../App";
 import { Calendar as BigCalendar, dayjsLocalizer } from "react-big-calendar";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import Appointment from "./Appointment";
-import { getUserCulture } from "../../helpers/common";
+import {getLocaleFromCulture} from "../../helpers/common";
 import { selectCalendarAppointmentsForApplications} from "../../store/applications/selectors";
 
 const localizer = dayjsLocalizer(dayjs)
 
 const Calendar = () =>
 {
-    dayjs.locale(getUserCulture());
+    const { currentUser } = useContext(UserContext);
+    const culture = currentUser.culture;
+
+    dayjs.locale(getLocaleFromCulture(culture));
     const [searchParams] = useSearchParams();
     const id = searchParams.get("id");
     const appointments = useSelector(selectCalendarAppointmentsForApplications);
@@ -47,7 +51,7 @@ const Calendar = () =>
                   endAccessor="endDateTimeUTC"
                   onSelectEvent={handleSelectAppointment}
                   onSelectSlot={handleSelectSlot}
-                  culture={"de-DE"}
+                  culture={culture}
                   selectable
                   style={{ height: 500 }}
                 />

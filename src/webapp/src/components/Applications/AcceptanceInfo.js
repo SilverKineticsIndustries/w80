@@ -1,7 +1,8 @@
-import React, { memo } from 'react';
+import { memo, useContext } from 'react';
 import { createUseStyles } from 'react-jss';
 import { useTranslation } from 'react-i18next';
 import { printLocalizedDate } from '../../helpers/dates';
+import { UserContext } from '../../App';
 
 const styles = createUseStyles({
     fieldset: {
@@ -30,6 +31,7 @@ const getMethodLabel = (t, val) => {
 const AcceptanceModal = ({acceptance}) =>
 {
     const classes = styles();
+    const { currentUser } = useContext(UserContext)
     const { t } = useTranslation(null, { keyPrefix: "application" });
 
     return (
@@ -38,7 +40,7 @@ const AcceptanceModal = ({acceptance}) =>
                 <fieldset className={classes.fieldset}>
                     <legend>{t("accepted")}</legend>
                     <div className="center">
-                        {printLocalizedDate(acceptance.acceptedUTC)}
+                        {printLocalizedDate(currentUser.culture, acceptance.acceptedUTC)}
                     </div>
                     <div className="center">
                         {t("acceptance-method")} {getMethodLabel(t, acceptance.method)}

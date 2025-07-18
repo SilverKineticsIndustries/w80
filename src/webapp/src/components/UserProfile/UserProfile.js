@@ -141,7 +141,7 @@ const UserProfile = ({onClose}) =>
                         </div>
                         <div>
                             <label>
-                                <div className={classes.labelText}>{t("nickname")}:</div>
+                                <div className={classes.labelText} data-test="profile-nickname-label">{t("nickname")}:</div>
                                 <input name="nickname" type="text" value={userProfile.nickname || ""} data-test="profile-nickname"
                                     onChange={onFieldChange} className={classes.inputControl} autoComplete="false" />
                                     <MaxLength val={userProfile.email} max={50} />
