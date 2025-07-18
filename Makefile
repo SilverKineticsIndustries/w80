@@ -18,8 +18,8 @@ init:                    ## Initialize development environment
 	@read -p ">> Do you want to set /proc/sys/fs/inotify/max_user_instances to 256? (Required by cypress n2n tests) Y/N (default N):" setinotify; 		\
 	if [ "$$setinotify" = "Y" ]; then 																										\
 		sudo bash -c 'echo 256 > /proc/sys/fs/inotify/max_user_instances'; 																	\
-    fi                                                                          
-	@echo ">> Symlinking to .githooks ..." 
+    fi
+	@echo ">> Symlinking to .githooks ..."
 	git config --local core.hooksPath .githooks/
 	@echo W80_Database__Name=W80 >> .env
 	@echo W80_CaptchaKey= >> .env
@@ -63,7 +63,7 @@ init:                    ## Initialize development environment
 	@echo W80_Tests_User_Password=longpassword123 >> .env
 	@echo W80_Tests_Admin_Password=longpassword123 >> .env
 	@echo ASPNETCORE_ENVIRONMENT=Development >> .env
-	@echo REACT_APP_BASE_API=http://localhost:"$$APIPORT" >> .env
+	@echo REACT_APP_BASE_API=http://localhost:15001 >> .env
 	@echo REACT_APP_BASE_API_TIMEOUT_IN_MILLISECONDS=5000 >> .env
 	@echo REACT_APP_NOTIFICATION_CHECK_IN_MILLISECONDS=30000 >> .env
 	@echo REACT_APP_BROWSER_NOTIFICATIONS_THRESHOLD_IN_MINUTES=30 >> .env
