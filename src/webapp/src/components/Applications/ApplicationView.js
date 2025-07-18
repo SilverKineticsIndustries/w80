@@ -250,7 +250,7 @@ const ApplicationView = ({ id, onBeginEdit, allowEdit = false,
                             <fieldset>
                                 <legend>{t("role-description")}</legend>
                                 <div className={classes.roleDescriptionContent} data-test={`application-view-${id}-role-description`}>
-                                    {(application.roleDescription || "").replace('\n', '<br/>')}
+                                    {application.roleDescription}
                                 </div>
                             </fieldset>
                         </div>
@@ -302,7 +302,7 @@ const ApplicationView = ({ id, onBeginEdit, allowEdit = false,
                                 <fieldset style={{ "width": "100%" }}>
                                     <legend>{t("additional-info")}</legend>
                                     <div className={classes.additionalInfoValue} data-test={`application-view-${id}-additional-info`}>
-                                        {(application.additionalInfo || "").replace('\n', "<br/>")}
+                                        {application.additionalInfo}
                                     </div>
                                 </fieldset>
                             </div>
